@@ -38,6 +38,7 @@ module "load_balancer_dev" {
     env_name = var.dev_env_name
     eks_fargate_profile_kubesystem = module.eks_cluster.eks_fargate_profile_kubesystem
 }
+/*
 module "external_secrets_dev"{
     source = "../modules/external-secrets-dev"
     eks_cluster = module.eks_cluster.eks_cluster
@@ -49,7 +50,7 @@ module "external_secrets_dev"{
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
 }
-
+*/
 module "efs" {
     source = "../modules/efs"
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
