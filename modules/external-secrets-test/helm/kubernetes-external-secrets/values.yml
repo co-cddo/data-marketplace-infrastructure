@@ -1,0 +1,7 @@
+serviceAccount:
+  name: "dm-frontend-sa"
+  annotations: {
+    eks.amazonaws.com/role-arn: "${roleArn}"
+  }
+securityContext:
+  fsGroup: 65534

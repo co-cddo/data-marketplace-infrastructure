@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: application
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dm-backend-api-fuseki
+  namespace: application
+  labels:
+    app: dm-backend-api-fuseki
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dm-backend-api-fuseki
+  template:
+    metadata:
+      labels:
+        app: dm-backend-api-fuseki
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+      containers:
+      - name: c-dm-backend-api-fuseki
+        image: 855859226163.dkr.ecr.eu-west-2.amazonaws.com/dm-backend-fuseki:ver0.0.1
+        resources:
+          requests:
+            memory: "0.5Gi"
+            cpu: "0.25"
+        env:
+          - name: ENABLE_UPDATE
+            value: "true"
+          - name: ENABLE_DATA_WRITE
+            value: "true"
+          - name: ENABLE_UPLOAD
+            value: "true"
+        ports:
+        - name: http
+          containerPort: 3030
+        imagePullPolicy: IfNotPresent
+      nodeSelector:
+        kubernetes.io/os: linux

@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: application
+  name: dm-frontend-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-2:855859226163:certificate/a27b5365-a70a-4caa-bed2-ddba9326e448
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/load-balancer-name: dm-tst-eks-alb-frontend
+    alb.ingress.kubernetes.io/auth-type: cognito
+    alb.ingress.kubernetes.io/auth-idp-cognito: '{"userPoolARN":"arn:aws:cognito-idp:eu-west-2:855859226163:userpool/eu-west-2_91AbtrwOd","userPoolClientID":"5h7lh8l229mvo15ie4uoc8l7h8","userPoolDomain":"dm-gen"}'
+    alb.ingress.kubernetes.io/auth-scope: 'openid'
+    alb.ingress.kubernetes.io/auth-session-cookie: AWSELBAuthSessionCookie
+    alb.ingress.kubernetes.io/auth-session-timeout: '86400'
+    alb.ingress.kubernetes.io/actions.forward-single-tg: >
+      {"type":"forward","targetGroupARN": ""}
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=false
+      [{"field":"path-pattern","pathPatternConfig":{"values":["/find"]}}]
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: dm-frontend-service
+              port:
+                number: 80
