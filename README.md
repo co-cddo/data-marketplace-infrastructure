@@ -12,6 +12,8 @@ Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 Run `terraform apply`
 
+If you get any of the errors described bellow, resolve them and then run `terraform apply` again.
+
 At the end, you would need to update your Kubernetes context to access the cluster with the following command:
 
 `aws eks update-kubeconfig --name dm-eks-dev --region eu-north-1`
@@ -34,6 +36,8 @@ Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 Run `terraform apply`
 
+If you get any of the errors described bellow, resolve them and then run `terraform apply` again.
+
 At the end, you would need to update your Kubernetes context to access the cluster with the following command:
 
 `aws eks update-kubeconfig --name dm-eks-test --region eu-north-1`
@@ -45,6 +49,20 @@ To start the ALB, go to the app folder and create deployments and services for f
 
 for each file.
 
+### To destroy the env:
+If you want to destroy the dev environment:
+
+* First, remove the ALB and Target Groups manually from the AWS Portal:
+<img width="1511" alt="Screenshot 2023-09-29 at 15 45 43" src="https://github.com/co-cddo/data-marketplace-infrastructure/assets/117096090/bfe6cbe2-8c4a-40fc-8819-5e66c0c82f36">
+
+
+<img width="848" alt="Screenshot 2023-09-29 at 15 46 10" src="https://github.com/co-cddo/data-marketplace-infrastructure/assets/117096090/e3294613-76fd-4223-8890-6731d0a510a9">
+
+* `cd dev`, then run `terraform destroy`
+
+* Same steps to destroy test environment.
+
+  
 ### Errors:
 
 If you see the following errors: 
