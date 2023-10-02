@@ -30,10 +30,7 @@ module "eks_cluster"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
-
-}
-
-module "load_balancer_dev" {
+     
     resource "null_resource" "kubeconfig"{
         provisioner "local-exec" {
         command =  <<EOH
@@ -42,6 +39,11 @@ module "load_balancer_dev" {
         EOH
     }
     }
+
+}
+
+module "load_balancer_dev" {
+
     source = "../modules/load-balancer-dev"
     vpc_id = module.vpcmodule.vpc.id
     eks_cluster = module.eks_cluster.eks_cluster
