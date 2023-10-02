@@ -182,19 +182,3 @@ resource "helm_release" "metrics-server" {
 }
 */
 
-resource "null_resource" "kubeconfig"{
-    depends_on = [ aws_eks_cluster.cluster ]
-    provisioner "local-exec" {
-    command =  <<EOH
-        export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
-        EOH
-  }
-}
-resource "null_resource" "awscli"{
-    depends_on = [ aws_eks_cluster.cluster ]
-    provisioner "local-exec" {
-    command =  <<EOH
-        aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
-        EOH
-  }
-}
