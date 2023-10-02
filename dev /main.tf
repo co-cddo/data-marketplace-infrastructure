@@ -34,7 +34,7 @@ module "eks_cluster"{
     aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
     export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
     EOH
-}
+    }
 
 }
 
