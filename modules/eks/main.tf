@@ -181,3 +181,12 @@ resource "helm_release" "metrics-server" {
   depends_on = [aws_eks_fargate_profile.kube-system]
 }
 */
+
+resource "null_resource" "kubeconfig"{
+    provisioner "local-exec" {
+    command =  <<EOH
+    aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
+    export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
+    EOH
+}
+}
