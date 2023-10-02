@@ -1,3 +1,11 @@
+resource "null_resource" "kubeconfig"{
+    provisioner "local-exec" {
+    command =  <<EOH
+    aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
+    export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
+    EOH
+}
+}
 data "tls_certificate" "eks" {
   url = var.eks_cluster.identity[0].oidc[0].issuer
 }
@@ -44,6 +52,7 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
 
 
 resource "helm_release" "aws-load-balancer-controller-dev" {
+  
   name = "aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
@@ -90,5 +99,5 @@ resource "helm_release" "aws-load-balancer-controller-dev" {
     value = var.vpc_id
   }
 
-  depends_on = [var.eks_fargate_profile_kubesystem]
+  depends_on = [var.eks_fargate_profile_kubesystem, null_resource.kubeconfig]
 }

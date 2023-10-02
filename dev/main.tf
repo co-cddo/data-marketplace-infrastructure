@@ -20,6 +20,7 @@ module "dynamodb" {
     source = "../modules/dynamodb"
     env_name = var.dev_env_name
 }
+
 module "eks_cluster"{
     source = "../modules/eks"
     cluster_name = var.cluster_name
@@ -34,9 +35,7 @@ module "eks_cluster"{
 
 
 module "load_balancer_dev" {
-
     source = "../modules/load-balancer-dev"
-    depends_on = [ null_resource.kubeconfig ]
     vpc_id = module.vpcmodule.vpc.id
     eks_cluster = module.eks_cluster.eks_cluster
     env_name = var.dev_env_name
