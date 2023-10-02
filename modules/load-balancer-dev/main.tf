@@ -44,6 +44,8 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
 resource "null_resource" "kubeconfig"{
     depends_on = [ var.eks_cluster ]
     provisioner "local-exec" {
+        interpreter = ["/bin/bash", "-c"]
+        working_dir = "/home/ec2-user/newinfra/data-marketplace-infrastructure/dev"
         command =  "export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config"
     }
 }
@@ -104,5 +106,5 @@ resource "helm_release" "aws-load-balancer-controller-dev" {
     value = var.vpc_id
   }
 
-  depends_on = [null_resource.kubeconfig,var.eks_fargate_profile_kubesystem]
+  depends_on = [null_resource.kubeconfig, var.eks_fargate_profile_kubesystem]
 }
