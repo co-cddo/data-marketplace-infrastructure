@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
   policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
 }
 resource "null_resource" "kubeconfig"{
-    depends_on = [ var.eks_cluster ]
+    depends_on = [ var.eks_cluster, var.eks_fargate_profile_kubesystem, var.eks_fargate_profile_staging ]
     provisioner "local-exec" {
         interpreter = ["/bin/bash", "-c"]
         working_dir = "/home/ec2-user/newinfra/data-marketplace-infrastructure/dev"
