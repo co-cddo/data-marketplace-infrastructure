@@ -1,11 +1,3 @@
-resource "null_resource" "kubeconfig"{
-    provisioner "local-exec" {
-    command =  <<EOH
-    aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
-    export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
-    EOH
-}
-}
 data "tls_certificate" "eks" {
   url = var.eks_cluster.identity[0].oidc[0].issuer
 }
