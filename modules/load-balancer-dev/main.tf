@@ -82,7 +82,7 @@ resource "helm_release" "aws-load-balancer-controller-dev" {
   # EKS Fargate specific
   set {
     name  = "region"
-    value = "eu-north-1"
+    value = "eu-west-3"
   }
 
   set {
