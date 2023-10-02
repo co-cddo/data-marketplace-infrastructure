@@ -44,10 +44,8 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
 resource "null_resource" "kubeconfig"{
     depends_on = [ var.eks_cluster ]
     provisioner "local-exec" {
-    command =  <<EOH
-        export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
-        EOH
-  }
+        command =  "export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config"
+    }
 }
 /*resource "null_resource" "awscli"{
     depends_on = [ var.eks_cluster ]
