@@ -31,14 +31,7 @@ module "eks_cluster"{
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
      
-    resource "null_resource" "kubeconfig"{
-        provisioner "local-exec" {
-        command =  <<EOH
-        aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
-        export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
-        EOH
-    }
-    }
+
 
 }
 
