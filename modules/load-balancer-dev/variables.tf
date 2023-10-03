@@ -5,3 +5,4 @@ variable "eks_fargate_profile_kubesystem" {}
 variable "eks_fargate_profile_staging" {}
 variable "cluster_name" {}
 variable "region" {}
+variable "user_name"{}
