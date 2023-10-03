@@ -49,7 +49,7 @@ resource "null_resource" "kubeconfig"{
         command =  "export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config"
     }
 }
-/*resource "null_resource" "awscli"{
+resource "null_resource" "awscli"{
     depends_on = [ var.eks_cluster ]
     provisioner "local-exec" {
     command =  <<EOH
@@ -57,7 +57,6 @@ resource "null_resource" "kubeconfig"{
         EOH
   }
 }
-*/
 resource "helm_release" "aws-load-balancer-controller-dev" {
   
   name = "aws-load-balancer-controller"
@@ -106,5 +105,5 @@ resource "helm_release" "aws-load-balancer-controller-dev" {
     value = var.vpc_id
   }
 
-  depends_on = [null_resource.kubeconfig, var.eks_fargate_profile_kubesystem]
+  depends_on = [null_resource.kubeconfig, null_resource.awscli, var.eks_fargate_profile_kubesystem]
 }
