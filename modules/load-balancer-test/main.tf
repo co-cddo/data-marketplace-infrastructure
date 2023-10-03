@@ -46,7 +46,7 @@ resource "null_resource" "kubeconfig"{
     depends_on = [ var.eks_cluster ]
     provisioner "local-exec" {
     command =  <<EOH
-        export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
+        export KUBE_CONFIG_PATH=/home/${var.user_name}/.kube/config
         EOH
   }
 }
@@ -99,7 +99,7 @@ resource "helm_release" "aws-load-balancer-controller-test" {
   # EKS Fargate specific
   set {
     name  = "region"
-    value = "eu-north-1"
+    value = "${var.region}"
   }
 
   set {
