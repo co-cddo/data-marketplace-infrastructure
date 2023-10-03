@@ -38,6 +38,7 @@ module "load_balancer_test" {
     eks_fargate_profile_staging = module.eks_cluster.eks_fargate_profile_staging
     region = var.region
     cluster_name = var.cluster_name
+    user_name = var.user_name
 }
 
 /*module "external_secrets_test"{
