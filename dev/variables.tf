@@ -29,3 +29,7 @@ variable "region"{
     type = string
     default = "eu-west-3"
 }
+variable "user_name" {
+    type = string
+    default = "ec2-user"
+}

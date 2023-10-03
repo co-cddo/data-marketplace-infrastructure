@@ -44,9 +44,7 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
 resource "null_resource" "kubeconfig"{
     depends_on = [ var.eks_cluster, var.eks_fargate_profile_kubesystem, var.eks_fargate_profile_staging ]
     provisioner "local-exec" {
-        interpreter = ["/bin/bash", "-c"]
-        working_dir = "/home/ec2-user/newinfra/data-marketplace-infrastructure/dev"
-        command =  "export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config"
+        command =  "export KUBE_CONFIG_PATH=/home/${user_name}/.kube/config"
     }
 }
 resource "null_resource" "awscli"{
@@ -97,7 +95,7 @@ resource "helm_release" "aws-load-balancer-controller-dev" {
   # EKS Fargate specific
   set {
     name  = "region"
-    value = "eu-west-3"
+    value = "${var.region}"
   }
 
   set {
