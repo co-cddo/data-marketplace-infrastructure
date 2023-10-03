@@ -12,11 +12,9 @@ Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 Run `terraform apply`
 
-<<<<<<< HEAD
-=======
 If you get any of the errors described bellow, resolve them and then run `terraform apply` again.
 
->>>>>>> 3bb9c7c4049e4226c3a3683fc2252a619b70e2d0
+
 At the end, you would need to update your Kubernetes context to access the cluster with the following command:
 
 `aws eks update-kubeconfig --name dm-eks-dev --region eu-north-1`
@@ -39,11 +37,9 @@ Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 Run `terraform apply`
 
-<<<<<<< HEAD
-=======
 If you get any of the errors described bellow, resolve them and then run `terraform apply` again.
 
->>>>>>> 3bb9c7c4049e4226c3a3683fc2252a619b70e2d0
+
 At the end, you would need to update your Kubernetes context to access the cluster with the following command:
 
 `aws eks update-kubeconfig --name dm-eks-test --region eu-north-1`
@@ -55,8 +51,6 @@ To start the ALB, go to the app folder and create deployments and services for f
 
 for each file.
 
-<<<<<<< HEAD
-=======
 ### To destroy the env:
 If you want to destroy the dev environment:
 
@@ -70,8 +64,6 @@ If you want to destroy the dev environment:
 
 * Same steps to destroy test environment.
 
-  
->>>>>>> 3bb9c7c4049e4226c3a3683fc2252a619b70e2d0
 ### Errors:
 
 If you see the following errors: 
@@ -99,8 +91,3 @@ run `aws eks update-kubeconfig --name dm-eks-test --region eu-north-1`
 * For Parameter Store: https://devpress.csdn.net/cicd/62ec66e689d9027116a10dbd.html and https://github.com/unfor19/terraform-aws-ssm-parameters/blob/master/main.tf
   
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 3bb9c7c4049e4226c3a3683fc2252a619b70e2d0
