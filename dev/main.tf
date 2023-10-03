@@ -20,6 +20,7 @@ module "dynamodb" {
     source = "../modules/dynamodb"
     env_name = var.dev_env_name
 }
+
 module "eks_cluster"{
     source = "../modules/eks"
     cluster_name = var.cluster_name
@@ -29,21 +30,21 @@ module "eks_cluster"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
-    provisioner "local-exec" {
-    command =  <<EOH
-    aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
-    export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
-    EOH
-    }
+    region = var.region
+
 
 }
 
 module "load_balancer_dev" {
+
     source = "../modules/load-balancer-dev"
     vpc_id = module.vpcmodule.vpc.id
     eks_cluster = module.eks_cluster.eks_cluster
     env_name = var.dev_env_name
     eks_fargate_profile_kubesystem = module.eks_cluster.eks_fargate_profile_kubesystem
+    eks_fargate_profile_staging = module.eks_cluster.eks_fargate_profile_staging
+    region = var.region
+    cluster_name = var.cluster_name
 }
 /*
 module "external_secrets_dev"{

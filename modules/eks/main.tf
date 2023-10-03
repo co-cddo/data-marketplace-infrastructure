@@ -181,3 +181,4 @@ resource "helm_release" "metrics-server" {
   depends_on = [aws_eks_fargate_profile.kube-system]
 }
 */
+
