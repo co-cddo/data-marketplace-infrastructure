@@ -27,7 +27,7 @@ module "eks_cluster"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
-
+    region = var.region
 }
 module "load_balancer_test" {
     source = "../modules/load-balancer-test"
