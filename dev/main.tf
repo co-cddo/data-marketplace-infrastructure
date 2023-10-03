@@ -29,8 +29,15 @@ module "eks_cluster"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
+    provisioner "local-exec" {
+    command =  <<EOH
+    aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
+    export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config
+    EOH
+    }
 
 }
+
 module "load_balancer_dev" {
     source = "../modules/load-balancer-dev"
     vpc_id = module.vpcmodule.vpc.id
