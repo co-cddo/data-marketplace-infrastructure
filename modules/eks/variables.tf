@@ -1,3 +1,4 @@
+variable "region" {}
 variable "cluster_name" {}
 variable "env_name" {}
 variable "cluster_version" {}

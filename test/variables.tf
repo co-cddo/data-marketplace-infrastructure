@@ -30,5 +30,5 @@ variable "region" {
 }
 variable "user_name" {
   type = string
-  default = "ec2-user"
+  default = "ssm-user"
 }

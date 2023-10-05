@@ -1,5 +1,13 @@
+
+
+
 //IAM role for EKS - used to make API calls to AWS services
 //i.e. to create managed node pools
+
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+}
 
 
 resource "aws_iam_role" "eks-cluster" {
@@ -48,8 +56,60 @@ resource "aws_eks_cluster" "cluster" {
     ]
   }
 
+  # csutom controllers need this config (loadbalancer, external secret)
+  provisioner "local-exec" {
+    command =  "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}"
+
+  }
+
+
   depends_on = [aws_iam_role_policy_attachment.amazon-eks-cluster-policy]
 }
+
+
+resource "kubernetes_namespace" "ns-app" {
+  metadata {
+    name = "app"
+  }
+}
+
+
+
+
+
+
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+resource "aws_iam_openid_connect_provider" "oidcprovider" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+
+
+
+# csutom controllers need this config (loadbalancer, external secret)
+resource "null_resource" "awscli"{
+    depends_on = [aws_eks_cluster.cluster]
+    provisioner "local-exec" {
+    command =  "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}"
+
+  }
+}
+
+# For accessing from aws console
+resource "null_resource" "cluster" {
+
+  depends_on = [null_resource.awscli]
+
+
+  provisioner "local-exec" {
+    command = "kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"
+  }
+}
+
+
 
 
 resource "aws_iam_role" "eks-fargate-profile" {
@@ -89,9 +149,10 @@ resource "aws_eks_fargate_profile" "kube-system" {
   }
 }
 
-resource "aws_eks_fargate_profile" "staging" {
+
+resource "aws_eks_fargate_profile" "fp-app" {
   cluster_name           = aws_eks_cluster.cluster.name
-  fargate_profile_name   = "staging"
+  fargate_profile_name   = "fp-app"
   pod_execution_role_arn = aws_iam_role.eks-fargate-profile.arn
 
   # These subnets must have the following resource tag: 
@@ -102,9 +163,12 @@ resource "aws_eks_fargate_profile" "staging" {
   ]
 
   selector {
-    namespace = "staging"
+    namespace = "app"
   }
 }
+
+/*
+
 
 
 //remove ec2 annotation from CoreDNS deployment
@@ -148,7 +212,7 @@ data "aws_eks_cluster" "this" {
 data "aws_eks_cluster_auth" "this" {
   name = aws_eks_cluster.cluster.name
 }
-
+*/
 
 provider "helm" {
   kubernetes {
