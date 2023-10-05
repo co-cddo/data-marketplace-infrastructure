@@ -1,5 +1,19 @@
 # Data-marketplace infrastructure
 
+
+check the kubectl config  
+check helm list -A  
+
+check region setting
+
+destroy:  
+  remove EFS test
+  remove ALB test
+  remove persistence test
+  remove ext.sec.
+
+
+
 ## This code is for Dev and Test Environments
 
 Can be used to create dev and test infrasturcture which includes VPCs with subnets, EKS clusters, ALBs, EFS, Parameter Store with secrets and external secrets.

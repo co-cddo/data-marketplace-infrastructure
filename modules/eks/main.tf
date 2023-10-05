@@ -167,12 +167,14 @@ resource "aws_eks_fargate_profile" "fp-app" {
   }
 }
 
-/*
 
 
 
-//remove ec2 annotation from CoreDNS deployment
 
+// remove ec2 annotation from CoreDNS deployment
+// Resolve CoreDNS pods in a Pending state
+// https://repost.aws/knowledge-center/eks-resolve-pending-fargate-pods
+// https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html#fargate-gs-coredns
 data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.cluster.id
 }
@@ -212,7 +214,7 @@ data "aws_eks_cluster" "this" {
 data "aws_eks_cluster_auth" "this" {
   name = aws_eks_cluster.cluster.name
 }
-*/
+
 
 provider "helm" {
   kubernetes {

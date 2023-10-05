@@ -42,6 +42,7 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
   name               = "aws-load-balancer-controller-${var.env_name}"
 }
 
+
 resource "aws_iam_policy" "aws_load_balancer_controller" {
   policy = file("${path.module}/LBControllerTF.json")
   name   = "LBControllerTF-${var.env_name}"
@@ -116,6 +117,6 @@ resource "helm_release" "aws-load-balancer-controller" {
     value = var.vpc_id
   }
   timeout = 600
-#  depends_on = [var.eks_fargate_profile_kubesystem ]
+  depends_on = [var.eks_fargate_profile_kubesystem ]
 }
 

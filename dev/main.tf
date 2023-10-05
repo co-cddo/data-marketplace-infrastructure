@@ -40,7 +40,7 @@ module "load_balancer_dev" {
     eks_cluster = module.eks_cluster.eks_cluster
     project_code = var.project_code
     env_name = var.dev_env_name
-    # eks_fargate_profile_kubesystem = module.eks_cluster.eks_fargate_profile_kubesystem
+    eks_fargate_profile_kubesystem = module.eks_cluster.eks_fargate_profile_kubesystem
     # eks_fargate_profile_app = module.eks_cluster.eks_fargate_profile_app
     region = var.region
     cluster_name = var.cluster_name
