@@ -4,5 +4,5 @@ terraform {
       key = "dev/terraform.tfstate"
       region = "eu-west-2"
       dynamodb_table = "dm-gen-dynamodb-terraform-lock-table"
-    }  
+    }
 }
