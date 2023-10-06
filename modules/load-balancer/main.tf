@@ -53,25 +53,6 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" 
   policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
 }
 
-/*
-resource "null_resource" "kubeconfig"{
-    depends_on = [ var.eks_cluster, var.eks_fargate_profile_kubesystem, var.eks_fargate_profile_app ]
-    provisioner "local-exec" {
-        command =  "export KUBE_CONFIG_PATH=/home/${var.user_name}/.kube/config"
-    }
-}
-
-
-resource "null_resource" "awscli"{
-    depends_on = [ var.eks_cluster ]
-    provisioner "local-exec" {
-    command =  "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}"
-        
-  }
-}
-
-*/
-
 
 resource "helm_release" "aws-load-balancer-controller" {
   

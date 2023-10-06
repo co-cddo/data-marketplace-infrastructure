@@ -30,6 +30,7 @@ module "eks_cluster"{
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
     region = var.region
+    app_namespace = var.app_namespace
 
 }
 
@@ -59,6 +60,8 @@ module "external_secrets_dev"{
     region = var.region
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
+    sa_name = "externalsecret-sa"
+    sa_namespace = var.app_namespace
 }
 
 module "efs" {
@@ -71,7 +74,7 @@ module "efs" {
 
 module "app_params" {
     source  = "../modules/parameter-store"
-    prefix = "/dm/dev/data-marketplace/gen/"
+    prefix = "/${var.project_code}/${var.env_name}/services/"
     securestring_parameters = [
         "API_ENDPOINT",
         "SSO_AUTH_URL",

@@ -9,6 +9,11 @@ variable "public_subnets" {
     default = ["10.10.1.0/24", "10.10.2.0/24"]
 }
 
+variable "env_name"   {
+    type = string
+    default = "dev"
+}
+
 variable "dev_env_name"   {
     type = string
     default = "dev"
@@ -32,4 +37,8 @@ variable "region"{
 variable "user_name" {
   type = string
   default = "ssm-user"
+}
+variable "app_namespace" {
+  type = string
+  default = "app"
 }

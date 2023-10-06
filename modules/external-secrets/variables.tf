@@ -7,6 +7,10 @@ variable "openid_connector" {}
 variable "env_name" {}
 variable "region" {}
 
+variable "sa_name" {}
+variable "sa_namespace" {}
+
+
 variable "private_subnet_one_id" {
     
 }

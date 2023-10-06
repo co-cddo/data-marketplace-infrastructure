@@ -27,6 +27,59 @@ resource "aws_eks_fargate_profile" "externalsecrets" {
 
 
 
+
+
+# service account
+data "aws_iam_policy_document" "sa_assumerole_trust" {
+  statement{
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+  condition {
+    test     = "StringEquals"
+    variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
+    values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
+  }
+
+  principals {
+    identifiers = [var.openid_connector.arn]
+    type        = "Federated"
+  }
+  }
+}
+
+resource "kubernetes_service_account" "service_account" {
+  metadata {
+    name      = var.sa_name
+    namespace = var.sa_namespace
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.sa_role.arn
+    }
+  }
+}
+
+
+resource "aws_iam_role" "sa_role" {
+  assume_role_policy = data.aws_iam_policy_document.sa_assumerole_trust.json
+  name               = "${var.project_code}-${var.env_name}-role-eks-externalsecrets-controller"
+}
+
+
+resource "aws_iam_policy" "sa_role_policy" {
+  policy = file("${path.module}/sa-role-policy.json")
+  name   = "${var.project_code}-${var.env_name}-policy-externalsecrets"
+}
+
+resource "aws_iam_role_policy_attachment" "policy_attach" {
+  role       = aws_iam_role.sa_role.name
+  policy_arn = aws_iam_policy.sa_role_policy.arn
+}
+
+
+
+
+
+
 resource "helm_release" "external-secrets" {
   name       = "${var.eks_cluster.name}-external-secrets"
   repository = "https://charts.external-secrets.io"
@@ -39,7 +92,7 @@ resource "helm_release" "external-secrets" {
     value = "true"
   }
   set {
-    name  = "webhook.por"
+    name  = "webhook.port"
     value = "9443"
     type  = "string"
   }

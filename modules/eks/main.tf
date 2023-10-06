@@ -69,7 +69,7 @@ resource "aws_eks_cluster" "cluster" {
 
 resource "kubernetes_namespace" "ns-app" {
   metadata {
-    name = "app"
+    name = var.app_namespace
   }
 }
 
