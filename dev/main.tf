@@ -47,6 +47,8 @@ module "load_balancer_dev" {
     cluster_name = var.cluster_name
     user_name = var.user_name
     openid_connector = module.eks_cluster.openid_connector
+    sa_name = "aws-alb-sa"
+    sa_namespace = "kube-system"
 }
 
 module "external_secrets_dev"{

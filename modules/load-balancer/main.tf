@@ -7,19 +7,8 @@ provider "helm" {
   }
 }
 
-/*
-data "tls_certificate" "eks" {
-  url = var.eks_cluster.identity[0].oidc[0].issuer
-}
-
-resource "aws_iam_openid_connect_provider" "eks" {
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
-  url             = var.eks_cluster.identity[0].oidc[0].issuer
-}
-*/
 //eks service account
-data "aws_iam_policy_document" "aws_load_balancer_controller_assume_role_policy" {
+data "aws_iam_policy_document" "sa_assumerole_trust" {
   statement{
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
@@ -27,7 +16,7 @@ data "aws_iam_policy_document" "aws_load_balancer_controller_assume_role_policy"
   condition {
     test     = "StringEquals"
     variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
-    values   = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
+    values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
   }
 
   principals {
@@ -36,23 +25,21 @@ data "aws_iam_policy_document" "aws_load_balancer_controller_assume_role_policy"
   }
   }
 }
-#should have env specified
-resource "aws_iam_role" "aws_load_balancer_controller" {
-  assume_role_policy = data.aws_iam_policy_document.aws_load_balancer_controller_assume_role_policy.json
-  name               = "aws-load-balancer-controller-${var.env_name}"
+
+resource "aws_iam_role" "sa_role" {
+  assume_role_policy = data.aws_iam_policy_document.sa_assumerole_trust.json
+  name               = "${var.project_code}-${var.env_name}-role-eks-aws-alb-controller"
 }
 
-
-resource "aws_iam_policy" "aws_load_balancer_controller" {
-  policy = file("${path.module}/LBControllerTF.json")
-  name   = "LBControllerTF-${var.env_name}"
+resource "aws_iam_policy" "sa_role_policy" {
+  policy = file("${path.module}/sa-role-policy.json")
+  name   = "${var.project_code}-${var.env_name}-policy-eks-alb"
 }
 
-resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_attach" {
-  role       = aws_iam_role.aws_load_balancer_controller.name
-  policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
+resource "aws_iam_role_policy_attachment" "policy_attach" {
+  role       = aws_iam_role.sa_role.name
+  policy_arn = aws_iam_policy.sa_role_policy.arn
 }
-
 
 resource "helm_release" "aws-load-balancer-controller" {
   
@@ -79,12 +66,12 @@ resource "helm_release" "aws-load-balancer-controller" {
 
   set {
     name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
+    value = var.sa_name
   }
 
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = aws_iam_role.aws_load_balancer_controller.arn
+    value = aws_iam_role.sa_role.arn
   }
 
   # EKS Fargate specific

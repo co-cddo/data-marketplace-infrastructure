@@ -8,3 +8,6 @@ variable "cluster_name" {}
 variable "region" {}
 variable "user_name"{}
 variable "openid_connector" {}
+
+variable "sa_name" {}
+variable "sa_namespace" {}
