@@ -34,7 +34,7 @@ module "eks_cluster"{
 
 }
 
-module "load_balancer_dev" {
+module "load_balancer_test" {
 
     source = "../modules/load-balancer"
     vpc_id = module.vpcmodule.vpc.id
@@ -51,7 +51,7 @@ module "load_balancer_dev" {
     sa_namespace = "kube-system"
 }
 
-module "external_secrets_dev"{
+module "external_secrets_test"{
     source = "../modules/external-secrets"
     eks_cluster = module.eks_cluster.eks_cluster
     cluster_name = var.cluster_name
