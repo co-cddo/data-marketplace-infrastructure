@@ -11,6 +11,7 @@
             "Resource": [
                 "arn:aws:ssm:eu-west-2:855859226163:parameter/tst/data-marketplace/*",
                 "arn:aws:ssm:eu-west-2:855859226163:parameter/data-marketplace/*",
+		"arn:aws:ssm:eu-west-2:855859226163:parameter/*",
                 "arn:aws:ssm:eu-north-1:855859226163:parameter/*",
                 "arn:aws:ssm:eu-north-1:855859226163:*",
 		"arn:aws:ssm:eu-west-2:855859226163:*"

@@ -36,7 +36,7 @@ resource "aws_efs_file_system" "eks" {
   # }
 
   tags = {
-    Name = "dm-eks-filesystem-${var.env_name}"
+    Name = "${var.project_code}-${var.env_name}-efs"
   }
 }
 
