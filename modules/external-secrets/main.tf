@@ -51,6 +51,8 @@ resource "kubernetes_service_account" "service_account" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.sa_role.arn
     }
   }
+  # the extsec depends on cluster and so simplest way to depend on the cluster is this atm. 
+  depends_on = [aws_eks_fargate_profile.externalsecrets]
 }
 
 resource "aws_iam_role" "sa_role" {

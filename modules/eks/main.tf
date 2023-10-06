@@ -68,6 +68,7 @@ resource "kubernetes_namespace" "ns-app" {
   metadata {
     name = var.app_namespace
   }
+  depends_on = [aws_eks_cluster.cluster]
 }
 
 
