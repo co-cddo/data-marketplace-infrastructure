@@ -68,10 +68,13 @@ module "external_secrets_dev"{
 
 module "efs" {
     source = "../modules/efs"
+    project_code = var.project_code
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     eks_cluster = module.eks_cluster.eks_cluster
     env_name = var.dev_env_name
+    vpc_cidr = var.vpc_cidr
+    eks_vpc_id = module.vpcmodule.vpc.id
 }
 
 module "app_params" {
@@ -84,6 +87,7 @@ module "app_params" {
         "SSO_CLIENT_ID",
         "SSO_CLIENT_SECRET",
         "JWT_AUD",
-        "JWKS_URL"
+        "JWKS_URL",
+        "OPS_API_KEY"
     ]
 }
