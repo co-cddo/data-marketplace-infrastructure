@@ -8,23 +8,19 @@ module "vpcmodule"{
     cidr_vpc = var.vpc_cidr
     private_subnets = var.private_subnets
     public_subnets = var.public_subnets
-    env_name = var.test_env_name
+    env_name = var.env_name
     project_code = var.project_code
     
-    cluster_name = var.cluster_name
+    cluster_name = "${var.project_code}-${var.env_name}-eks-cluster"
     cluster_version = var.cluster_version
 
-}
-module "dynamodb" {
-    source = "../modules/dynamodb"
-    env_name = var.test_env_name
 }
 
 module "eks_cluster"{
     source = "../modules/eks"
-    cluster_name = var.cluster_name
+    project_code = var.project_code
+    env_name = var.env_name
     cluster_version = var.cluster_version
-    env_name = var.test_env_name
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     public_subnet_one_id = module.vpcmodule.public_subnets_output[0]
@@ -34,31 +30,29 @@ module "eks_cluster"{
 
 }
 
-module "load_balancer_test" {
+module "load_balancer" {
 
     source = "../modules/load-balancer"
     vpc_id = module.vpcmodule.vpc.id
     eks_cluster = module.eks_cluster.eks_cluster
     project_code = var.project_code
-    env_name = var.test_env_name
+    env_name = var.env_name
     eks_fargate_profile_kubesystem = module.eks_cluster.eks_fargate_profile_kubesystem
     # eks_fargate_profile_app = module.eks_cluster.eks_fargate_profile_app
     region = var.region
-    cluster_name = var.cluster_name
-    user_name = var.user_name
     openid_connector = module.eks_cluster.openid_connector
     sa_name = "aws-alb-sa"
     sa_namespace = "kube-system"
 }
 
-module "external_secrets_test"{
+module "external_secrets"{
     source = "../modules/external-secrets"
     eks_cluster = module.eks_cluster.eks_cluster
-    cluster_name = var.cluster_name
+    cluster_name = "${var.project_code}-${var.env_name}-eks-cluster"
     project_code = var.project_code
     iam_fargate = module.eks_cluster.iam_fargate
     openid_connector = module.eks_cluster.openid_connector
-    env_name = var.test_env_name
+    env_name = var.env_name
     region = var.region
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
@@ -68,10 +62,13 @@ module "external_secrets_test"{
 
 module "efs" {
     source = "../modules/efs"
+    project_code = var.project_code
     private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     eks_cluster = module.eks_cluster.eks_cluster
-    env_name = var.test_env_name
+    env_name = var.env_name
+    vpc_cidr = var.vpc_cidr
+    eks_vpc_id = module.vpcmodule.vpc.id
 }
 
 module "app_params" {
@@ -84,6 +81,7 @@ module "app_params" {
         "SSO_CLIENT_ID",
         "SSO_CLIENT_SECRET",
         "JWT_AUD",
-        "JWKS_URL"
+        "JWKS_URL",
+        "OPS_API_KEY"
     ]
 }
