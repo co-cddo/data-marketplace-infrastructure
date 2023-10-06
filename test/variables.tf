@@ -10,7 +10,7 @@ variable "public_subnets" {
 }
 variable "test_env_name"   {
     type = string
-    default = "test"
+    default = "tst"
 }
 variable "project_code" {
     type = string
