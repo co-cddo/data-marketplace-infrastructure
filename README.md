@@ -14,23 +14,25 @@ destroy:
 
 
 
+# Data-marketplace infrastructure
+
 ## This code is for Dev and Test Environments
 
 Can be used to create dev and test infrasturcture which includes VPCs with subnets, EKS clusters, ALBs, EFS, Parameter Store with secrets and external secrets.
 
-### For Dev Environment:
+### Pre-requisites:
 
-Run `cd dev`
+* Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
+* Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+* Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
+  
+### For Environment Creation:
+
+Run `cd dev` or `cd test`
 Run `terraform init`
 Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 Run `terraform apply`
-
-At the end, you would need to update your Kubernetes context to access the cluster with the following command:
-
-`aws eks update-kubeconfig --name dm-eks-dev --region eu-north-1`
-
-The name for the cluster and the region in the Terraform variables.tf file in the dev folder.
 
 To start the ALB, go to the app folder and create deployments and services for frontend, frontend-ingress, frontend-ingress-secure, backend-api  and fuseki by running:
 
@@ -39,43 +41,14 @@ To start the ALB, go to the app folder and create deployments and services for f
 for each file.
 
 
+### Destroy Resources:
 
-### For Test Environment:
+If you want to destroy the dev environment:
 
-Run `cd test`
-Run `terraform init`
-Run `terraform plan` and check the output.
-If the output is what you expect and there are no errors:
-Run `terraform apply`
+* First, remove the ALB and Target Groups manually from the AWS Portal:
 
-At the end, you would need to update your Kubernetes context to access the cluster with the following command:
+* `cd dev` or `cd test`, then run `terraform destroy`
 
-`aws eks update-kubeconfig --name dm-eks-test --region eu-north-1`
-
-The name for the cluster and the region in the Terraform variables.tf file in the test folder.
-To start the ALB, go to the app folder and create deployments and services for frontend, frontend-ingress, frontend-ingress-secure, backend-api  and fuseki by running:
-
-`kubectl apply -f <filename.yml>`
-
-for each file.
-
-### Errors:
-
-If you see the following errors: 
-
-* `Kubernetes cluster unreachable: invalid configuration: no configuration has been provided, try setting KUBERNETES_MASTER environment variable`
-
-run the following command:
-
-`export KUBE_CONFIG_PATH=/home/ec2-user/.kube/config`
-
-*  For the following error:
-
-<img width="1239" alt="Screenshot 2023-09-29 at 12 38 24" src="https://github.com/co-cddo/data-marketplace-infrastructure/assets/117096090/c7467e30-6dde-4597-814d-4f056a56fc22">
-
-run `aws eks update-kubeconfig --name dm-eks-test --region eu-north-1`
-
-* “Fixing ‘Cannot Re-Use a Name That Is Still In Use’ Error in Terraform Helm Kubernetes Deployments”: https://maripeddi-supraj.medium.com/fixing-cannot-re-use-a-name-that-is-still-in-use-error-in-terraform-helm-kubernetes-deployments-5c86afa3e8f9
 
 ### References:
 
