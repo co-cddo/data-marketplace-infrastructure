@@ -2,9 +2,13 @@ variable "region" {
     type = string
     default = "eu-north-1"
 }
+variable "dynamodb_tablename" {
+  type    = string
+  default = "dm-gen-dynamodb-terraform-lock-table"
+}
 variable "devops_policy_name" {
   type    = string
-  default = "devops-policy"
+  default = "dm-gen-devops-policy"
 }
 
 variable "devops_role_name" {
@@ -13,7 +17,7 @@ variable "devops_role_name" {
 }
 variable "developer_policy_name" {
   type    = string
-  default = "developer-policy"
+  default = "dm-gen-policy-developer"
 }
 
 variable "developer_role_name" {
@@ -23,7 +27,7 @@ variable "developer_role_name" {
 
 variable "readonly_policy_name" {
   type    = string
-  default = "readonly-policy"
+  default = "dm-gen-policy-readonly"
 }
 
 variable "readonly_role_name" {

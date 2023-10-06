@@ -1,12 +1,17 @@
+provider "aws" {
+  region  = "eu-west-2"
+}
 
 resource "aws_kms_key" "state_backend_bucket_kms_key" {
   description             = "Encrypt the state bucket objects"
   deletion_window_in_days = 10
 }
+
 resource "aws_s3_bucket" "state_backend_bucket" {
   bucket = "dm-gen-configuration"
-
 }
+
+
 resource "aws_s3_bucket_versioning" "state_backend_bucket_versioning" {
   bucket  = aws_s3_bucket.state_backend_bucket.id
   versioning_configuration {
@@ -35,11 +40,36 @@ resource "aws_s3_bucket_public_access_block" "state_backend_bucket_acl" {
   restrict_public_buckets = true
 }
 
+
+
+
+
+
+
+//for terraform state lock file - one table for each environment
+resource "aws_dynamodb_table" "state_dynamo_table" {
+  name = var.dynamodb_tablename
+
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+
+
+
+
+
+
 // DEVOPS ROLE
 
 # Create an IAM policy
 resource "aws_iam_policy" "devops_iam_policy" {
-  name = var.devops_policy_name
+  name = "${var.devops_policy_name}"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -90,7 +120,7 @@ resource "aws_iam_policy_attachment" "devops_role_policy_attachment" {
 
 # Create an IAM policy
 resource "aws_iam_policy" "developer_iam_policy" {
-  name = var.developer_policy_name
+  name = "${var.developer_policy_name}-name"
 
   policy = jsonencode({
 
@@ -184,7 +214,7 @@ resource "aws_iam_policy_attachment" "developer_role_policy_attachment" {
 
 # Create an IAM policy
 resource "aws_iam_policy" "readonly_iam_policy" {
-  name = var.readonly_policy_name
+  name = "${var.readonly_policy_name}"
 
   policy = jsonencode({
 
