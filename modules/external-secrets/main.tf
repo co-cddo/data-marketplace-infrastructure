@@ -84,5 +84,5 @@ resource "helm_release" "external-secrets" {
     value = "9443"
     type  = "string"
   }
-  depends_on = [aws_eks_fargate_profile.externalsecrets ]
+  depends_on = [aws_eks_fargate_profile.externalsecrets, kubernetes_service_account.service_account, var.namespace_app ]
 }

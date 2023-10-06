@@ -16,3 +16,6 @@ output "iam_fargate" {
 output "openid_connector" {
     value = aws_iam_openid_connect_provider.oidcprovider
 }
+output "namespace_app" {
+  value = kubernetes_namespace.ns-app
+}

@@ -48,7 +48,6 @@ module "load_balancer" {
 module "external_secrets"{
     source = "../modules/external-secrets"
     eks_cluster = module.eks_cluster.eks_cluster
-    cluster_name = "${var.project_code}-${var.env_name}-eks-cluster"
     project_code = var.project_code
     iam_fargate = module.eks_cluster.iam_fargate
     openid_connector = module.eks_cluster.openid_connector
@@ -58,6 +57,7 @@ module "external_secrets"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     sa_name = "externalsecret-sa"
     sa_namespace = var.app_namespace
+    namespace_app = module.eks_cluster.namespace_app
 }
 
 module "efs" {

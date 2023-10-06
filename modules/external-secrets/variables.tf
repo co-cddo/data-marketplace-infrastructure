@@ -1,15 +1,14 @@
+variable "region" {}
 variable "project_code" {}
+variable "env_name" {}
 
 variable "eks_cluster" {}
 variable "iam_fargate" {}
-variable "cluster_name" {}
 variable "openid_connector" {}
-variable "env_name" {}
-variable "region" {}
 
 variable "sa_name" {}
 variable "sa_namespace" {}
-
+variable "namespace_app" {}
 
 variable "private_subnet_one_id" {
     
