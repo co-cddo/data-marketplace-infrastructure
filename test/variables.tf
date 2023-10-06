@@ -18,7 +18,7 @@ variable "project_code" {
 }
 variable "cluster_name" {
     type = string
-    default = "dm-eks-test"
+    default = "dm-eks-tst"
 }
 variable "cluster_version" {
     type = string
@@ -31,4 +31,14 @@ variable "region" {
 variable "user_name" {
   type = string
   default = "ssm-user"
+}
+
+variable "env_name"   {
+    type = string
+    default = "tst"
+}
+
+variable "app_namespace" {
+  type = string
+  default = "app"
 }
