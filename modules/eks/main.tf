@@ -1,6 +1,3 @@
-
-
-
 //IAM role for EKS - used to make API calls to AWS services
 //i.e. to create managed node pools
 
@@ -10,8 +7,8 @@ provider "kubernetes" {
 }
 
 
-resource "aws_iam_role" "eks-cluster" {
-  name = "eks-cluster-${var.cluster_name}"
+resource "aws_iam_role" "eks-cluster-role" {
+  name = "${var.project_code}-${var.env_name}-role-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -33,15 +30,15 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "amazon-eks-cluster-policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks-cluster.name
+  role       = aws_iam_role.eks-cluster-role.name
 }
 
 //EKS cluster
 
 resource "aws_eks_cluster" "cluster" {
-  name     = var.cluster_name
+  name     = "${var.project_code}-${var.env_name}-eks-cluster"
   version  = var.cluster_version
-  role_arn = aws_iam_role.eks-cluster.arn
+  role_arn = aws_iam_role.eks-cluster-role.arn
   vpc_config {
 
     endpoint_private_access = true
@@ -58,7 +55,7 @@ resource "aws_eks_cluster" "cluster" {
 
   # csutom controllers need this config (loadbalancer, external secret)
   provisioner "local-exec" {
-    command =  "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}"
+    command =  "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster --region ${var.region}"
 
   }
 
@@ -75,9 +72,6 @@ resource "kubernetes_namespace" "ns-app" {
 
 
 
-
-
-
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
@@ -87,14 +81,11 @@ resource "aws_iam_openid_connect_provider" "oidcprovider" {
   url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
-
-
 # csutom controllers need this config (loadbalancer, external secret)
 resource "null_resource" "awscli"{
     depends_on = [aws_eks_cluster.cluster]
     provisioner "local-exec" {
-    command =  "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}"
-
+    command =  "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster  --region ${var.region}"
   }
 }
 
@@ -103,17 +94,13 @@ resource "null_resource" "cluster" {
 
   depends_on = [null_resource.awscli]
 
-
   provisioner "local-exec" {
     command = "kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"
   }
 }
 
-
-
-
-resource "aws_iam_role" "eks-fargate-profile" {
-  name = "eks-fargate-profile-${var.env_name}"
+resource "aws_iam_role" "eks-fargate-profile-role" {
+  name = "${var.project_code}-${var.env_name}-role-eks-fargate-profile"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -124,21 +111,20 @@ resource "aws_iam_role" "eks-fargate-profile" {
       }
     }]
     Version = "2012-10-17"
-    
   })
 }
 
 
 resource "aws_iam_role_policy_attachment" "eks-fargate-profile" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.eks-fargate-profile.name
+  role       = aws_iam_role.eks-fargate-profile-role.name
 }
 
 
 resource "aws_eks_fargate_profile" "kube-system" {
   cluster_name           = aws_eks_cluster.cluster.name
   fargate_profile_name   = "kube-system"
-  pod_execution_role_arn = aws_iam_role.eks-fargate-profile.arn
+  pod_execution_role_arn = aws_iam_role.eks-fargate-profile-role.arn
   subnet_ids = [
     var.private_subnet_one_id,
     var.private_subnet_two_id
@@ -153,7 +139,7 @@ resource "aws_eks_fargate_profile" "kube-system" {
 resource "aws_eks_fargate_profile" "fp-app" {
   cluster_name           = aws_eks_cluster.cluster.name
   fargate_profile_name   = "fp-app"
-  pod_execution_role_arn = aws_iam_role.eks-fargate-profile.arn
+  pod_execution_role_arn = aws_iam_role.eks-fargate-profile-role.arn
 
   # These subnets must have the following resource tag: 
   # kubernetes.io/cluster/<CLUSTER_NAME>.

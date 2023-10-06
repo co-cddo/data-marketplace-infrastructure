@@ -10,7 +10,7 @@ output "eks_fargate_profile_app" {
     value = aws_eks_fargate_profile.fp-app
 }
 output "iam_fargate" {
-    value = aws_iam_role.eks-fargate-profile
+    value = aws_iam_role.eks-fargate-profile-role
 }
 
 output "openid_connector" {
