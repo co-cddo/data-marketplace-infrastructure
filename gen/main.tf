@@ -1,7 +1,3 @@
-provider "aws" {
-  region  = "eu-west-2"
-}
-
 resource "aws_kms_key" "state_backend_bucket_kms_key" {
   description             = "Encrypt the state bucket objects"
   deletion_window_in_days = 10

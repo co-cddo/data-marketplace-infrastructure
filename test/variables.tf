@@ -26,7 +26,7 @@ variable "cluster_version" {
 }
 variable "region" {
   type = string
-  default = "eu-north-1"
+  default = "eu-west-2"
 }
 variable "user_name" {
   type = string

@@ -15,10 +15,6 @@ module "vpcmodule"{
     cluster_version = var.cluster_version
 
 }
-module "dynamodb" {
-    source = "../modules/dynamodb"
-    env_name = var.env_name
-}
 
 module "eks_cluster"{
     source = "../modules/eks"

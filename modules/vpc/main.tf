@@ -108,7 +108,7 @@ resource "aws_eip" "Nat-Gateway-EIP" {
   depends_on = [
     aws_route_table_association.public-subnet-1
   ]
-  vpc = true
+  domain = "vpc"
   tags = {
     "Name" = "${var.project_code}-${var.env_name}-ElasticIP"
   
