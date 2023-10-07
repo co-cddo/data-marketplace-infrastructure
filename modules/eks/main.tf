@@ -63,16 +63,6 @@ resource "aws_eks_cluster" "cluster" {
   depends_on = [aws_iam_role_policy_attachment.amazon-eks-cluster-policy]
 }
 
-
-resource "kubernetes_namespace" "ns-app" {
-  metadata {
-    name = var.app_namespace
-  }
-  depends_on = [aws_eks_cluster.cluster]
-}
-
-
-
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
@@ -82,18 +72,11 @@ resource "aws_iam_openid_connect_provider" "oidcprovider" {
   url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
-# csutom controllers need this config (loadbalancer, external secret)
-resource "null_resource" "awscli"{
-    depends_on = [aws_eks_cluster.cluster]
-    provisioner "local-exec" {
-    command =  "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster  --region ${var.region}"
-  }
-}
-
 # For accessing from aws console
 resource "null_resource" "cluster" {
 
-  depends_on = [null_resource.awscli]
+  # depends_on = [null_resource.awscli]
+  depends_on = [aws_eks_cluster.cluster]
 
   provisioner "local-exec" {
     command = "kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"

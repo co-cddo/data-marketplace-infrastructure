@@ -57,7 +57,6 @@ module "external_secrets"{
     private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
     sa_name = "externalsecret-sa"
     sa_namespace = var.app_namespace
-    namespace_app = module.eks_cluster.namespace_app
 }
 
 module "efs" {

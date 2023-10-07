@@ -8,7 +8,6 @@ variable "openid_connector" {}
 
 variable "sa_name" {}
 variable "sa_namespace" {}
-variable "namespace_app" {}
 
 variable "private_subnet_one_id" {
     
