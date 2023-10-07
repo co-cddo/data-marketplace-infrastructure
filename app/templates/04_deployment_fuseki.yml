@@ -1,18 +1,12 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: application
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dm-backend-api-fuseki
-  namespace: application
+  namespace: app
   labels:
     app: dm-backend-api-fuseki
 spec:
-  replicas: 2
+  replicas: 1 
   selector:
     matchLabels:
       app: dm-backend-api-fuseki
@@ -30,9 +24,26 @@ spec:
                 operator: In
                 values:
                 - amd64
+
+      initContainers:
+      - name: fs-owner-change
+        image: busybox
+        command:
+        - chown
+        - "9008:root"
+        - "/fuseki-base/databases"
+        volumeMounts:
+        - mountPath: /fuseki-base/databases
+          name: persistent-storage
+
+
+
       containers:
       - name: c-dm-backend-api-fuseki
-        image: 855859226163.dkr.ecr.eu-west-2.amazonaws.com/dm-backend-fuseki:ver0.0.1
+        image: {{IMG}}
+        volumeMounts:
+          - name: persistent-storage
+            mountPath: /fuseki-base/databases 
         resources:
           requests:
             memory: "0.5Gi"
@@ -48,5 +59,9 @@ spec:
         - name: http
           containerPort: 3030
         imagePullPolicy: IfNotPresent
+      volumes:
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: efs-claim
       nodeSelector:
         kubernetes.io/os: linux

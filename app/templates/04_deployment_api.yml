@@ -1,16 +1,12 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: application
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dm-backend-api
-  namespace: application
+  namespace: app
+  labels:
+    app: dm-backend-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: dm-backend-api
@@ -30,7 +26,7 @@ spec:
                 - amd64
       containers:
       - name: c-dm-backend-api
-        image: 855859226163.dkr.ecr.eu-west-2.amazonaws.com/dm-backend-api:ver0.1.0
+        image: {{IMG}}
         resources:
           requests:
             memory: "0.5Gi"
@@ -43,19 +39,19 @@ spec:
           - name: JWT_AUD
             valueFrom:
               secretKeyRef:
-                name: dm-externalsecret-frontend
+                name: dm-externalsecret
                 key: JWT_AUD
                 optional: false
           - name: JWKS_URL
             valueFrom:
               secretKeyRef:
-                name: dm-externalsecret-frontend
+                name: dm-externalsecret
                 key: JWKS_URL
                 optional: false
           - name: OPS_API_KEY
             valueFrom:
               secretKeyRef:
-                name: dm-externalsecret-frontend
+                name: dm-externalsecret
                 key: OPS_API_KEY
                 optional: false
         ports:
