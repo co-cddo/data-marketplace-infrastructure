@@ -71,9 +71,9 @@ fi
 
 if [[ ${ACTION} == "uninstall" ]]; then
 
-  kubectl delete ns app
   kubectl delete -f 03_efs.yml
 
+  kubectl delete ns app
 fi
 
 if [[ ${ACTION} == "update" ]]; then
