@@ -27,6 +27,6 @@ variable "cluster_version" {
     default = "1.27"
 }
 variable "app_namespace" {
-  type = string
-  default = "app"
+    type = string
+    default = "app"
 }

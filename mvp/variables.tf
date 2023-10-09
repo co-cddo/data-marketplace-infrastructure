@@ -1,6 +1,6 @@
 variable "region" {
-  type = string
-  default = "eu-west-2"
+    type = string
+    default = "eu-west-2"
 }
 variable "project_code" {
     type = string
@@ -25,6 +25,6 @@ variable "cluster_version" {
     default = "1.27"
 }
 variable "app_namespace" {
-  type = string
-  default = "app"
+    type = string
+    default = "app"
 }
