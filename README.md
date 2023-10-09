@@ -29,18 +29,18 @@ Can be used to create dev and test infrasturcture which includes VPCs with subne
   
 ### For Environment Creation:
 
-Run `cd dev` or `cd test`
-Run `terraform init`
-Run `terraform plan` and check the output.
+* Run `cd dev` or `cd test`
+* Run `terraform init`
+* Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
-Run `terraform apply`
-
-To start the ALB, go to the app folder and create deployments and services for frontend, frontend-ingress, frontend-ingress-secure, backend-api  and fuseki by running:
-
-`kubectl apply -f <filename.yml>`
-
-for each file.
-
+* Run `terraform apply`
+* Go to Paramater Store in AWS Systems Manager portal and fill in the values for the parameters using the values found in /dm/gen/DONOT-DELETE under app-env-values.
+*  Go back the the EC2 instance and 'cd app'.
+*  Create .env file: 'touch .env'
+*  Then 'cp dev.env .env' - similar for test env.
+*  Run 'vi .env'
+*  Fill in the values with the values found in the /dm/gen/DONOT-DELETE parameter under app-deploy-env file.
+*  Then run 'sh dm-deploy.sh install' . This will create pods for frontend, backend, fuseki and will create the ALB.
 
 ### Destroy Resources:
 
