@@ -46,7 +46,7 @@ If the output is what you expect and there are no errors:
 
 If you want to destroy the dev environment:
 
-* First, remove the ALB and Target Groups manually from the AWS Portal:
+* First, run `sh dm-deploy.sh uninstall` from the app folder.
 
 * `cd dev` or `cd test`, then run `terraform destroy`
 
