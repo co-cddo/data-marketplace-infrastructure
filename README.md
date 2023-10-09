@@ -35,12 +35,12 @@ Can be used to create dev and test infrasturcture which includes VPCs with subne
 If the output is what you expect and there are no errors:
 * Run `terraform apply`
 * Go to Paramater Store in AWS Systems Manager portal and fill in the values for the parameters using the values found in /dm/gen/DONOT-DELETE under app-env-values.
-*  Go back the the EC2 instance and 'cd app'.
-*  Create .env file: 'touch .env'
-*  Then 'cp dev.env .env' - similar for test env.
-*  Run 'vi .env'
+*  Go back the the EC2 instance and `cd app`.
+*  Create .env file: `touch .env`
+*  Then `cp dev.env .env` - similar for test env.
+*  Run `vi .env`
 *  Fill in the values with the values found in the /dm/gen/DONOT-DELETE parameter under app-deploy-env file.
-*  Then run 'sh dm-deploy.sh install' . This will create pods for frontend, backend, fuseki and will create the ALB.
+*  Then run `sh dm-deploy.sh install` . This will create pods for frontend, backend, fuseki and will create the ALB.
 
 ### Destroy Resources:
 
