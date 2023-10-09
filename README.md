@@ -24,6 +24,7 @@ Can be used to create dev and test infrasturcture which includes VPCs with subne
 
 * Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
 * Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+* Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 * Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
   
 ### For Environment Creation:
