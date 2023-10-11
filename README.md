@@ -8,6 +8,9 @@ This code can be used to create infrasturcture which includes for services of da
 * Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
 * Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 * Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
+* Cognito user pool and client app
+* a domain name and tls certificate for the domainname.
+* SSO settings on the security.gov.uk
   
 ### For Environment Creation:
 There are multiple environments: dev, tst, mvp. One can create any other environment by copying one of them and updating the variables section (for example, CIDR, env name, etc). Below process is for dev envrionment creation. By replacing the dev to other environment, one can create the other environment as well
