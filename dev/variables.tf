@@ -30,3 +30,7 @@ variable "app_namespace" {
     type = string
     default = "app"
 }
+variable "user_name" {
+    type = string
+    default = "ec2-user"
+}

@@ -27,7 +27,6 @@ module "eks_cluster"{
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
     region = var.region
     app_namespace = var.app_namespace
-
 }
 
 module "load_balancer" {
@@ -58,7 +57,7 @@ module "external_secrets"{
     sa_name = "externalsecret-sa"
     sa_namespace = var.app_namespace
 }
-
+*/
 module "efs" {
     source = "../modules/efs"
     project_code = var.project_code
