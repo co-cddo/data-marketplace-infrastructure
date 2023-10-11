@@ -32,7 +32,7 @@ fi
 
 ACTION=${1}
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
-
+AWS_GENERIC_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-aws-generic-serviceaccount
  
 mkdir tmp
 WORKDIR=tmp
@@ -40,6 +40,7 @@ cp templates/* $WORKDIR
 cd $WORKDIR
 
 sed -i "s|{{ROLE_ARN}}|${EXT_SECRET_ROLE}|g" 02_serviceaccount.yml
+sed -i "s|{{ROLE_ARN_AWS_GENERIC}}|${AWS_GENERIC_ROLE}|g" 02_serviceaccount.yml
 sed -i "s/eu-west-2/${REGION}/g" 03_externalsecret.yml
 sed -i "s/{{EFS_FSID}}/${EFS_FSID}/g" 03_efs.yml
 
@@ -84,6 +85,7 @@ fi
 
 if [[ ${ACTION} == "update" ]]; then
   echo "updating"
+  
   kubectl apply -f 04_deployment_fuseki.yml
   kubectl apply -f 04_deployment_api.yml
   kubectl apply -f 04_deployment_frontend.yml

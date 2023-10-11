@@ -27,6 +27,7 @@ module "eks_cluster"{
     public_subnet_two_id = module.vpcmodule.public_subnets_output[1]
     region = var.region
     app_namespace = var.app_namespace
+    sa_name = "aws-generic-sa"
 
 }
 
