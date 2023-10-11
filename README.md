@@ -21,7 +21,6 @@ If the output is what you expect and there are no errors:
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh install`.
 
-
 ### Destroy Resources:
 
 If you want to destroy the dev environment:
@@ -34,5 +33,3 @@ If you want to destroy the dev environment:
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh update`.
-
-
