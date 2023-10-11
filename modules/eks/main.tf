@@ -2,8 +2,13 @@
 //i.e. to create managed node pools
 
 
-resource "aws_iam_role" "eks-cluster" {
-  name = "eks-cluster-${var.cluster_name}"
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+}
+
+
+resource "aws_iam_role" "eks-cluster-role" {
+  name = "${var.project_code}-${var.env_name}-role-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -25,15 +30,15 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "amazon-eks-cluster-policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks-cluster.name
+  role       = aws_iam_role.eks-cluster-role.name
 }
 
 //EKS cluster
 
 resource "aws_eks_cluster" "cluster" {
-  name     = var.cluster_name
+  name     = "${var.project_code}-${var.env_name}-eks-cluster"
   version  = var.cluster_version
-  role_arn = aws_iam_role.eks-cluster.arn
+  role_arn = aws_iam_role.eks-cluster-role.arn
   vpc_config {
 
     endpoint_private_access = true
@@ -48,12 +53,38 @@ resource "aws_eks_cluster" "cluster" {
     ]
   }
 
+  # csutom controllers need this config (loadbalancer, external secret)
+  provisioner "local-exec" {
+    command =  "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster --region ${var.region}"
+
+  }
+
+
   depends_on = [aws_iam_role_policy_attachment.amazon-eks-cluster-policy]
 }
 
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+resource "aws_iam_openid_connect_provider" "oidcprovider" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
 
-resource "aws_iam_role" "eks-fargate-profile" {
-  name = "eks-fargate-profile-${var.env_name}"
+# For accessing from aws console
+resource "null_resource" "cluster" {
+
+  # depends_on = [null_resource.awscli]
+  depends_on = [aws_eks_cluster.cluster]
+
+  provisioner "local-exec" {
+    command = "kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"
+  }
+}
+
+resource "aws_iam_role" "eks-fargate-profile-role" {
+  name = "${var.project_code}-${var.env_name}-role-eks-fargate-profile"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -64,21 +95,20 @@ resource "aws_iam_role" "eks-fargate-profile" {
       }
     }]
     Version = "2012-10-17"
-    
   })
 }
 
 
 resource "aws_iam_role_policy_attachment" "eks-fargate-profile" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.eks-fargate-profile.name
+  role       = aws_iam_role.eks-fargate-profile-role.name
 }
 
 
 resource "aws_eks_fargate_profile" "kube-system" {
   cluster_name           = aws_eks_cluster.cluster.name
   fargate_profile_name   = "kube-system"
-  pod_execution_role_arn = aws_iam_role.eks-fargate-profile.arn
+  pod_execution_role_arn = aws_iam_role.eks-fargate-profile-role.arn
   subnet_ids = [
     var.private_subnet_one_id,
     var.private_subnet_two_id
@@ -89,10 +119,11 @@ resource "aws_eks_fargate_profile" "kube-system" {
   }
 }
 
-resource "aws_eks_fargate_profile" "staging" {
+
+resource "aws_eks_fargate_profile" "fp-app" {
   cluster_name           = aws_eks_cluster.cluster.name
-  fargate_profile_name   = "staging"
-  pod_execution_role_arn = aws_iam_role.eks-fargate-profile.arn
+  fargate_profile_name   = "fp-app"
+  pod_execution_role_arn = aws_iam_role.eks-fargate-profile-role.arn
 
   # These subnets must have the following resource tag: 
   # kubernetes.io/cluster/<CLUSTER_NAME>.
@@ -102,13 +133,18 @@ resource "aws_eks_fargate_profile" "staging" {
   ]
 
   selector {
-    namespace = "staging"
+    namespace = "app"
   }
 }
 
 
-//remove ec2 annotation from CoreDNS deployment
 
+
+
+// remove ec2 annotation from CoreDNS deployment
+// Resolve CoreDNS pods in a Pending state
+// https://repost.aws/knowledge-center/eks-resolve-pending-fargate-pods
+// https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html#fargate-gs-coredns
 data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.cluster.id
 }
@@ -163,22 +199,4 @@ provider "helm" {
    
   }
 }
-/*
-resource "helm_release" "metrics-server" {
-    name = "metrics-server"
-
-    repository       = "https://charts.bitnami.com/bitnami"
-    chart            = "metrics-server"
-    namespace        = "metrics-server"
-    //version          = "5.11.1"
-    create_namespace = true
-
-    set {
-        name  = "apiService.create"
-        value = "true"
-    }
-
-  depends_on = [aws_eks_fargate_profile.kube-system]
-}
-*/
 

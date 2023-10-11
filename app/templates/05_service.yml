@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-backend-api-fuseki-service
+  namespace: app
+  labels:
+    app: dm-backend-api-fuseki
+spec:
+  selector:
+    app: dm-backend-api-fuseki
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3030
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-backend-api-service
+  namespace: app
+  labels:
+    app: dm-backend-api
+spec:
+  selector:
+    app: dm-backend-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-frontend-service
+  namespace: app
+  labels:
+    app: dm-frontend-app
+spec:
+  selector:
+    app: dm-frontend-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort

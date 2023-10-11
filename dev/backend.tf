@@ -1,7 +1,8 @@
 terraform {
    backend "s3" {
-      bucket = "dm-gen-configuration"
+      bucket = "dm-gen-config"
       key = "dev/terraform.tfstate"
-      region = "eu-north-1"
+      region = "eu-west-2"
+      dynamodb_table = "dm-gen-dynamodb-terraform-lock-table"
     }  
 }

@@ -1,3 +1,16 @@
+variable "region"{
+    type = string
+    default = "eu-west-2"
+}
+variable "project_code" {
+    type = string
+    default = "dm"
+}
+variable "env_name"   {
+    type = string
+    default = "dev"
+}
+#vpc vars
 variable "vpc_cidr" {
     type = string 
     default = "10.10.0.0/16"
@@ -8,28 +21,12 @@ variable "private_subnets" {
 variable "public_subnets" { 
     default = ["10.10.1.0/24", "10.10.2.0/24"]
 }
-
-variable "dev_env_name"   {
-    type = string
-    default = "dev"
-}
-variable "project_code" {
-    type = string
-    default = "dm"
-}
-variable "cluster_name" {
-    type = string
-    default = "dm-eks-dev"
-}
+# eks cluster vars
 variable "cluster_version" {
     type = string
     default = "1.27"
 }
-variable "region"{
+variable "app_namespace" {
     type = string
-    default = "eu-north-1"
-}
-variable "user_name" {
-    type = string
-    default = "ec2-user"
+    default = "app"
 }

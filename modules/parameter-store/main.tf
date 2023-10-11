@@ -24,7 +24,7 @@ resource "aws_ssm_parameter" "securestring_parameters" {
   value     = local.securestring_initial_value
   tier      = local.securestring_tier
   key_id    = local.key_id
-  overwrite = local.overwrite
+#  overwrite = local.overwrite
   lifecycle {
     ignore_changes = [
       value,
