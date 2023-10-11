@@ -78,6 +78,9 @@ fi
 
 if [[ ${ACTION} == "update" ]]; then
   echo "updating"
+  kubectl apply -f 04_deployment_fuseki.yml
+  kubectl apply -f 04_deployment_api.yml
+  kubectl apply -f 04_deployment_frontend.yml
   echo "updated"
 fi
 
