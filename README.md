@@ -16,10 +16,13 @@ There are multiple environments: dev, tst, mvp. One can create any other environ
 * Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 * Run `terraform apply`
+* For SSO, define client settings on security.gov.uk (for first time, only once!)
+* For restricted access to the env, create cognito user pool and define app client in the userpool
 * Go to Paramater Store in AWS Systems Manager portal and fill in the values for the parameters for /dm/dev/*.
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh install`.
+* define a custom DNS record (CNAME) for Application Load Balancer DNS
 
 ### Destroy Resources:
 
