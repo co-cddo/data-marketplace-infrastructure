@@ -70,6 +70,11 @@ resource "aws_iam_openid_connect_provider" "oidcprovider" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
   url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+
+  tags = {
+    ProjectCode = "${var.project_code}"
+    Environment = "${var.env_name}"
+  }
 }
 
 # For accessing from aws console
@@ -139,6 +144,37 @@ resource "aws_eks_fargate_profile" "fp-app" {
 
 
 
+
+# Generic Role and ServiceAccount for Pods to call AWS services
+data "aws_iam_policy_document" "aws-sa_assumerole_trust" {
+  statement{
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.oidcprovider.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:${var.app_namespace}:${var.sa_name}"]
+    }
+
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.oidcprovider.arn]
+      type        = "Federated"
+    }
+  }
+}
+resource "aws_iam_policy" "aws_sa_role_policy" {
+  policy = file("${path.module}/aws-sa-role-policy.json")
+  name   = "${var.project_code}-${var.env_name}-policy-generic-aws-sa"
+}
+resource "aws_iam_role" "aws_sa_role" {
+  assume_role_policy = data.aws_iam_policy_document.aws-sa_assumerole_trust.json
+  name               = "${var.project_code}-${var.env_name}-role-eks-aws-generic-serviceaccount"
+}
+resource "aws_iam_role_policy_attachment" "policy_attach" {
+  role       = aws_iam_role.aws_sa_role.name
+  policy_arn = aws_iam_policy.aws_sa_role_policy.arn
+}
 
 
 // remove ec2 annotation from CoreDNS deployment
