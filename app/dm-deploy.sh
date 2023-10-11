@@ -22,7 +22,13 @@ clear='\033[0m'
 
 echo -e "${green}IMPORTANT: PLEASE CHECK THE .env FILE: REQUIRED PARAMETERS!${clear}"
 echo -e "${green} EFS ID, CERT ARN, COGNITO CLIENT ID !${clear}"
-echo -e "${red} DO NOT FORGET TO UPDATE CNAME !${clear}"
+echo -e "${green} DO NOT FORGET TO UPDATE CNAME !${clear}"
+
+echo -e "${red} DOUBLE CHECK KUBE CONFIG! YOU HAVE TO CONNECT THE ${ENV_VAR}. TYPE YES IF YOU ARE SURE! ${clear}"
+read userapprove
+if [[ ${userapprove} != "YES" ]]; then
+exit
+fi
 
 ACTION=${1}
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
