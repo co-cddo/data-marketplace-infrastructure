@@ -33,7 +33,12 @@ fi
 ACTION=${1}
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
 AWS_GENERIC_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-aws-generic-serviceaccount
- 
+
+
+kubectl config use-context arn:aws:eks:${REGION}:${ACCOUNT}:cluster/dm-${ENV_NAME}-eks-cluster
+
+
+
 mkdir tmp
 WORKDIR=tmp
 cp templates/* $WORKDIR

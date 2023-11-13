@@ -26,6 +26,7 @@ If the output is what you expect and there are no errors:
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh install`.
 * define a custom DNS record (CNAME) for Application Load Balancer DNS
+* Update the EFS backup for the newly create environment. 
 
 ### Destroy Resources:
 
@@ -38,4 +39,7 @@ If you want to destroy the dev environment:
 ### Update the services 
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
-* Then run `sh dm-deploy.sh update`.
+* Then run `sh dm-deploy.sh update`.  
+  
+### Backup and Restore  
+TBA  
