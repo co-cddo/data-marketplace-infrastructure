@@ -186,6 +186,9 @@ data "aws_eks_cluster_auth" "eks" {
 }
 
 resource "null_resource" "k8s_patcher" {
+
+  count = var.enable_coredns ? 0 : 1
+
   depends_on = [aws_eks_fargate_profile.kube-system]
 
   triggers = {
@@ -213,6 +216,18 @@ EOH
     ignore_changes = [triggers]
   }
 }
+
+resource "aws_eks_addon" "coredns" {
+  count = var.enable_coredns ? 1 : 0
+
+  cluster_name                = aws_eks_cluster.cluster.name
+  addon_name                  = "coredns"
+  addon_version               = var.coredns_version
+  resolve_conflicts_on_update = "PRESERVE"
+
+  depends_on = [aws_eks_fargate_profile.kube-system]
+}
+
 data "aws_eks_cluster" "this" {
   name = aws_eks_cluster.cluster.name
 }
@@ -235,4 +250,3 @@ provider "helm" {
    
   }
 }
-
