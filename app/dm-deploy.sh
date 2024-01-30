@@ -47,6 +47,7 @@ cd $WORKDIR
 sed -i "s|{{ROLE_ARN}}|${EXT_SECRET_ROLE}|g" 02_serviceaccount.yml
 sed -i "s|{{ROLE_ARN_AWS_GENERIC}}|${AWS_GENERIC_ROLE}|g" 02_serviceaccount.yml
 sed -i "s/eu-west-2/${REGION}/g" 03_externalsecret.yml
+sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 03_externalsecret.yml
 sed -i "s/{{EFS_FSID}}/${EFS_FSID}/g" 03_efs.yml
 
 IMG_FRONTEND=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-frontend:ver${FRONTEND_VERSION}
@@ -98,4 +99,4 @@ if [[ ${ACTION} == "update" ]]; then
 fi
 
 cd ..
-rm -rf $WORKDIR
+#rm -rf $WORKDIR
