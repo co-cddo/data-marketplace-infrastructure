@@ -5,7 +5,7 @@ This code can be used to create infrasturcture which includes for services of da
 ### Pre-requisites:
 
 * Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
-* Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+* Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli (Required version - Terraform v1.5.7)
 * Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 * Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
 * Cognito user pool and client app
@@ -19,9 +19,13 @@ There are multiple environments: dev, tst, mvp. One can create any other environ
 * Run `terraform plan` and check the output.
 If the output is what you expect and there are no errors:
 * Run `terraform apply`
+
+    If CoreDNS patch failed for due to some error then run `terraform apply` again and then `kubectl rollout restart -n kube-system deployment coredns`
+
 * For SSO, define client settings on security.gov.uk (for first time, only once!)
 * For restricted access to the env, create cognito user pool and define app client in the userpool
 * Go to Paramater Store in AWS Systems Manager portal and fill in the values for the parameters for /dm/dev/*.
+* Generate ACM for the required domain (To be automated)
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh install`.
@@ -42,4 +46,22 @@ If you want to destroy the dev environment:
 * Then run `sh dm-deploy.sh update`.  
   
 ### Backup and Restore  
-TBA  
+TBA
+
+### TODO by Code
+* Generate certificate the new test domain
+* Add DNS record for the new environment
+
+
+### Add IAM users to aws_auth config if required
+kubectl edit configmap aws-auth -n kube-system
+
+    mapUsers: |
+        - userarn: arn:aws:iam::<AWS_ACCOUNT_ID>:user/<USERNAME>
+          username: admin
+          groups:
+            - system:masters
+
+### Additional improvements notes
+
+Use EKS Addons for CoreDNS to avoid patching
