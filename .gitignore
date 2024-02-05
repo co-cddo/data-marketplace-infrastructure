@@ -36,4 +36,4 @@ terraform.rc
 .DS_Store
 
 # environment file
-.env
+app/.env
