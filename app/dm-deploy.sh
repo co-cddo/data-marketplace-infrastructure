@@ -99,4 +99,4 @@ if [[ ${ACTION} == "update" ]]; then
 fi
 
 cd ..
-#rm -rf $WORKDIR
+rm -rf $WORKDIR

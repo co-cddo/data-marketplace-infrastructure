@@ -64,4 +64,4 @@ kubectl edit configmap aws-auth -n kube-system
 
 ### Additional improvements notes
 
-Use EKS Addons for CoreDNS to avoid patching
+CoreDNS plugin resources created for MVP environment to avoid applying DNS patching. Dev environment is still using CoreDNS patching which is controlled through terraform variable.
