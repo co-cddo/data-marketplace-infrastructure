@@ -9,4 +9,5 @@ variable "public_subnet_two_id" {}
 variable "app_namespace" {}
 variable "sa_name" {}
 variable "enable_coredns" {}
-variable "coredns_version" { default = "v1.10.1-eksbuild.7"}
+variable "tags" { default = {} }
+variable "coredns_version" { default = "v1.10.1-eksbuild.7" }

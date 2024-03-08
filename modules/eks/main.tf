@@ -3,7 +3,7 @@
 
 
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
+  config_path = "~/.kube/config"
 }
 
 
@@ -46,21 +46,24 @@ resource "aws_eks_cluster" "cluster" {
     public_access_cidrs     = ["0.0.0.0/0"]
     //need to improve this code and not use 0 and 1 
     subnet_ids = [
-        var.private_subnet_one_id,
-        var.private_subnet_two_id,
-        var.public_subnet_one_id,
-        var.public_subnet_two_id
+      var.private_subnet_one_id,
+      var.private_subnet_two_id,
+      var.public_subnet_one_id,
+      var.public_subnet_two_id
     ]
   }
 
   # csutom controllers need this config (loadbalancer, external secret)
   provisioner "local-exec" {
-    command =  "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster --region ${var.region}"
+    command = "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster --region ${var.region}"
 
   }
 
 
   depends_on = [aws_iam_role_policy_attachment.amazon-eks-cluster-policy]
+
+  tags = var.tags
+
 }
 
 data "tls_certificate" "eks" {
@@ -147,7 +150,7 @@ resource "aws_eks_fargate_profile" "fp-app" {
 
 # Generic Role and ServiceAccount for Pods to call AWS services
 data "aws_iam_policy_document" "aws-sa_assumerole_trust" {
-  statement{
+  statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
 
@@ -244,9 +247,9 @@ provider "helm" {
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
 
-      args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id]
-      command     = "aws"
-    } 
-   
+      args    = ["eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id]
+      command = "aws"
+    }
+
   }
 }

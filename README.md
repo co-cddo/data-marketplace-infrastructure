@@ -11,7 +11,27 @@ This code can be used to create infrasturcture which includes for services of da
 * Cognito user pool and client app
 * a domain name and tls certificate for the domainname.
 * SSO settings on the security.gov.uk
-  
+
+### Local development
+
+Use assume role access to run terraform plan locally.
+
+* Require AWS user account with assume role (ROLE_ARN=arn:aws:iam::855859226163:role/dm-gen-devops-role) access
+* Create sts session keys
+
+      export ROLE_ARN="arn:aws:iam::855859226163:role/dm-gen-devops-role"
+      export MFA_DEVICE_ARN="arn:aws:iam::855859226163:mfa/<MFANAME>"
+
+      aws sts assume-role \
+        --role-arn "$ROLE_ARN" \
+        --serial-number "$MFA_DEVICE_ARN" \
+        --token-code "<MFA_CODE>" \
+        --role-session-name "terraform-session"
+
+      export AWS_PROFILE=terraform-session
+
+Alternately, the jump host (adm-instance) on AWS account can be used for deployment as well.
+
 ### For Environment Creation:
 There are multiple environments: dev, tst, mvp. One can create any other environment by copying one of them and updating the variables section (for example, CIDR, env name, etc). Below process is for dev envrionment creation. By replacing the dev to other environment, one can create the other environment as well
 * Run `cd dev`
@@ -40,18 +60,17 @@ If you want to destroy the dev environment:
 * `cd dev` , then run `terraform destroy`
 * remove kubernetes config for the environment.
 
+MVP & TST environments destroyed as new test environments created by AGM in Azure Cloud.
+
 ### Update the services 
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh update`.  
   
-### Backup and Restore  
-TBA
+### Backup and Restore 
 
-### TODO by Code
-* Generate certificate the new test domain
-* Add DNS record for the new environment
-
+Backend database fuseki using EFS as persistence and its protected by AWS backup service.
+Backup restore can be done manually in the event of any data loss using AWS backup restore feature.
 
 ### Add IAM users to aws_auth config if required
 kubectl edit configmap aws-auth -n kube-system
@@ -65,3 +84,9 @@ kubectl edit configmap aws-auth -n kube-system
 ### Additional improvements notes
 
 CoreDNS plugin resources created for MVP environment to avoid applying DNS patching. Dev environment is still using CoreDNS patching which is controlled through terraform variable.
+
+### TODO by Code
+* Generate certificate the new test domain
+* Add DNS record for the new environment
+* CI/CD for IaC & app deployment
+* Import AWS backup resource creation in IaC

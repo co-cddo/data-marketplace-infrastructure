@@ -5,11 +5,11 @@ resource "aws_security_group" "efs-sg" {
   vpc_id      = var.eks_vpc_id
 
   ingress {
-    description      = "NFS from VPC"
-    from_port        = 2049
-    to_port          = 2049
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_cidr]
+    description = "NFS from VPC"
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
 
   egress {
@@ -35,9 +35,7 @@ resource "aws_efs_file_system" "eks" {
   #   transition_to_ia = "AFTER_30_DAYS"
   # }
 
-  tags = {
-    Name = "${var.project_code}-${var.env_name}-efs"
-  }
+  tags = var.tags
 }
 
 resource "aws_efs_mount_target" "zone-a" {
