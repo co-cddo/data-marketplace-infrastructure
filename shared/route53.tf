@@ -1,3 +1,10 @@
+## Hosted zone
+resource "aws_route53_zone" "datamarketplace" {
+  name = "datamarketplace.gov.uk"
+}
+
+
+# Temporary test environments for data marketplace
 module "records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 2.0"
