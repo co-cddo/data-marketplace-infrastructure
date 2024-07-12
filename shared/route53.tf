@@ -48,7 +48,7 @@ module "datamarketplace" {
       ]
     },
     {
-      name    = "_dnsauth.dev.dm.cddo.cabinetoffice.gov.uk"
+      name    = "_dnsauth.dev.datamarketplace.gov.uk"
       type    = "TXT"
       ttl     = 300
       records = [
@@ -71,22 +71,22 @@ module "datamarketplace" {
         "_vyg83xw6n719deh710x50gty892dfkp",
       ]
     },
-    # {
-    #   name    = "www"
-    #   type    = "CNAME"
-    #   ttl     = 300
-    #   records = [
-    #     "cddo-production-dneqgkgqfnaxg2ds.a03.azurefd.net",
-    #   ]
-    # },
-    # {
-    #   name    = "_dnsauth.datamarketplace.gov.uk"
-    #   type    = "TXT"
-    #   ttl     = 300
-    #   records = [
-    #     "_vyg83xw6n719deh710x50gty892dfkp",
-    #   ]
-    # },
+    {
+      name    = "www"
+      type    = "CNAME"
+      ttl     = 300
+      records = [
+        "cddo-production-dneqgkgqfnaxg2ds.a03.azurefd.net",
+      ]
+    },
+    {
+      name    = "_dnsauth.datamarketplace.gov.uk"
+      type    = "TXT"
+      ttl     = 300
+      records = [
+        "_tycxv58rpzr8m9t16vqpzawvu54o2zc",
+      ]
+    },
   ]
 }
 
