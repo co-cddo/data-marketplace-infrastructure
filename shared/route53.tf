@@ -28,6 +28,14 @@ module "records" {
         "cddo-test-f5g3gugzffgba3et.z02.azurefd.net",
       ]
     },
+    {
+      name    = "_dnsauth.dev.dm.cddo.cabinetoffice.gov.uk"
+      type    = "TXT"
+      ttl     = 300
+      records = [
+        "_txz6jm5lfata4tivxix808iqp8sped6",
+      ]
+    },
   ]
 }
 
