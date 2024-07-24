@@ -60,7 +60,23 @@ module "datamarketplace" {
       type    = "TXT"
       ttl     = 300
       records = [
-        "_bsad0xqdw2no77r6246efdye9l9lygk",
+        "_p66t5uybni3hzxpa6hg4sct6iaowl2n",
+      ]
+    },
+    {
+      name    = "test"
+      type    = "CNAME"
+      ttl     = 300
+      records = [
+        "cddo-test-f5g3gugzffgba3et.a02.azurefd.net",
+      ]
+    },
+    {
+      name    = "_dnsauth.test.datamarketplace.gov.uk"
+      type    = "TXT"
+      ttl     = 300
+      records = [
+        "_2e9i57q84sztg6d6pptoozfmsmt6xgf",
       ]
     },
     {
@@ -68,7 +84,7 @@ module "datamarketplace" {
       type    = "CNAME"
       ttl     = 300
       records = [
-        "cddo-production-dneqgkgqfnaxg2ds.a03.azurefd.net",
+        "cddo-production-preview-gxhhc2cte4fpcnd2.a03.azurefd.net",
       ]
     },
     {
@@ -76,7 +92,7 @@ module "datamarketplace" {
       type    = "TXT"
       ttl     = 300
       records = [
-        "_vyg83xw6n719deh710x50gty892dfkp",
+        "_mmunqo9xxjel1981uwpbvre4ahw924l",
       ]
     },
     {
@@ -92,7 +108,7 @@ module "datamarketplace" {
       type    = "TXT"
       ttl     = 300
       records = [
-        "_tycxv58rpzr8m9t16vqpzawvu54o2zc",
+        "_nrkkr1fctcisn0s9fyj77gyqa2u392m",
       ]
     },
   ]
