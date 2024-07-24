@@ -45,14 +45,14 @@ module "records" {
 
 # Datamarketplace
 
-resource "aws_route53_record" "dev" {
+resource "aws_route53_record" "dev-cname" {
   zone_id = aws_route53_zone.datamarketplace.zone_id
   name    = "dev"
   type    = "CNAME"
   ttl     = 300
   records = ["cddo-dev-bve6cnagahezfch0.a02.azurefd.net"]
 }
-resource "aws_route53_record" "dev" {
+resource "aws_route53_record" "dev-txt" {
   zone_id = aws_route53_zone.datamarketplace.zone_id
   name    = "_dnsauth.dev"
   type    = "TXT"
