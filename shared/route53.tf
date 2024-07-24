@@ -1,6 +1,10 @@
 ## Hosted zone
+variable "domain_name" {
+  default = "datamarketplace.gov.uk
+}
+
 resource "aws_route53_zone" "datamarketplace" {
-  name = "datamarketplace.gov.uk"
+  name = var.domain_name
 }
 
 
@@ -40,29 +44,29 @@ module "records" {
 }
 
 # Datamarketplace
+
+resource "aws_route53_record" "dev" {
+  zone_id = aws_route53_zone.datamarketplace.zone_id
+  name    = "dev"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["cddo-dev-bve6cnagahezfch0.a02.azurefd.net"]
+}
+resource "aws_route53_record" "dev" {
+  zone_id = aws_route53_zone.datamarketplace.zone_id
+  name    = "_dnsauth.dev"
+  type    = "TXT"
+  ttl     = 300
+  records = ["_p66t5uybni3hzxpa6hg4sct6iaowl2n"]
+}
 module "datamarketplace" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 2.0"
+  
 
   zone_name = "datamarketplace.gov.uk"
 
   records = [
-    {
-      name    = "dev"
-      type    = "CNAME"
-      ttl     = 300
-      records = [
-        "cddo-dev-bve6cnagahezfch0.a02.azurefd.net",
-      ]
-    },
-    {
-      name    = "_dnsauth.dev.datamarketplace.gov.uk"
-      type    = "TXT"
-      ttl     = 300
-      records = [
-        "_p66t5uybni3hzxpa6hg4sct6iaowl2n",
-      ]
-    },
     {
       name    = "test"
       type    = "CNAME"
