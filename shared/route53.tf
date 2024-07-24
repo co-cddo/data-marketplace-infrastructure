@@ -95,7 +95,7 @@ resource "aws_route53_record" "prod-cname" {
   name    = "www"
   type    = "CNAME"
   ttl     = 300
-  records = ["ddo-production-dneqgkgqfnaxg2ds.a03.azurefd.net"]
+  records = ["cddo-production-dneqgkgqfnaxg2ds.a03.azurefd.net"]
 }
 resource "aws_route53_record" "prod-txt" {
   zone_id = aws_route53_zone.datamarketplace.zone_id
