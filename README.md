@@ -1,6 +1,6 @@
 # Data-marketplace infrastructure
 
-This code can be used to create infrasturcture which includes for services of data marketplace.
+This changed code can be used to create infrasturcture which includes for services of data marketplace.
 
 ### Pre-requisites:
 
