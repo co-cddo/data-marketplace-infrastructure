@@ -24,7 +24,7 @@ variable "public_subnets" {
 # eks cluster vars
 variable "cluster_version" {
   type    = string
-  default = "1.27"
+  default = "1.32"
 }
 variable "app_namespace" {
   type    = string

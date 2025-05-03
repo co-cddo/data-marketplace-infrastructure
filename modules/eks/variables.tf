@@ -10,4 +10,4 @@ variable "app_namespace" {}
 variable "sa_name" {}
 variable "enable_coredns" {}
 variable "tags" { default = {} }
-variable "coredns_version" { default = "v1.10.1-eksbuild.7" }
+variable "coredns_version" { default = "v1.11.4-eksbuild.2" }

@@ -71,8 +71,7 @@ resource "helm_release" "external-secrets" {
   }
   set {
     name  = "webhook.port"
-    value = "9443"
-    type  = "string"
+    value = 9443
   }
   depends_on = [aws_eks_fargate_profile.externalsecrets]
 }

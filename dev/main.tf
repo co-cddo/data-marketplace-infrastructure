@@ -36,7 +36,7 @@ module "eks_cluster" {
   region                = var.region
   app_namespace         = var.app_namespace
   sa_name               = "aws-generic-sa"
-  enable_coredns        = false
+  enable_coredns        = true
   tags                  = local.tags
 }
 
