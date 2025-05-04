@@ -188,45 +188,38 @@ data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.cluster.id
 }
 
-resource "null_resource" "k8s_patcher" {
-
-  count = var.enable_coredns ? 0 : 1
-
-  depends_on = [aws_eks_fargate_profile.kube-system]
-
-  triggers = {
-    endpoint = aws_eks_cluster.cluster.endpoint
-    ca_crt   = base64decode(aws_eks_cluster.cluster.certificate_authority[0].data)
-    token    = data.aws_eks_cluster_auth.eks.token
-  }
-
-  provisioner "local-exec" {
-    command = <<EOH
-cat >/tmp/ca.crt <<EOF
-${base64decode(aws_eks_cluster.cluster.certificate_authority[0].data)}
-EOF
-kubectl \
-  --server="${aws_eks_cluster.cluster.endpoint}" \
-  --certificate_authority=/tmp/ca.crt \
-  --token="${data.aws_eks_cluster_auth.eks.token}" \
-  patch deployment coredns \
-  -n kube-system --type json \
-  -p='[{"op": "remove", "path": "/spec/template/metadata/annotations/eks.amazonaws.com~1compute-type"}]'
-EOH
-  }
-
-  lifecycle {
-    ignore_changes = [triggers]
-  }
-}
-
 resource "aws_eks_addon" "coredns" {
-  count = var.enable_coredns ? 1 : 0
-
   cluster_name                = aws_eks_cluster.cluster.name
   addon_name                  = "coredns"
   addon_version               = var.coredns_version
   resolve_conflicts_on_update = "PRESERVE"
+
+
+  configuration_values = jsonencode({
+        computeType = "Fargate"
+        # Ensure that the we fully utilize the minimum amount of resources that are supplied by
+        # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
+        # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
+        # components (kubelet, kube-proxy, and containerd). Fargate rounds up to the following
+        # compute configuration that most closely matches the sum of vCPU and memory requests in
+        # order to ensure pods always have the resources that they need to run.
+        resources = {
+          limits = {
+            cpu = "0.25"
+            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+            # request/limit to ensure we can fit within that task
+            memory = "256M"
+          }
+          requests = {
+            cpu = "0.25"
+            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+            # request/limit to ensure we can fit within that task
+            memory = "256M"
+          }
+        }
+      })
+
+
 
   depends_on = [aws_eks_fargate_profile.kube-system]
 }

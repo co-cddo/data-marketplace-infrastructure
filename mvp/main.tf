@@ -28,7 +28,6 @@ module "eks_cluster"{
     region = var.region
     app_namespace = var.app_namespace
     sa_name = "aws-generic-sa"
-    enable_coredns = true
 }
 
 module "load_balancer" {

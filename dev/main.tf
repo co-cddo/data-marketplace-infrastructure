@@ -36,7 +36,6 @@ module "eks_cluster" {
   region                = var.region
   app_namespace         = var.app_namespace
   sa_name               = "aws-generic-sa"
-  enable_coredns        = true
   tags                  = local.tags
 }
 
@@ -69,21 +68,21 @@ module "external_secrets" {
   sa_namespace          = var.app_namespace
 }
 
-module "efs" {
-  source                = "../modules/efs"
-  project_code          = var.project_code
-  private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
-  private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
-  eks_cluster           = module.eks_cluster.eks_cluster
-  env_name              = var.env_name
-  vpc_cidr              = var.vpc_cidr
-  eks_vpc_id            = module.vpcmodule.vpc.id
-
-  tags = merge(
-    { Name = "${var.project_code}-${var.env_name}-efs" },
-    local.tags
-  )
-}
+#module "efs" {
+#  source                = "../modules/efs"
+#  project_code          = var.project_code
+#  private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
+#  private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
+#  eks_cluster           = module.eks_cluster.eks_cluster
+#  env_name              = var.env_name
+#  vpc_cidr              = var.vpc_cidr
+#  eks_vpc_id            = module.vpcmodule.vpc.id
+#
+#  tags = merge(
+#    { Name = "${var.project_code}-${var.env_name}-efs" },
+#    local.tags
+#  )
+#}
 
 module "app_params" {
   source = "../modules/parameter-store"
