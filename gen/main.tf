@@ -449,3 +449,18 @@ resource "aws_iam_policy_attachment" "readonly_role_policy_attachment" {
   policy_arn = aws_iam_policy.readonly_iam_policy.arn
   roles      = [aws_iam_role.readonly_role.name]
 }
+
+
+resource "aws_secretsmanager_secret" "mssql_password_dev" {
+  name        = var.secretmanager_mssql_masterpass_dev_name
+  description = "MSSQL master password for dev"
+}
+resource "aws_secretsmanager_secret_version" "mssql_password_version" {
+  secret_id     = aws_secretsmanager_secret.mssql_password_dev.id
+  secret_string = jsonencode({
+    password = "NO-PASS-HERE"
+  })
+}
+output "secret_id" {
+  value = aws_secretsmanager_secret.mssql_password_dev.id
+}

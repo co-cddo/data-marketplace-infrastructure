@@ -58,18 +58,16 @@ IMG_DATASHARE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-datashare:${DAT
 
 sed -i "s|{{IMG}}|${IMG_UI}|g" 04_deployment_ui.yml
 sed -i "s|{{IMG}}|${IMG_API}|g" 04_deployment_api.yml
+sed -i "s|{{IMG}}|${IMG_USERS}|g" 04_deployment_users.yml
+sed -i "s|{{IMG}}|${IMG_DATASHARE}|g" 04_deployment_datashare.yml
 
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_ui.yml
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_api.yml
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_users.yml
+sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_datashare.yml
 
-sed -i "s|{{IMG}}|${IMG_API}|g" 04_deployment_users.yml
 sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 06_ingress.yml
 sed -i "s|CERTIFICATEARN|${CERTIFICATEARN}|g" 06_ingress.yml
-
-
-
-
 
 
 if [[ ${ACTION} == "install" ]]; then
@@ -81,6 +79,7 @@ if [[ ${ACTION} == "install" ]]; then
   kubectl apply -f 04_deployment_ui.yml
   kubectl apply -f 04_deployment_api.yml
   kubectl apply -f 04_deployment_users.yml
+  kubectl apply -f 04_deployment_datashare.yml
 
   kubectl apply -f 05_service.yml
 
@@ -97,14 +96,15 @@ fi
 if [[ ${ACTION} == "update" ]]; then
   echo "updating"
   
-
-  kubectl apply -f 03_externalsecret.yml
-
-
+#  kubectl apply -f 03_externalsecret.yml
+  
   kubectl apply -f 04_deployment_ui.yml
   kubectl apply -f 04_deployment_api.yml
   kubectl apply -f 04_deployment_users.yml
+  kubectl apply -f 04_deployment_datashare.yml
   echo "updated"
+
+
 fi
 
 cd ..

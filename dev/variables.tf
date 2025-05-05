@@ -30,3 +30,32 @@ variable "app_namespace" {
   type    = string
   default = "app"
 }
+variable "rds_engine" {
+  type    = string
+  default = "sqlserver-ex"
+}
+variable "rds_engine_version" {
+  type    = string
+  default = "16.00.4185.3.v1"
+}
+variable "rds_instance_class" {
+  type    = string
+  default = "db.t3.large"
+}
+variable "rds_allocated_storage" {
+  type    = number
+  default = 200
+}
+variable "rds_storage_type" {
+  type    = string
+  default = "gp3"
+}
+variable "rds_multi_az" {
+  type    = bool
+  default = false
+}
+variable "rds_backup_retention_period" {
+  type    = number
+  default = 7
+}
+

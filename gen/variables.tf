@@ -34,3 +34,8 @@ variable "readonly_role_name" {
   type    = string
   default = "dm-gen-role-readonly"
 }
+
+variable "secretmanager_mssql_masterpass_dev_name" {
+  type    = string
+  default = "dm-gen-mssql-dev-masterpassword"
+}
