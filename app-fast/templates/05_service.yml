@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-fast-ui
+  namespace: app
+  labels:
+    app: dm-fast-ui
+spec:
+  selector:
+    app: dm-fast-ui
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-fast-api
+  namespace: app
+  labels:
+    app: dm-fast-api
+spec:
+  selector:
+    app: dm-fast-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-fast-users
+  namespace: app
+  labels:
+    app: dm-fast-users
+spec:
+  selector:
+    app: dm-fast-users
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+

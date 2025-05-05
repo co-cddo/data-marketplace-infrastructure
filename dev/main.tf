@@ -86,15 +86,11 @@ module "external_secrets" {
 
 module "app_params" {
   source = "../modules/parameter-store"
-  prefix = "/${var.project_code}/${var.env_name}/services/"
+  prefix = "/${var.project_code}/${var.env_name}/appsettings/"
   securestring_parameters = [
-    "API_ENDPOINT",
-    "SSO_AUTH_URL",
-    "SSO_CALLBACK_URL",
-    "SSO_CLIENT_ID",
-    "SSO_CLIENT_SECRET",
-    "JWT_AUD",
-    "JWKS_URL",
-    "OPS_API_KEY"
+    "ui",
+    "api",
+    "users",
+    "datashare"
   ]
 }

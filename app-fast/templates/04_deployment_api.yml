@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dm-fast-api
+  namespace: app
+  labels:
+    app: dm-fast-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dm-fast-api
+  template:
+    metadata:
+      labels:
+        app: dm-fast-api
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+      volumes:
+        - name: appsettings
+          secret:
+            secretName: dm-externalsecret
+            items:
+              - key: API_APPCONFIG
+                path: appsettings.{{ENV_FULLNAME}}.json
+      containers:
+      - name: c-dm-fast-api
+        image: {{IMG}}
+        resources:
+          requests:
+            memory: "0.5Gi"
+            cpu: "0.25"
+        volumeMounts:
+          - name: appsettings
+            mountPath: /app/appsettings.{{ENV_FULLNAME}}.json
+            subPath: appsettings.{{ENV_FULLNAME}}.json
+            readOnly: true
+        env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value:  {{ENV_FULLNAME}}
+        ports:
+        - name: http
+          containerPort: 8000
+        imagePullPolicy: IfNotPresent
+      nodeSelector:
+        kubernetes.io/os: linux

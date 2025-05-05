@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fs-chmod
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: c-fs-chmod
+        image: busybox
+        command: 
+        - chown
+        - "9008:root"
+        - "/fuseki-base/databases"
+        volumeMounts:
+        - mountPath: /fuseki-base/databases
+          name: persistent-storage
+      volumes:
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: efs-claim      
+      restartPolicy: Never
