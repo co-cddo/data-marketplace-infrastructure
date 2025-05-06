@@ -11,13 +11,13 @@
 resource "aws_db_instance" "postgresql_instance" {
   identifier        = "${var.project_code}-${var.env_name}-rds-postgresql-instance"
   engine            = "postgres"
-  engine_version    = "17.2-R2"
+  engine_version    = "17.4"
   instance_class    = "db.t3.large"
   allocated_storage = 200
   storage_type      = "gp3"
-  license_model     = "license-included"
+  license_model     = "postgresql-license"
 
-  username = "admin"
+  username = "pgadmin"
   password = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
 
 
