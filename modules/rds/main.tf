@@ -54,7 +54,13 @@ resource "aws_security_group" "db_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
-
+  #Postgresql ingress port
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
   egress {
     from_port   = 0
     to_port     = 0
