@@ -18,11 +18,6 @@ import {
   id = var.devops_role_name
 }
 
-import {
-  to = aws_iam_policy.readonly_iam_policy
-  id = "arn:aws:iam::855859226163:policy/dm-gen-policy-readonly"
-}
-
 
 import {
   to = aws_iam_policy.developer_iam_policy
