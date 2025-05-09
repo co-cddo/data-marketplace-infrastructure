@@ -54,17 +54,19 @@ IMG_UI=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-ui:${UI_VERSION}
 IMG_API=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-api:${API_VERSION}
 IMG_USERS=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-users:${USERS_VERSION}
 IMG_DATASHARE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-datashare:${DATASHARE_VERSION}
-#IMG_CATALOGUE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-catalogue:${CATALOGUE_VERSION}
+IMG_CATALOGUE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-catalogue:${CATALOGUE_VERSION}
 
 sed -i "s|{{IMG}}|${IMG_UI}|g" 04_deployment_ui.yml
 sed -i "s|{{IMG}}|${IMG_API}|g" 04_deployment_api.yml
 sed -i "s|{{IMG}}|${IMG_USERS}|g" 04_deployment_users.yml
 sed -i "s|{{IMG}}|${IMG_DATASHARE}|g" 04_deployment_datashare.yml
+sed -i "s|{{IMG}}|${IMG_CATALOGUE}|g" 04_deployment_catalogue.yml
 
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_ui.yml
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_api.yml
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_users.yml
 sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_datashare.yml
+# NO ENV_FULLNAME FOR CATALOGUE, IT TAKES IT FROM CONF.
 
 sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 06_ingress.yml
 sed -i "s|CERTIFICATEARN|${CERTIFICATEARN}|g" 06_ingress.yml
@@ -80,6 +82,7 @@ if [[ ${ACTION} == "install" ]]; then
   kubectl apply -f 04_deployment_api.yml
   kubectl apply -f 04_deployment_users.yml
   kubectl apply -f 04_deployment_datashare.yml
+  kubectl apply -f 04_deployment_catalogue.yml
 
   kubectl apply -f 05_service.yml
 
@@ -102,6 +105,7 @@ if [[ ${ACTION} == "update" ]]; then
   kubectl apply -f 04_deployment_api.yml
   kubectl apply -f 04_deployment_users.yml
   kubectl apply -f 04_deployment_datashare.yml
+  kubectl apply -f 04_deployment_catalogue.yml
   echo "updated"
 
 

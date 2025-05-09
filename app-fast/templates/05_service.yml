@@ -58,3 +58,18 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dm-fast-catalogue
+  namespace: app
+  labels:
+    app: dm-fast-catalogue
+spec:
+  selector:
+    app: dm-fast-catalogue
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
