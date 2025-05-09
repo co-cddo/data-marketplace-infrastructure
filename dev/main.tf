@@ -92,6 +92,7 @@ module "app_params" {
     "ui",
     "api",
     "users",
-    "datashare"
+    "datashare",
+    "catalogue"
   ]
 }

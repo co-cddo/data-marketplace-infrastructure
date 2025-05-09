@@ -54,6 +54,15 @@ resource "aws_security_group" "db_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
+
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+   #description = "FromDefaultVPC"
+  }
+
   #Postgresql ingress port
   ingress {
     from_port   = 5432
@@ -61,6 +70,15 @@ resource "aws_security_group" "db_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+    description = "FromDefaultVPC"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
