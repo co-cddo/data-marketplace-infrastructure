@@ -69,20 +69,43 @@ module "external_secrets" {
 }
 
 module "mssql" {
-  source                	= "../modules/rds"
-  project_code          	= var.project_code
-  private_subnet_one_id 	= module.vpcmodule.private_subnets_output[0]
-  private_subnet_two_id 	= module.vpcmodule.private_subnets_output[1]
-  env_name              	= var.env_name
-  vpc_cidr              	= var.vpc_cidr
-  eks_vpc_id            	= module.vpcmodule.vpc.id
-  rds_engine			= var.rds_engine
-  rds_engine_version		= var.rds_engine_version
-  rds_instance_class		= var.rds_instance_class
-  rds_allocated_storage 	= var.rds_allocated_storage
-  rds_storage_type		= var.rds_storage_type
-  rds_multi_az			= var.rds_multi_az
-  rds_backup_retention_period 	= var.rds_backup_retention_period
+  source                	           = "../modules/rds-mssql"
+  project_code          	           = var.project_code
+  private_subnet_one_id 	           = module.vpcmodule.private_subnets_output[0]
+  private_subnet_two_id 	           = module.vpcmodule.private_subnets_output[1]
+  env_name              	           = var.env_name
+  vpc_cidr              	           = var.vpc_cidr
+  eks_vpc_id            	           = module.vpcmodule.vpc.id
+  rds_mssql_engine                   = var.rds_mssql_engine
+  rds_mssql_engine_version           = var.rds_mssql_engine_version
+  rds_mssql_instance_class           = var.rds_mssql_instance_class
+  rds_mssql_allocated_storage        = var.rds_mssql_allocated_storage
+  rds_mssql_storage_type             = var.rds_mssql_storage_type
+  rds_mssql_multi_az                 = var.rds_mssql_multi_az
+  rds_mssql_backup_retention_period  = var.rds_mssql_backup_retention_period
+  rds_mssql_skip_final_snapshot      = var.rds_mssql_skip_final_snapshot
+  rds_mssql_license_model            = var.rds_mssql_license_model
+  rds_mssql_username                 = var.rds_mssql_username
+}
+
+module "postgres" {
+  source                	             = "../modules/rds-postgres"
+  project_code          	             = var.project_code
+  private_subnet_one_id 	             = module.vpcmodule.private_subnets_output[0]
+  private_subnet_two_id 	             = module.vpcmodule.private_subnets_output[1]
+  env_name              	             = var.env_name
+  vpc_cidr              	             = var.vpc_cidr
+  eks_vpc_id            	             = module.vpcmodule.vpc.id
+  rds_postgres_engine                  = var.rds_postgres_engine
+  rds_postgres_engine_version          = var.rds_postgres_engine_version
+  rds_postgres_instance_class          = var.rds_postgres_instance_class
+  rds_postgres_allocated_storage       = var.rds_postgres_allocated_storage
+  rds_postgres_storage_type            = var.rds_postgres_storage_type
+  rds_postgres_multi_az                = var.rds_postgres_multi_az
+  rds_postgres_backup_retention_period = var.rds_postgres_backup_retention_period
+  rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
+  rds_postgres_license_model           = var.rds_postgres_license_model
+  rds_postgres_username                = var.rds_postgres_username
 }
 
 module "app_params" {

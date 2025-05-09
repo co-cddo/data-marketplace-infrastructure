@@ -30,32 +30,92 @@ variable "app_namespace" {
   type    = string
   default = "app"
 }
-variable "rds_engine" {
+#-------------------------------------------------
+#-- MSSQL
+#-------------------------------------------------
+variable "rds_mssql_engine" {
   type    = string
   default = "sqlserver-ex"
 }
-variable "rds_engine_version" {
+variable "rds_mssql_engine_version" {
   type    = string
   default = "16.00.4185.3.v1"
 }
-variable "rds_instance_class" {
+variable "rds_mssql_instance_class" {
   type    = string
   default = "db.t3.large"
 }
-variable "rds_allocated_storage" {
+variable "rds_mssql_allocated_storage" {
   type    = number
   default = 200
 }
-variable "rds_storage_type" {
+variable "rds_mssql_storage_type" {
   type    = string
   default = "gp3"
 }
-variable "rds_multi_az" {
+variable "rds_mssql_license_model" {
+  type    = string
+  default = "license-included"
+}
+variable "rds_mssql_username" {
+  type    = string
+  default = "admin"
+}
+variable "rds_mssql_multi_az" {
   type    = bool
   default = false
 }
-variable "rds_backup_retention_period" {
+variable "rds_mssql_backup_retention_period" {
   type    = number
   default = 7
 }
+variable "rds_mssql_skip_final_snapshot" {
+  type    = bool
+  default = true
+}
+#-------------------------------------------------
+#-- POSTGRES
+#-------------------------------------------------
+variable "rds_postgres_engine" {
+  type    = string
+  default = "sqlserver-ex"
+}
+variable "rds_postgres_engine_version" {
+  type    = string
+  default = "16.00.4185.3.v1"
+}
+variable "rds_postgres_instance_class" {
+  type    = string
+  default = "db.t3.large"
+}
+variable "rds_postgres_allocated_storage" {
+  type    = number
+  default = 200
+}
+variable "rds_postgres_storage_type" {
+  type    = string
+  default = "gp3"
+}
+variable "rds_postgres_license_model" {
+  type    = string
+  default = "license-included"
+}
+variable "rds_postgres_username" {
+  type    = string
+  default = "admin"
+}
+variable "rds_postgres_multi_az" {
+  type    = bool
+  default = false
+}
+variable "rds_postgres_backup_retention_period" {
+  type    = number
+  default = 7
+}
+variable "rds_postgres_skip_final_snapshot" {
+  type    = bool
+  default = true
+}
+#-------------------------------------------------
+
 
