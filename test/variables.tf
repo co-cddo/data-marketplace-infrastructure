@@ -78,11 +78,11 @@ variable "rds_mssql_skip_final_snapshot" {
 #-------------------------------------------------
 variable "rds_postgres_engine" {
   type    = string
-  default = "sqlserver-ex"
+  default = "postgres"
 }
 variable "rds_postgres_engine_version" {
   type    = string
-  default = "16.00.4185.3.v1"
+  default = "16.6"
 }
 variable "rds_postgres_instance_class" {
   type    = string
@@ -98,11 +98,11 @@ variable "rds_postgres_storage_type" {
 }
 variable "rds_postgres_license_model" {
   type    = string
-  default = "license-included"
+  default = "postgresql-license"
 }
 variable "rds_postgres_username" {
   type    = string
-  default = "admin"
+  default = "pgadmin"
 }
 variable "rds_postgres_multi_az" {
   type    = bool
