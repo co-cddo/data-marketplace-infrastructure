@@ -4,7 +4,7 @@ provider "aws" {
 
 locals {
   tags = {
-    Project     = "Data-Marketplace"
+    Project     = "DataShare"
     Environment = var.env_name
     Team        = "CDDO"
   }
