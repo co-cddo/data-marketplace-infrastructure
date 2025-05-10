@@ -235,11 +235,97 @@ resource "aws_secretsmanager_secret" "mssql_password_dev" {
   description = "MSSQL master password for dev"
 }
 resource "aws_secretsmanager_secret_version" "mssql_password_version" {
-  secret_id     = aws_secretsmanager_secret.mssql_password_dev.id
+  secret_id = aws_secretsmanager_secret.mssql_password_dev.id
+  secret_string = jsonencode({
+    password = "NO-PASS-HERE"
+  })
+}
+resource "aws_secretsmanager_secret" "mssql_password_stg" {
+  name        = "dm-gen-mssql-masterpassword-stg"
+  description = "MSSQL master password for stage"
+}
+resource "aws_secretsmanager_secret_version" "mssql_password_version_stg" {
+  secret_id = aws_secretsmanager_secret.mssql_password_stg.id
   secret_string = jsonencode({
     password = "NO-PASS-HERE"
   })
 }
 output "secret_id" {
   value = aws_secretsmanager_secret.mssql_password_dev.id
+}
+output "mssql_pass" {
+  value = aws_secretsmanager_secret.mssql_password_stg.id
+}
+
+# Private subnet for instances of admin tasks
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+resource "aws_subnet" "private_in_default" {
+  vpc_id            = data.aws_vpc.default.id
+  cidr_block        = "172.31.64.0/20"  # adjust as needed
+  availability_zone = "eu-west-2a"
+
+  tags = {
+    Name = "default-private-subnet"
+    Type = "private"
+  }
+}
+
+resource "aws_route_table" "private_rtb" {
+  vpc_id = data.aws_vpc.default.id
+
+  tags = {
+    Name = "private-route-table"
+  }
+}
+
+resource "aws_route_table_association" "private_assoc" {
+  subnet_id      = aws_subnet.private_in_default.id
+  route_table_id = aws_route_table.private_rtb.id
+}
+
+
+
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_subnet" "public_first" {
+  id = data.aws_subnets.default.ids[0]
+}
+
+
+
+data "aws_internet_gateway" "default" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+resource "aws_eip" "default_ngw" {
+  domain = "vpc"
+}
+
+
+resource "aws_nat_gateway" "default_ngw" {
+  allocation_id = aws_eip.default_ngw.id
+  subnet_id     = data.aws_subnet.public_first.id
+
+  tags = {
+    Name = "default-vpc-nat-gw"
+  }
+}
+
+
+resource "aws_route" "private_to_internet" {
+  route_table_id         = aws_route_table.private_rtb.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id             = aws_nat_gateway.default_ngw.id
 }

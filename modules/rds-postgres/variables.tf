@@ -1,0 +1,16 @@
+variable "project_code" {}
+variable "env_name" {}
+variable "vpc_cidr" {}
+variable "eks_vpc_id" {}
+variable "private_subnet_one_id" {}
+variable "private_subnet_two_id" {}
+variable "rds_postgres_engine" {}
+variable "rds_postgres_engine_version" {}
+variable "rds_postgres_instance_class" {}
+variable "rds_postgres_allocated_storage" {}
+variable "rds_postgres_storage_type" {}
+variable "rds_postgres_license_model" {}
+variable "rds_postgres_multi_az" {}
+variable "rds_postgres_backup_retention_period" {}
+variable "rds_postgres_username" {}
+variable "rds_postgres_skip_final_snapshot" {}
