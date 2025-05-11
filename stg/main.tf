@@ -23,6 +23,12 @@ module "vpcmodule" {
   cluster_version = var.cluster_version
 }
 
+resource "null_resource" "network_ready" {
+  depends_on = [
+    module.vpcmodule
+  ]
+}
+
 module "eks_cluster" {
   source                = "../modules/eks"
   project_code          = var.project_code
@@ -36,6 +42,7 @@ module "eks_cluster" {
   app_namespace         = var.app_namespace
   sa_name               = "aws-generic-sa"
   tags                  = local.tags
+  network_dependency = null_resource.network_ready.id
 }
 
 module "load_balancer" {
@@ -52,6 +59,14 @@ module "load_balancer" {
   sa_namespace     = "kube-system"
 }
 
+
+resource "null_resource" "network_ready_2" {
+  depends_on = [
+    module.vpcmodule,
+    module.eks_cluster
+  ]
+}
+
 module "external_secrets" {
   source                = "../modules/external-secrets"
   eks_cluster           = module.eks_cluster.eks_cluster
@@ -64,7 +79,10 @@ module "external_secrets" {
   private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
   sa_name               = "externalsecret-sa"
   sa_namespace          = var.app_namespace
+  
+  network_dependency = null_resource.network_ready_2.id
 }
+
 
 module "mssql" {
   source                        = "../modules/rds-mssql"
@@ -81,20 +99,19 @@ module "mssql" {
   rds_storage_type              = var.rds_storage_type
   rds_multi_az                  = var.rds_multi_az
   rds_backup_retention_period   = var.rds_backup_retention_period
-  rds_mssql_skip_final_snapshot      = var.rds_mssql_skip_final_snapshot
-  rds_mssql_license_model            = var.rds_mssql_license_model
-  rds_mssql_username                 = var.rds_mssql_username
+  rds_mssql_skip_final_snapshot = var.rds_mssql_skip_final_snapshot
+  rds_mssql_license_model       = var.rds_mssql_license_model
+  rds_mssql_username            = var.rds_mssql_username
 }
 
-
 module "postgres" {
-  source                	             = "../modules/rds-postgres"
-  project_code          	             = var.project_code
-  private_subnet_one_id 	             = module.vpcmodule.private_subnets_output[0]
-  private_subnet_two_id 	             = module.vpcmodule.private_subnets_output[1]
-  env_name              	             = var.env_name
-  vpc_cidr              	             = var.vpc_cidr
-  eks_vpc_id            	             = module.vpcmodule.vpc.id
+  source                               = "../modules/rds-postgres"
+  project_code                         = var.project_code
+  private_subnet_one_id                = module.vpcmodule.private_subnets_output[0]
+  private_subnet_two_id                = module.vpcmodule.private_subnets_output[1]
+  env_name                             = var.env_name
+  vpc_cidr                             = var.vpc_cidr
+  eks_vpc_id                           = module.vpcmodule.vpc.id
   rds_postgres_engine                  = var.rds_postgres_engine
   rds_postgres_engine_version          = var.rds_postgres_engine_version
   rds_postgres_instance_class          = var.rds_postgres_instance_class

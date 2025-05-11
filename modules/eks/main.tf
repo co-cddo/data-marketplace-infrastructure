@@ -42,8 +42,8 @@ resource "aws_eks_cluster" "cluster" {
   vpc_config {
 
     endpoint_private_access = true
-    endpoint_public_access  = true
-    public_access_cidrs     = ["0.0.0.0/0"]
+    endpoint_public_access  = false
+    // public_access_cidrs     = ["0.0.0.0/0"]
     //need to improve this code and not use 0 and 1 
     subnet_ids = [
       var.private_subnet_one_id,
@@ -51,18 +51,44 @@ resource "aws_eks_cluster" "cluster" {
     ]
   }
 
-  # csutom controllers need this config (loadbalancer, external secret)
-  provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${var.project_code}-${var.env_name}-eks-cluster --region ${var.region}"
+  depends_on = [
+    aws_iam_role_policy_attachment.amazon-eks-cluster-policy,
+  ]
 
-  }
-
-
-  depends_on = [aws_iam_role_policy_attachment.amazon-eks-cluster-policy]
-
-  tags = var.tags
+  tags = merge(
+    var.tags,
+    {
+      vpc_dependency = var.network_dependency
+    }
+  )
 
 }
+data "aws_security_group" "eks_cluster_sg" {
+  id = data.aws_eks_cluster.this.vpc_config[0].cluster_security_group_id
+}
+
+resource "aws_security_group_rule" "allow_peered_vpc_to_control_plane" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["172.31.0.0/16"]
+  security_group_id = data.aws_security_group.eks_cluster_sg.id
+  description       = "Allow peered VPC private subnet CIDR to access EKS control plane"
+}
+
+# custom controllers need this config (loadbalancer, external secret)
+resource "null_resource" "eks_kubeconfig_update" {
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${aws_eks_cluster.cluster.name} --region ${var.region}"
+  }
+
+  depends_on = [
+    aws_eks_cluster.cluster,
+    aws_security_group_rule.allow_peered_vpc_to_control_plane
+  ]
+}
+
 
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
@@ -82,10 +108,14 @@ resource "aws_iam_openid_connect_provider" "oidcprovider" {
 resource "null_resource" "cluster" {
 
   # depends_on = [null_resource.awscli]
-  depends_on = [aws_eks_cluster.cluster]
+  depends_on = [
+    aws_eks_cluster.cluster,
+    aws_security_group_rule.allow_peered_vpc_to_control_plane
+  ]
+
 
   provisioner "local-exec" {
-    command = "kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"
+    command = "sleep 45 && kubectl apply -f https://s3.us-west-2.amazonaws.com/amazon-eks/docs/eks-console-full-access.yaml"
   }
 }
 
@@ -122,6 +152,7 @@ resource "aws_eks_fargate_profile" "kube-system" {
 
   selector {
     namespace = "kube-system"
+    labels    = {}
   }
 }
 
@@ -140,6 +171,7 @@ resource "aws_eks_fargate_profile" "fp-app" {
 
   selector {
     namespace = "app"
+    labels    = {}
   }
 }
 
@@ -194,28 +226,28 @@ resource "aws_eks_addon" "coredns" {
 
 
   configuration_values = jsonencode({
-        computeType = "Fargate"
-        # Ensure that the we fully utilize the minimum amount of resources that are supplied by
-        # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
-        # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
-        # components (kubelet, kube-proxy, and containerd). Fargate rounds up to the following
-        # compute configuration that most closely matches the sum of vCPU and memory requests in
-        # order to ensure pods always have the resources that they need to run.
-        resources = {
-          limits = {
-            cpu = "0.25"
-            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
-            # request/limit to ensure we can fit within that task
-            memory = "256M"
-          }
-          requests = {
-            cpu = "0.25"
-            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
-            # request/limit to ensure we can fit within that task
-            memory = "256M"
-          }
-        }
-      })
+    computeType = "Fargate"
+    # Ensure that the we fully utilize the minimum amount of resources that are supplied by
+    # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
+    # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
+    # components (kubelet, kube-proxy, and containerd). Fargate rounds up to the following
+    # compute configuration that most closely matches the sum of vCPU and memory requests in
+    # order to ensure pods always have the resources that they need to run.
+    resources = {
+      limits = {
+        cpu = "0.25"
+        # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+        # request/limit to ensure we can fit within that task
+        memory = "256M"
+      }
+      requests = {
+        cpu = "0.25"
+        # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+        # request/limit to ensure we can fit within that task
+        memory = "256M"
+      }
+    }
+  })
 
 
 

@@ -10,3 +10,8 @@ variable "app_namespace" {}
 variable "sa_name" {}
 variable "tags" { default = {} }
 variable "coredns_version" { default = "v1.11.4-eksbuild.2" }
+variable "network_dependency" {
+  description = "Used to enforce dependency on VPC peering"
+  type        = string
+  default     = ""
+}
