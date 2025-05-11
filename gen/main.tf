@@ -265,7 +265,7 @@ data "aws_vpc" "default" {
 
 resource "aws_subnet" "private_in_default" {
   vpc_id            = data.aws_vpc.default.id
-  cidr_block        = "172.31.64.0/20"  # adjust as needed
+  cidr_block        = "172.31.64.0/20" # adjust as needed
   availability_zone = "eu-west-2a"
 
   tags = {
@@ -311,6 +311,9 @@ data "aws_internet_gateway" "default" {
 }
 resource "aws_eip" "default_ngw" {
   domain = "vpc"
+  tags = {
+    "Name" = "dm-gen-ElasticIP"
+  }
 }
 
 
@@ -327,5 +330,5 @@ resource "aws_nat_gateway" "default_ngw" {
 resource "aws_route" "private_to_internet" {
   route_table_id         = aws_route_table.private_rtb.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id             = aws_nat_gateway.default_ngw.id
+  nat_gateway_id         = aws_nat_gateway.default_ngw.id
 }
