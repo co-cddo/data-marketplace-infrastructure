@@ -51,9 +51,9 @@ resource "aws_security_group" "postgres_db_sg" {
   }
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
     // TODO: make it more parametric!
     cidr_blocks = ["172.31.0.0/16"]
     description = "FromDefaultVPC"

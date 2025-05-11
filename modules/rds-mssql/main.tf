@@ -9,18 +9,18 @@ data "aws_secretsmanager_secret_version" "db_password" {
 
 
 resource "aws_db_instance" "mssql_instance" {
-  identifier        = "${var.project_code}-${var.env_name}-rds-mssql-instance"
-  engine            = "sqlserver-ex"
-  engine_version    = "16.00.4185.3.v1"
-  instance_class    = "db.t3.large"
-  allocated_storage = 200
-  storage_type      = "gp3"
+  identifier              = "${var.project_code}-${var.env_name}-rds-mssql-instance"
+  engine                  = "sqlserver-ex"
+  engine_version          = "16.00.4185.3.v1"
+  instance_class          = "db.t3.large"
+  allocated_storage       = 200
+  storage_type            = "gp3"
   license_model           = var.rds_mssql_license_model
-  username = var.rds_mssql_username
-  password = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
-  multi_az               = false
+  username                = var.rds_mssql_username
+  password                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
+  vpc_security_group_ids  = [aws_security_group.db_sg.id]
+  db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name
+  multi_az                = false
   backup_retention_period = 7
   skip_final_snapshot     = var.rds_mssql_skip_final_snapshot
 
