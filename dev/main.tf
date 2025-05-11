@@ -69,20 +69,20 @@ module "external_secrets" {
 }
 
 module "mssql" {
-  source                	= "../modules/rds"
-  project_code          	= var.project_code
-  private_subnet_one_id 	= module.vpcmodule.private_subnets_output[0]
-  private_subnet_two_id 	= module.vpcmodule.private_subnets_output[1]
-  env_name              	= var.env_name
-  vpc_cidr              	= var.vpc_cidr
-  eks_vpc_id            	= module.vpcmodule.vpc.id
-  rds_engine			= var.rds_engine
-  rds_engine_version		= var.rds_engine_version
-  rds_instance_class		= var.rds_instance_class
-  rds_allocated_storage 	= var.rds_allocated_storage
-  rds_storage_type		= var.rds_storage_type
-  rds_multi_az			= var.rds_multi_az
-  rds_backup_retention_period 	= var.rds_backup_retention_period
+  source                      = "../modules/rds"
+  project_code                = var.project_code
+  private_subnet_one_id       = module.vpcmodule.private_subnets_output[0]
+  private_subnet_two_id       = module.vpcmodule.private_subnets_output[1]
+  env_name                    = var.env_name
+  vpc_cidr                    = var.vpc_cidr
+  eks_vpc_id                  = module.vpcmodule.vpc.id
+  rds_engine                  = var.rds_engine
+  rds_engine_version          = var.rds_engine_version
+  rds_instance_class          = var.rds_instance_class
+  rds_allocated_storage       = var.rds_allocated_storage
+  rds_storage_type            = var.rds_storage_type
+  rds_multi_az                = var.rds_multi_az
+  rds_backup_retention_period = var.rds_backup_retention_period
 }
 
 module "app_params" {

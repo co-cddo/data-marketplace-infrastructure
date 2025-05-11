@@ -18,13 +18,13 @@ resource "aws_ssm_parameter" "string_parameters" {
 
 
 resource "aws_ssm_parameter" "securestring_parameters" {
-  for_each  = toset(local.securestring_parameters)
-  name      = "${local.prefix}${each.value}"
-  type      = "SecureString"
-  value     = local.securestring_initial_value
-  tier      = local.securestring_tier
-  key_id    = local.key_id
-#  overwrite = local.overwrite
+  for_each = toset(local.securestring_parameters)
+  name     = "${local.prefix}${each.value}"
+  type     = "SecureString"
+  value    = local.securestring_initial_value
+  tier     = local.securestring_tier
+  key_id   = local.key_id
+  #  overwrite = local.overwrite
   lifecycle {
     ignore_changes = [
       value,
