@@ -30,6 +30,10 @@ variable "app_namespace" {
   type    = string
   default = "app"
 }
+
+#-------------------------------------------------
+#-- MSSQL
+#-------------------------------------------------
 variable "rds_engine" {
   type    = string
   default = "sqlserver-ex"
@@ -56,7 +60,7 @@ variable "rds_mssql_license_model" {
 }
 variable "rds_mssql_username" {
   type    = string
-  default = "admin"
+  default = "saadmin"
 }
 variable "rds_multi_az" {
   type    = bool
@@ -69,6 +73,9 @@ variable "rds_backup_retention_period" {
 variable "rds_mssql_skip_final_snapshot" {
   type    = bool
   default = true
+}
+variable "rds_mssql_snapshot_identifier" {
+  type = string
 }
 #-------------------------------------------------
 #-- POSTGRES

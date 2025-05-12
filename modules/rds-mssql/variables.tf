@@ -14,3 +14,4 @@ variable "rds_multi_az" {}
 variable "rds_backup_retention_period" {}
 variable "rds_mssql_username" {}
 variable "rds_mssql_skip_final_snapshot" {}
+variable "rds_mssql_snapshot_identifier" {}

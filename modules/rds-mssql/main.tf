@@ -23,6 +23,7 @@ resource "aws_db_instance" "mssql_instance" {
   multi_az                = false
   backup_retention_period = 7
   skip_final_snapshot     = var.rds_mssql_skip_final_snapshot
+  snapshot_identifier     = var.rds_mssql_snapshot_identifier
 
   tags = {
     Name = "${var.project_code}-${var.env_name}-eks-sg"
@@ -38,6 +39,10 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   }
 }
 
+data "aws_vpc" "default" {
+  default = true
+}
+
 resource "aws_security_group" "db_sg" {
   name        = "${var.project_code}-${var.env_name}-mssql-sg"
   description = "Security group for MSSQL RDS instance"
@@ -48,7 +53,7 @@ resource "aws_security_group" "db_sg" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
+    cidr_blocks = [var.vpc_cidr, data.aws_vpc.default.cidr_block]
   }
 
   egress {

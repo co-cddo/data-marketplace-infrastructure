@@ -42,7 +42,7 @@ module "eks_cluster" {
   app_namespace         = var.app_namespace
   sa_name               = "aws-generic-sa"
   tags                  = local.tags
-  network_dependency = null_resource.network_ready.id
+  network_dependency    = null_resource.network_ready.id
 }
 
 module "load_balancer" {
@@ -79,7 +79,7 @@ module "external_secrets" {
   private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
   sa_name               = "externalsecret-sa"
   sa_namespace          = var.app_namespace
-  
+
   network_dependency = null_resource.network_ready_2.id
 }
 
@@ -102,6 +102,7 @@ module "mssql" {
   rds_mssql_skip_final_snapshot = var.rds_mssql_skip_final_snapshot
   rds_mssql_license_model       = var.rds_mssql_license_model
   rds_mssql_username            = var.rds_mssql_username
+  rds_mssql_snapshot_identifier = var.rds_mssql_snapshot_identifier
 }
 
 module "postgres" {
