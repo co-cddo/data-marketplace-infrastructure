@@ -1,9 +1,4 @@
 import {
-  to = aws_dynamodb_table.state_dynamo_table
-  id = var.dynamodb_tablename
-}
-
-import {
   to = aws_s3_bucket.state_backend_bucket
   id = "dm-gen-config"
 }
