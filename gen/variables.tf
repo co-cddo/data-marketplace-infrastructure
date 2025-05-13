@@ -34,3 +34,7 @@ variable "readonly_role_name" {
   type    = string
   default = "dm-gen-role-readonly"
 }
+variable "adm_ec2_profile_role_name" {
+  type    = string
+  default = "dm-gen-ec2-profile-role"
+}
