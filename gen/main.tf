@@ -221,7 +221,7 @@ resource "aws_secretsmanager_secret" "mssql_passwords" {
 resource "aws_secretsmanager_secret_version" "mssql_passwords_version" {
   secret_id = aws_secretsmanager_secret.mssql_passwords.id
   secret_string = jsonencode({
-    dbusername = "saadmin",
+    dbusername   = "saadmin",
     dev-password = "NO-PASS-HERE",
     tst-password = "NO-PASS-HERE",
     stg-password = "NO-PASS-HERE",
@@ -236,7 +236,7 @@ resource "aws_secretsmanager_secret" "postgresql_passwords" {
 resource "aws_secretsmanager_secret_version" "postgresql_passwords_version" {
   secret_id = aws_secretsmanager_secret.postgresql_passwords.id
   secret_string = jsonencode({
-    dbusername = "pgadmin",
+    dbusername   = "pgadmin",
     dev-password = "NO-PASS-HERE",
     tst-password = "NO-PASS-HERE",
     stg-password = "NO-PASS-HERE",
