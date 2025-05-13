@@ -1,10 +1,12 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_kms_key" "state_backend_bucket_kms_key" {
   description             = "Encrypt the state bucket objects"
   deletion_window_in_days = 10
 }
 
 resource "aws_s3_bucket" "state_backend_bucket" {
-  bucket = "dm-gen-config"
+  bucket = "dm-gen-config-prod"
 }
 
 
@@ -99,7 +101,7 @@ resource "aws_iam_role" "devops_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = "sts:AssumeRole",
         Condition = {
@@ -144,7 +146,7 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:DescribeLogStreams",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/docker/mygroup:*"
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/docker/mygroup:*"
       },
       {
         "Sid" : "VisualEditor1",
@@ -153,7 +155,7 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:GetLogEvents",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/docker/mygroup:*"
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/docker/mygroup:*"
       },
       {
         "Sid" : "VisualEditor2",
@@ -177,7 +179,7 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:GetLogEvents",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/dm/docker/applications:*"
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/dm/docker/applications:*"
       }
     ]
 
@@ -194,7 +196,7 @@ resource "aws_iam_role" "developer_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = "sts:AssumeRole",
         Condition = {
@@ -226,7 +228,7 @@ resource "aws_iam_role" "readonly_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = "sts:AssumeRole",
         Condition = {
