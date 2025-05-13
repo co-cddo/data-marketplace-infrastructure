@@ -90,7 +90,10 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "adm-ec2-instance-profile"
+  role = aws_iam_role.adm_ec2_profile_role.name
+}
 
 resource "aws_iam_role" "devops_role" {
   name = var.devops_role_name
