@@ -1,7 +1,8 @@
 terraform {
   backend "s3" {
-    bucket       = "cddo-datamarketplace-tfstate"
-    key          = "gen/terraform.tfstate"
+    # BUCKET NAME SHOULD BE SET ACCORDING TO ACCOUNT TYPE
+    bucket       = "dm-gen-config-prod"
+    key          = "terraform/gen/terraform.tfstate"
     region       = "eu-west-2"
     use_lockfile = true
   }

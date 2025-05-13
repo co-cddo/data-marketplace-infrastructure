@@ -6,7 +6,7 @@ resource "aws_kms_key" "state_backend_bucket_kms_key" {
 }
 
 resource "aws_s3_bucket" "state_backend_bucket" {
-  bucket = "dm-gen-config-prod"
+  bucket = "dm-gen-config-${var.account_type}"
 }
 
 
