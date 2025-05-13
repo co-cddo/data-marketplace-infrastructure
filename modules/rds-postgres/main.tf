@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret" "db_password" {
-  name = "dm-gen-mssql-masterpassword-${var.env_name}"
+  name = "dm-gen-postgresql-master-credentials"
 }
 
 data "aws_secretsmanager_secret_version" "db_password" {
@@ -14,8 +14,8 @@ resource "aws_db_instance" "postgresql_instance" {
   allocated_storage       = var.rds_postgres_allocated_storage
   storage_type            = var.rds_postgres_storage_type
   license_model           = var.rds_postgres_license_model
-  username                = var.rds_postgres_username
-  password                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]
+  username                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["dbusername"]
+  password                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["${var.env_name}-password"]
   vpc_security_group_ids  = [aws_security_group.postgres_db_sg.id]
   db_subnet_group_name    = aws_db_subnet_group.postgres_db_subnet_group.name
   multi_az                = var.rds_postgres_multi_az

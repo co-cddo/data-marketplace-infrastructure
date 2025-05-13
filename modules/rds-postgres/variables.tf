@@ -12,5 +12,4 @@ variable "rds_postgres_storage_type" {}
 variable "rds_postgres_license_model" {}
 variable "rds_postgres_multi_az" {}
 variable "rds_postgres_backup_retention_period" {}
-variable "rds_postgres_username" {}
 variable "rds_postgres_skip_final_snapshot" {}

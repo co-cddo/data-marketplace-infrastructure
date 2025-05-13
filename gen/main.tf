@@ -214,31 +214,34 @@ resource "aws_iam_policy_attachment" "readonly_role_policy_attachment" {
 }
 
 
-resource "aws_secretsmanager_secret" "mssql_password_dev" {
-  name        = var.secretmanager_mssql_masterpass_dev_name
-  description = "MSSQL master password for dev"
+resource "aws_secretsmanager_secret" "mssql_passwords" {
+  name        = "dm-gen-mssql-master-credentials"
+  description = "MSSQL master credentials"
 }
-resource "aws_secretsmanager_secret_version" "mssql_password_version" {
-  secret_id = aws_secretsmanager_secret.mssql_password_dev.id
+resource "aws_secretsmanager_secret_version" "mssql_passwords_version" {
+  secret_id = aws_secretsmanager_secret.mssql_passwords.id
   secret_string = jsonencode({
-    password = "NO-PASS-HERE"
+    dbusername = "saadmin",
+    dev-password = "NO-PASS-HERE",
+    tst-password = "NO-PASS-HERE",
+    stg-password = "NO-PASS-HERE",
+    pro-password = "NO-PASS-HERE"
   })
 }
-resource "aws_secretsmanager_secret" "mssql_password_stg" {
-  name        = "dm-gen-mssql-masterpassword-stg"
-  description = "MSSQL master password for stage"
+
+resource "aws_secretsmanager_secret" "postgresql_passwords" {
+  name        = "dm-gen-postgresql-master-credentials"
+  description = "POSTGRESQL master credentials"
 }
-resource "aws_secretsmanager_secret_version" "mssql_password_version_stg" {
-  secret_id = aws_secretsmanager_secret.mssql_password_stg.id
+resource "aws_secretsmanager_secret_version" "postgresql_passwords_version" {
+  secret_id = aws_secretsmanager_secret.postgresql_passwords.id
   secret_string = jsonencode({
-    password = "NO-PASS-HERE"
+    dbusername = "pgadmin",
+    dev-password = "NO-PASS-HERE",
+    tst-password = "NO-PASS-HERE",
+    stg-password = "NO-PASS-HERE",
+    pro-password = "NO-PASS-HERE"
   })
-}
-output "secret_id" {
-  value = aws_secretsmanager_secret.mssql_password_dev.id
-}
-output "mssql_pass" {
-  value = aws_secretsmanager_secret.mssql_password_stg.id
 }
 
 # Private subnet for instances of admin tasks

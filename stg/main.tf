@@ -101,7 +101,6 @@ module "mssql" {
   rds_backup_retention_period   = var.rds_backup_retention_period
   rds_mssql_skip_final_snapshot = var.rds_mssql_skip_final_snapshot
   rds_mssql_license_model       = var.rds_mssql_license_model
-  rds_mssql_username            = var.rds_mssql_username
   rds_mssql_snapshot_identifier = var.rds_mssql_snapshot_identifier
 }
 
@@ -122,7 +121,6 @@ module "postgres" {
   rds_postgres_backup_retention_period = var.rds_postgres_backup_retention_period
   rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   rds_postgres_license_model           = var.rds_postgres_license_model
-  rds_postgres_username                = var.rds_postgres_username
 }
 
 

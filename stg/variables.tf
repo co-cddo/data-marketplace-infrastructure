@@ -48,7 +48,7 @@ variable "rds_instance_class" {
 }
 variable "rds_allocated_storage" {
   type    = number
-  default = 200
+  default = 30
 }
 variable "rds_storage_type" {
   type    = string
@@ -57,10 +57,6 @@ variable "rds_storage_type" {
 variable "rds_mssql_license_model" {
   type    = string
   default = "license-included"
-}
-variable "rds_mssql_username" {
-  type    = string
-  default = "saadmin"
 }
 variable "rds_multi_az" {
   type    = bool
@@ -103,10 +99,6 @@ variable "rds_postgres_storage_type" {
 variable "rds_postgres_license_model" {
   type    = string
   default = "postgresql-license"
-}
-variable "rds_postgres_username" {
-  type    = string
-  default = "pgadmin"
 }
 variable "rds_postgres_multi_az" {
   type    = bool
