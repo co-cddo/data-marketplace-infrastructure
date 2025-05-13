@@ -297,6 +297,7 @@ resource "aws_subnet" "private_in_default" {
     Name = "default-private-subnet"
     Type = "private"
   }
+  depends_on = [aws_nat_gateway.default_ngw]
 }
 
 resource "aws_route_table" "private_rtb" {
@@ -322,8 +323,8 @@ data "aws_subnets" "default" {
   }
 }
 
-data "aws_subnet" "public_first" {
-  id = data.aws_subnets.default.ids[0]
+data "aws_subnet" "public_second" {
+  id = data.aws_subnets.default.ids[1]
 }
 
 
@@ -344,7 +345,7 @@ resource "aws_eip" "default_ngw" {
 
 resource "aws_nat_gateway" "default_ngw" {
   allocation_id = aws_eip.default_ngw.id
-  subnet_id     = data.aws_subnet.public_first.id
+  subnet_id     = data.aws_subnet.public_second.id
 
   tags = {
     Name = "default-vpc-nat-gw"
