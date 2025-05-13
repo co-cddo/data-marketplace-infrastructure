@@ -13,13 +13,13 @@ variable "env_name" {
 #vpc vars
 variable "vpc_cidr" {
   type    = string
-  default = "10.20.0.0/16"
+  default = "10.21.0.0/16"
 }
 variable "private_subnets" {
-  default = ["10.20.3.0/24", "10.20.4.0/24"]
+  default = ["10.21.3.0/24", "10.21.4.0/24"]
 }
 variable "public_subnets" {
-  default = ["10.20.1.0/24", "10.20.2.0/24"]
+  default = ["10.21.1.0/24", "10.21.2.0/24"]
 }
 # eks cluster vars
 variable "cluster_version" {
