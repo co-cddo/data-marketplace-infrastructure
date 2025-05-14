@@ -3,7 +3,8 @@ variable "region" {
   default = "eu-west-2"
 }
 variable "account_type" {
-  type = string
+  type        = string
+  description = "prod | dev" 
 }
 variable "devops_policy_name" {
   type    = string

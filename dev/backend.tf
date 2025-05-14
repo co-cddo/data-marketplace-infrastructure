@@ -1,7 +1,8 @@
 terraform {
   backend "s3" {
+    # BUCKET NAME SHOULD BE SET ACCORDING TO ACCOUNT TYPE
     bucket       = "dm-gen-config"
-    key          = "dev/terraform.tfstate"
+    key          = "terraform/dev/terraform.tfstate"
     region       = "eu-west-2"
     use_lockfile = true
   }

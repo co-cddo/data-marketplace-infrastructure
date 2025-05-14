@@ -6,6 +6,7 @@ variable "project_code" {
   type    = string
   default = "dm"
 }
+# DO NOT FORGET TO UPDATE BACKEND FILE ALSO
 variable "env_name" {
   type    = string
   default = "tst"

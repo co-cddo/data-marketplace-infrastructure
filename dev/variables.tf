@@ -6,6 +6,7 @@ variable "project_code" {
   type    = string
   default = "dm"
 }
+# DO NOT FORGET TO UPDATE BACKEND FILE ALSO
 variable "env_name" {
   type    = string
   default = "dev"
@@ -30,6 +31,10 @@ variable "app_namespace" {
   type    = string
   default = "app"
 }
+
+#-------------------------------------------------
+#-- MSSQL
+#-------------------------------------------------
 variable "rds_engine" {
   type    = string
   default = "sqlserver-ex"
@@ -44,11 +49,15 @@ variable "rds_instance_class" {
 }
 variable "rds_allocated_storage" {
   type    = number
-  default = 200
+  default = 30
 }
 variable "rds_storage_type" {
   type    = string
   default = "gp3"
+}
+variable "rds_mssql_license_model" {
+  type    = string
+  default = "license-included"
 }
 variable "rds_multi_az" {
   type    = bool
@@ -58,4 +67,50 @@ variable "rds_backup_retention_period" {
   type    = number
   default = 7
 }
-
+variable "rds_mssql_skip_final_snapshot" {
+  type    = bool
+  default = true
+}
+variable "rds_mssql_snapshot_identifier" {
+  type = string
+}
+#-------------------------------------------------
+#-- POSTGRES
+#-------------------------------------------------
+variable "rds_postgres_engine" {
+  type    = string
+  default = "postgres"
+}
+variable "rds_postgres_engine_version" {
+  type    = string
+  default = "16.6"
+}
+variable "rds_postgres_instance_class" {
+  type    = string
+  default = "db.t3.large"
+}
+variable "rds_postgres_allocated_storage" {
+  type    = number
+  default = 200
+}
+variable "rds_postgres_storage_type" {
+  type    = string
+  default = "gp3"
+}
+variable "rds_postgres_license_model" {
+  type    = string
+  default = "postgresql-license"
+}
+variable "rds_postgres_multi_az" {
+  type    = bool
+  default = false
+}
+variable "rds_postgres_backup_retention_period" {
+  type    = number
+  default = 7
+}
+variable "rds_postgres_skip_final_snapshot" {
+  type    = bool
+  default = true
+}
+#-------------------------------------------------
