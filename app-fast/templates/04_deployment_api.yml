@@ -46,6 +46,8 @@ spec:
         env:
           - name: ASPNETCORE_ENVIRONMENT
             value:  {{ENV_FULLNAME}}
+          - name: DM_CATALOGUE_BASE_URL
+            value: http://dm-fast-catalogue/api/v1
         ports:
         - name: http
           containerPort: 8000
