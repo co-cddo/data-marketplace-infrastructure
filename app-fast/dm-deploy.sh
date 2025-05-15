@@ -49,12 +49,11 @@ sed -i "s|{{ROLE_ARN_AWS_GENERIC}}|${AWS_GENERIC_ROLE}|g" 02_serviceaccount.yml
 sed -i "s/eu-west-2/${REGION}/g" 03_externalsecret.yml
 sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 03_externalsecret.yml
 
-
-IMG_UI=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-ui:${UI_VERSION}
-IMG_API=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-api:${API_VERSION}
-IMG_USERS=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-users:${USERS_VERSION}
-IMG_DATASHARE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-datashare:${DATASHARE_VERSION}
-IMG_CATALOGUE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-catalogue:${CATALOGUE_VERSION}
+IMG_UI=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-${ENV_NAME}:ui-${UI_VERSION}
+IMG_API=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-${ENV_NAME}:api-${API_VERSION}
+IMG_USERS=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-${ENV_NAME}:users-${USERS_VERSION}
+IMG_DATASHARE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-${ENV_NAME}:datashare-${DATASHARE_VERSION}
+IMG_CATALOGUE=${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/dm-fast-${ENV_NAME}:catalogue-${CATALOGUE_VERSION}
 
 sed -i "s|{{IMG}}|${IMG_UI}|g" 04_deployment_ui.yml
 sed -i "s|{{IMG}}|${IMG_API}|g" 04_deployment_api.yml
