@@ -121,6 +121,7 @@ module "postgres" {
   rds_postgres_backup_retention_period = var.rds_postgres_backup_retention_period
   rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   rds_postgres_license_model           = var.rds_postgres_license_model
+  rds_postgres_snapshot_identifier     = var.rds_postgres_snapshot_identifier
 }
 
 

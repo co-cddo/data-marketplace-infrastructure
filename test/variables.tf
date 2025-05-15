@@ -113,4 +113,7 @@ variable "rds_postgres_skip_final_snapshot" {
   type    = bool
   default = true
 }
+variable "rds_postgres_snapshot_identifier" {
+  type = string
+}
 #-------------------------------------------------

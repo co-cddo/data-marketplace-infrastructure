@@ -24,7 +24,7 @@ resource "aws_db_instance" "mssql_instance" {
   multi_az                = var.rds_multi_az
   backup_retention_period = var.rds_backup_retention_period
   skip_final_snapshot     = var.rds_mssql_skip_final_snapshot
-  snapshot_identifier     = var.rds_mssql_snapshot_identifier
+  snapshot_identifier     = var.rds_mssql_snapshot_identifier != "" ? var.rds_mssql_snapshot_identifier : null
 
   tags = {
     Name = "${var.project_code}-${var.env_name}-eks-sg"

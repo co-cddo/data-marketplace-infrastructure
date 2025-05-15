@@ -21,7 +21,8 @@ resource "aws_db_instance" "postgresql_instance" {
   multi_az                = var.rds_postgres_multi_az
   backup_retention_period = var.rds_postgres_backup_retention_period
   skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
-
+  snapshot_identifier     = var.rds_postgres_snapshot_identifier != "" ? var.rds_postgres_snapshot_identifier : null
+ 
   tags = {
     Name = "${var.project_code}-${var.env_name}-eks-sg"
   }
