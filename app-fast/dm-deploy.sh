@@ -73,6 +73,12 @@ sed -i "s|CERTIFICATEARN|${CERTIFICATEARN}|g" 06_ingress.yml
 
 if [[ ${ACTION} == "install" ]]; then
 
+
+
+  kubectl apply -f 00_logging_ns.yml
+  kubectl apply -f 00_logging_configmap.yml
+
+
   kubectl apply -f 01_namespace.yml
   kubectl apply -f 02_serviceaccount.yml
   kubectl apply -f 03_externalsecret.yml
@@ -87,12 +93,15 @@ if [[ ${ACTION} == "install" ]]; then
 
   kubectl apply -f 06_ingress.yml
 
+
+
+
 fi
 
 if [[ ${ACTION} == "uninstall" ]]; then
 
-
   kubectl delete ns app
+  kubectl delete -f 00_logging_ns.yml
 fi
 
 if [[ ${ACTION} == "update" ]]; then

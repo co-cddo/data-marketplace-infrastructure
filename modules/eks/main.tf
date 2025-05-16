@@ -276,3 +276,30 @@ provider "helm" {
 
   }
 }
+
+# Logging
+
+data "aws_iam_policy_document" "fargate_logs" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy"
+    ]
+
+    resources = ["*"]
+  }
+}
+resource "aws_iam_policy" "fargate_logs" {
+  name        = "${var.project_code}-${var.env_name}-policy-fargate-logs"
+  description = "Policy for Fargate pods to log to CloudWatch"
+  policy      = data.aws_iam_policy_document.fargate_logs.json
+}
+resource "aws_iam_role_policy_attachment" "attach_fargate_logs" {
+  role       = aws_iam_role.eks-fargate-profile-role.name
+  policy_arn = aws_iam_policy.fargate_logs.arn
+}
