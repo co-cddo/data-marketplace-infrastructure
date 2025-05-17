@@ -15,3 +15,7 @@ variable "network_dependency" {
   type        = string
   default     = ""
 }
+variable "account_type" {
+  type        = string
+  default = ""
+}

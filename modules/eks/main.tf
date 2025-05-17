@@ -303,3 +303,34 @@ resource "aws_iam_role_policy_attachment" "attach_fargate_logs" {
   role       = aws_iam_role.eks-fargate-profile-role.name
   policy_arn = aws_iam_policy.fargate_logs.arn
 }
+
+
+# in prod, pull images from dev ecr
+resource "aws_iam_policy" "ecr_pull_policy" {
+  count       = var.account_type == "prod" ? 1 : 0
+  name        = "${var.project_code}-${var.env_name}-policy-ecr-pull-from-dev"
+  description = "Allow pulling images from ECR in Dev account"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ecr_pull_policy" {
+  count       = var.account_type == "prod" ? 1 : 0
+  role       = aws_iam_role.eks-fargate-profile-role.name
+  policy_arn = aws_iam_policy.ecr_pull_policy[0].arn
+}
+
+

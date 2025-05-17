@@ -43,6 +43,7 @@ module "eks_cluster" {
   sa_name               = "aws-generic-sa"
   tags                  = local.tags
   network_dependency    = null_resource.network_ready.id
+  account_type          = var.account_type
 }
 
 module "load_balancer" {

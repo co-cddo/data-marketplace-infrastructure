@@ -117,3 +117,7 @@ variable "rds_postgres_snapshot_identifier" {
   type = string
 }
 #-------------------------------------------------
+variable "account_type" {
+  type        = string
+  description = "prod | dev"
+}
