@@ -29,10 +29,10 @@ spec:
           secret:
             secretName: dm-externalsecret
             items:
-              - key: USERS_APPCONFIG
+              - key: DATASHARE_APPCONFIG
                 path: appsettings.{{ENV_FULLNAME}}.json
       containers:
-      - name: c-dm-fast-users
+      - name: c-dm-fast-datashare
         image: {{IMG}}
         resources:
           requests:
