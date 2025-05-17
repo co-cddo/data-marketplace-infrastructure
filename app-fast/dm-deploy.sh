@@ -70,14 +70,12 @@ sed -i "s|{{ENV_FULLNAME}}|${ENV_FULLNAME}|g" 04_deployment_datashare.yml
 sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 06_ingress.yml
 sed -i "s|CERTIFICATEARN|${CERTIFICATEARN}|g" 06_ingress.yml
 
+sed -i "s|{{ENV_NAME}}|${ENV_NAME}|g" 00_logging_configmap.yml
 
 if [[ ${ACTION} == "install" ]]; then
 
-
-
   kubectl apply -f 00_logging_ns.yml
   kubectl apply -f 00_logging_configmap.yml
-
 
   kubectl apply -f 01_namespace.yml
   kubectl apply -f 02_serviceaccount.yml
@@ -92,9 +90,6 @@ if [[ ${ACTION} == "install" ]]; then
   kubectl apply -f 05_service.yml
 
   kubectl apply -f 06_ingress.yml
-
-
-
 
 fi
 

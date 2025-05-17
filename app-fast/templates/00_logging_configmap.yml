@@ -23,7 +23,7 @@ data:
         Name cloudwatch_logs
         Match   kube.*
         region eu-west-2
-        log_group_name my-logs
+        log_group_name dm-fast-{{ENV_NAME}}-logs
         log_stream_prefix from-fluent-bit-
         log_retention_days 60
         auto_create_group true
