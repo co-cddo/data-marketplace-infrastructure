@@ -168,7 +168,9 @@ resource "aws_iam_policy" "developer_iam_policy" {
         ],
         "Resource": [
                       "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
-                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*"
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
                     ]
       },
       {
@@ -180,7 +182,9 @@ resource "aws_iam_policy" "developer_iam_policy" {
         ],
         "Resource": [
                       "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
-                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*"
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
                     ]
       },
       {
