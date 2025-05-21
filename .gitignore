@@ -34,3 +34,8 @@ override.tf.json
 terraform.rc
 
 .DS_Store
+
+# Ignore node modules files
+**/node_modules/
+e2e/test-results/
+e2e/screenshots/

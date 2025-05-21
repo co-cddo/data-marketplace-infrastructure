@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/playwright:v1.52.0-jammy
+
+# Install xvfb for virtual framebuffer (headful browser support)
+RUN apt-get update && apt-get install -y xvfb
+
+WORKDIR /e2e
+
+COPY package*.json ./
+RUN npm install
+
+ENV NODE_ENV=development
+
+# Wrap the test command with xvfb-run for headed mode
+CMD ["xvfb-run", "npm", "run", "test"]
