@@ -9,7 +9,6 @@ resource "aws_s3_bucket" "state_backend_bucket" {
   bucket = var.account_type == "prod" ? "dm-gen-config-${var.account_type}" : "dm-gen-config"
 }
 
-
 resource "aws_s3_bucket_versioning" "state_backend_bucket_versioning" {
   bucket = aws_s3_bucket.state_backend_bucket.id
   versioning_configuration {
