@@ -95,104 +95,45 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.adm_ec2_profile_role.name
 }
 
-#resource "aws_iam_role" "devops_role" {
-#  name = var.devops_role_name
-#  assume_role_policy = jsonencode({
-#    Version = "2012-10-17"
-#    Statement = [
-#      {
-#        Effect = "Allow"
-#        Principal = {
-#          AWS = [
-#                        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-#                        "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-#                        "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-#                ]
-#        }
-#        Action = "sts:AssumeRole"
-#        Condition = {
-#          Bool : {
-#            "aws:MultiFactorAuthPresent" : "true"
-#          },
-#          "IpAddress": {
-#                    "aws:SourceIp": [
-#                        "217.196.229.77/32",
-#                        "217.196.229.79/32",
-#                        "217.196.229.80/32",
-#                        "217.196.229.81/32",
-#                        "51.149.8.0/25",
-#                        "51.149.8.128/29"
-#                    ]
-#          }
-#        }
-#      }
-#    ]
-#  })
-#}
-
-
 resource "aws_iam_role" "devops_role" {
-    name = var.devops_role_name
-    assume_role_policy = jsonencode({
+  name = var.devops_role_name
+
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
-
-    dynamic "default_action" {
-        count    = account_type == "dev" ?  [0] : []
-
-        Statement = [
-          {
-            Effect = "Allow"
-            Principal = {
-              AWS = [
-                            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-                            "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-                            "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-                    ]
-            }
-            Action = "sts:AssumeRole"
-            Condition = {
-              Bool : {
-                "aws:MultiFactorAuthPresent" : "true"
-              }
-            }
+    Statement = [
+      merge(
+        {
+          Effect = "Allow"
+          Principal = {
+            AWS = [
+              "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+              "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+              "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
+            ]
           }
-        ]
-
-    }
-
-    dynamic "default_action" {
-        count    = account_type == "prod" ? [] : [0]
-
-        Statement = [
-          {
-            Effect = "Allow"
-            Principal = {
-              AWS = [
-                            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-                            "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-                            "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-                    ]
-            }
-            Action = "sts:AssumeRole"
-            Condition = {
-              Bool : {
-                "aws:MultiFactorAuthPresent" : "true"
-              },
-              "IpAddress": {
-                        "aws:SourceIp": [
-                            "217.196.229.77/32",
-                            "217.196.229.79/32",
-                            "217.196.229.80/32",
-                            "217.196.229.81/32",
-                            "51.149.8.0/25",
-                            "51.149.8.128/29"
-                        ]
+          Action = "sts:AssumeRole"
+          Condition = merge(
+            {
+              Bool = {
+                "aws:MultiFactorAuthPresent" = "true"
               }
-            }
-          }
-        ]
-
-
+            },
+            var.account_type == "prod" ? {
+              IpAddress = {
+                "aws:SourceIp" = [
+                  "217.196.229.77/32",
+                  "217.196.229.79/32",
+                  "217.196.229.80/32",
+                  "217.196.229.81/32",
+                  "51.149.8.0/25",
+                  "51.149.8.128/29"
+                ]
+              }
+            } : {}
+          )
+        }
+      )
+    ]
   })
 }
 
