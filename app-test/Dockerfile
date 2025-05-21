@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright:v1.52.0-jammy
 
-WORKDIR /e2e
+WORKDIR /app-test
 
 COPY package*.json ./
 RUN npm ci
