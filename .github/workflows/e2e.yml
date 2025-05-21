@@ -1,0 +1,61 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select environment'
+        required: true
+        default: 'Dev'
+        type: choice
+        options:
+          - Dev
+          - Test
+          - Prod
+          - Custom
+      custom_url:
+        description: 'Custom URL (if "Custom" selected)'
+        required: false
+        default: ''
+      token:
+        description: 'Manual JWT token (CO-Datamarketplace cookie)'
+        required: true
+      authCookie:
+        description: 'Manual auth token (.AspNetCore.Cookies cookie)'
+        required: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    env:
+      DEV_URL: https://dev.datamarketplace.gov.uk/
+      TEST_URL: https://test.datamarketplace.gov.uk/
+      PROD_URL: https://www.datamarketplace.gov.uk/
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set BASE_URL
+        id: set-url
+        run: |
+          case "${{ github.event.inputs.environment }}" in
+            Dev) echo "BASE_URL=${{ env.DEV_URL }}" >> $GITHUB_ENV ;;
+            Test) echo "BASE_URL=${{ env.TEST_URL }}" >> $GITHUB_ENV ;;
+            Prod) echo "BASE_URL=${{ env.PROD_URL }}" >> $GITHUB_ENV ;;
+            Custom)
+              if [[ -z "${{ github.event.inputs.custom_url }}" ]]; then
+                echo "Custom URL is required when environment is Custom" && exit 1
+              fi
+              echo "BASE_URL=${{ github.event.inputs.custom_url }}" >> $GITHUB_ENV
+              ;;
+          esac
+
+      - name: Build and run E2E tests in Docker
+        run: |
+          docker build -t e2e-tests ./e2e
+          docker run --rm \
+            -e BASE_URL=${BASE_URL} \
+            -e TOKEN="${{ github.event.inputs.token }}" \
+            -e AUTH_COOKIE="${{ github.event.inputs.authCookie }}" \
+            e2e-tests
