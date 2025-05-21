@@ -263,11 +263,13 @@ resource "aws_iam_role" "readonly_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = [
-			"arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-			"arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-			"arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-		]
+          AWS = concat(
+            ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"],
+            var.account_type == "prod" ? [
+              "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+              "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk"
+            ] : []
+          )
         }
         Action = "sts:AssumeRole"
         Condition = {
