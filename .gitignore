@@ -37,5 +37,5 @@ terraform.rc
 
 # Ignore node modules files
 **/node_modules/
-e2e/test-results/
-e2e/screenshots/
+**/test-results/
+**/screenshots/
