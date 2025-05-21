@@ -137,12 +137,6 @@ resource "aws_iam_role" "devops_role" {
   })
 }
 
-
-
-
-
-
-
 # Attach the IAM policy to the IAM role
 resource "aws_iam_policy_attachment" "devops_role_policy_attachment" {
   name       = "Policy Attachement"
