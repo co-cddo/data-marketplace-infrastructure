@@ -58,9 +58,6 @@ resource "aws_iam_policy" "devops_iam_policy" {
 }
 
 # Create an IAM role
-
-
-
 resource "aws_iam_role" "adm_ec2_profile_role" {
   name = var.adm_ec2_profile_role_name
 
