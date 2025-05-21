@@ -272,21 +272,25 @@ resource "aws_iam_role" "readonly_role" {
           )
         }
         Action = "sts:AssumeRole"
-        Condition = {
-          Bool : {
-            "aws:MultiFactorAuthPresent" : "true"
+        Condition = merge(
+          {
+            Bool = {
+              "aws:MultiFactorAuthPresent" = "true"
+            }
           },
-	  "IpAddress": {
-                    "aws:SourceIp": [
-                        "217.196.229.77/32",
-                        "217.196.229.79/32",
-                        "217.196.229.80/32",
-                        "217.196.229.81/32",
-                        "51.149.8.0/25",
-                        "51.149.8.128/29"
-                    ]
-          }
-        }
+          var.account_type == "prod" ? {
+            IpAddress = {
+              "aws:SourceIp" = [
+                "217.196.229.77/32",
+                "217.196.229.79/32",
+                "217.196.229.80/32",
+                "217.196.229.81/32",
+                "51.149.8.0/25",
+                "51.149.8.128/29"
+              ]
+            }
+          } : {}
+        )
       }
     ]
   })
