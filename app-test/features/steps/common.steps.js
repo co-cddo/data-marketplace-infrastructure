@@ -7,7 +7,7 @@ Given('I am logged in via SSO', async () => {
   browser = await chromium.launch({ headless: true });
   context = await browser.newContext();
 
-  const token = process.env.AUTH_TOKEN;
+  const token = process.env.TOKEN;
   const baseURL = process.env.BASE_URL;
   const authCookie = process.env.AUTH_COOKIE;
 
