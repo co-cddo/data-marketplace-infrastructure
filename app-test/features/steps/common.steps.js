@@ -44,16 +44,6 @@ Before(async function () {
  
 })
 
-Given('I am logged in via SSO', async () => {
-
-  await page.goto(new URL('/', baseURL).toString());
-
-  // Wait for app confirmation
-  await page.waitForSelector('span.govuk-header__product-name');
-  const header = page.locator('span.govuk-header__product-name');
-  await expect(header).toContainText('Data Marketplace');
-});
-
 After(async function () {
   if (this.page) {
     await this.page.close();

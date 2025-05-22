@@ -2,6 +2,15 @@ import { Given, Then } from '@cucumber/cucumber';
 import { chromium, expect } from '@playwright/test';
 
 let browser, page;
+Given('I am logged in via SSO', async () => {
+
+  await page.goto(new URL('/', baseURL).toString());
+
+  // Wait for app confirmation
+  await page.waitForSelector('span.govuk-header__product-name');
+  const header = page.locator('span.govuk-header__product-name');
+  await expect(header).toContainText('Data Marketplace');
+});
 
 Given('I navigate to the base URL', async () => {
   browser = await chromium.launch({ headless: true });
