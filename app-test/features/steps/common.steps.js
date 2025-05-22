@@ -1,15 +1,16 @@
-import { Given } from '@cucumber/cucumber';
+import { Given,AfterAll, After, Before } from '@cucumber/cucumber';
 import { chromium, expect } from '@playwright/test';
 
 export let browser, context, page;
-
-Given('I am logged in via SSO', async () => {
-  browser = await chromium.launch({ headless: true });
-  context = await browser.newContext();
-
   const token = process.env.TOKEN;
   const baseURL = process.env.BASE_URL;
   const authCookie = process.env.AUTH_COOKIE;
+
+Before(async function () {
+  if (!browser) {
+    browser = await chromium.launch({ headless: true });
+  }
+  context = await browser.newContext();
 
   if (!token || !baseURL || !authCookie) {
     throw new Error('AUTH_TOKEN or BASE_URL not set');
@@ -38,8 +39,12 @@ Given('I am logged in via SSO', async () => {
       sameSite: 'Lax'
     }
   ]);
+   page = await context.newPage();
 
-  page = await context.newPage();
+ 
+})
+
+Given('I am logged in via SSO', async () => {
 
   await page.goto(new URL('/', baseURL).toString());
 
@@ -47,4 +52,22 @@ Given('I am logged in via SSO', async () => {
   await page.waitForSelector('span.govuk-header__product-name');
   const header = page.locator('span.govuk-header__product-name');
   await expect(header).toContainText('Data Marketplace');
+});
+
+After(async function () {
+  if (this.page) {
+    await this.page.close();
+    console.log('Page closed after scenario.');
+  }
+  if (this.context) {
+    await this.context.close();
+    console.log('Context closed after scenario.');
+  }
+});
+
+AfterAll(async function () {
+  if (browser) {
+    await browser.close();
+    console.log('Playwright browser closed after all tests.');
+  }
 });

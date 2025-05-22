@@ -2,7 +2,7 @@ import { When, Then } from '@cucumber/cucumber';
 import fs from 'fs';
 import path from 'path';
 
-import { page, browser,context } from './common.steps.js';
+import { page, browser } from './common.steps.js';
 
 When('I navigate to the catalog data page', async () => {
   const catalogUrl = new URL('/catalogdata/getcddodataassets', process.env.BASE_URL).toString();
