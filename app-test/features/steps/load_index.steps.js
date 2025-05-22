@@ -2,6 +2,7 @@ import { Given, Then } from '@cucumber/cucumber';
 import { chromium, expect } from '@playwright/test';
 
 let browser, page;
+const baseURL= process.env.BASE_URL
 Given('I am logged in via SSO', async () => {
 
   await page.goto(new URL('/', baseURL).toString());
@@ -17,9 +18,9 @@ Given('I navigate to the base URL', async () => {
   const context = await browser.newContext();
   page = await context.newPage();
 
-  const response = await page.goto(process.env.BASE_URL);
+  const response = await page.goto(baseURL);
   if (!response || !response.ok()) {
-    throw new Error(`Failed to load ${process.env.BASE_URL}`);
+    throw new Error(`Failed to load ${baseURL}`);
   }
 });
 
