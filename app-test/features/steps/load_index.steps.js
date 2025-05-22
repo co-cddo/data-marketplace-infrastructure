@@ -17,6 +17,6 @@ Given('I navigate to the base URL', async () => {
 Then('I should see {string} in the product name header', async (expectedText) => {
   const header = page.locator('span.govuk-header__product-name');
   await expect(header).toContainText(expectedText);
-  await page.screenshot({ path: 'screenshots/base-url.png', fullPage: true });
+  // await page.screenshot({ path: 'screenshots/base-url.png', fullPage: true });
   await browser.close();
 });

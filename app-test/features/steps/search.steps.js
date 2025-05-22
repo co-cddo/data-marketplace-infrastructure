@@ -14,6 +14,6 @@ Then('I take a screenshot of the page', async () => {
   if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir);
   }
-  await page.screenshot({ path: path.join(screenshotsDir, 'catalog_data_page.png'), fullPage: true });
+  // await page.screenshot({ path: path.join(screenshotsDir, 'catalog_data_page.png'), fullPage: true });
   await browser.close();
 });
