@@ -9,7 +9,6 @@ resource "aws_s3_bucket" "state_backend_bucket" {
   bucket = var.account_type == "prod" ? "dm-gen-config-${var.account_type}" : "dm-gen-config"
 }
 
-
 resource "aws_s3_bucket_versioning" "state_backend_bucket_versioning" {
   bucket = aws_s3_bucket.state_backend_bucket.id
   versioning_configuration {
@@ -59,9 +58,6 @@ resource "aws_iam_policy" "devops_iam_policy" {
 }
 
 # Create an IAM role
-
-
-
 resource "aws_iam_role" "adm_ec2_profile_role" {
   name = var.adm_ec2_profile_role_name
 
@@ -97,42 +93,47 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 
 resource "aws_iam_role" "devops_role" {
   name = var.devops_role_name
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = [
-                        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-                        "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-                        "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-                ]
-        }
-        Action = "sts:AssumeRole"
-        Condition = {
-          Bool : {
-            "aws:MultiFactorAuthPresent" : "true"
-          },
-          "IpAddress": {
-                    "aws:SourceIp": [
-                        "217.196.229.77/32",
-                        "217.196.229.79/32",
-                        "217.196.229.80/32",
-                        "217.196.229.81/32",
-                        "51.149.8.0/25",
-                        "51.149.8.128/29"
-                    ]
+      merge(
+        {
+          Effect = "Allow"
+          Principal = {
+            AWS = concat(
+              ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"],
+              var.account_type == "prod" ? [
+                "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+                "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk"
+              ] : []
+            )
           }
+          Action = "sts:AssumeRole"
+          Condition = merge(
+            {
+              Bool = {
+                "aws:MultiFactorAuthPresent" = "true"
+              }
+            },
+            var.account_type == "prod" ? {
+              IpAddress = {
+                "aws:SourceIp" = [
+                  "217.196.229.77/32",
+                  "217.196.229.79/32",
+                  "217.196.229.80/32",
+                  "217.196.229.81/32",
+                  "51.149.8.0/25",
+                  "51.149.8.128/29"
+                ]
+              }
+            } : {}
+          )
         }
-      }
+      )
     ]
   })
 }
-
-
-
-
 
 # Attach the IAM policy to the IAM role
 resource "aws_iam_policy_attachment" "devops_role_policy_attachment" {
@@ -166,7 +167,12 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:DescribeLogStreams",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/docker/mygroup:*"
+        "Resource": [
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
+                    ]
       },
       {
         "Sid" : "VisualEditor1",
@@ -175,7 +181,12 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:GetLogEvents",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/docker/mygroup:*"
+        "Resource": [
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
+                    ]
       },
       {
         "Sid" : "VisualEditor2",
@@ -248,28 +259,34 @@ resource "aws_iam_role" "readonly_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = [
-			"arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-			"arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
-			"arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk",
-		]
+          AWS = concat(
+            ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"],
+            var.account_type == "prod" ? [
+              "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+              "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk"
+            ] : []
+          )
         }
         Action = "sts:AssumeRole"
-        Condition = {
-          Bool : {
-            "aws:MultiFactorAuthPresent" : "true"
+        Condition = merge(
+          {
+            Bool = {
+              "aws:MultiFactorAuthPresent" = "true"
+            }
           },
-	  "IpAddress": {
-                    "aws:SourceIp": [
-                        "217.196.229.77/32",
-                        "217.196.229.79/32",
-                        "217.196.229.80/32",
-                        "217.196.229.81/32",
-                        "51.149.8.0/25",
-                        "51.149.8.128/29"
-                    ]
-          }
-        }
+          var.account_type == "prod" ? {
+            IpAddress = {
+              "aws:SourceIp" = [
+                "217.196.229.77/32",
+                "217.196.229.79/32",
+                "217.196.229.80/32",
+                "217.196.229.81/32",
+                "51.149.8.0/25",
+                "51.149.8.128/29"
+              ]
+            }
+          } : {}
+        )
       }
     ]
   })
