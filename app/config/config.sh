@@ -51,12 +51,15 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
     echo "--------------------------------------------"
     echo "--- ENVIRONMENT:  $_ENV"
     echo "--------------------------------------------"
+
+    echo "--- INFO: creating new dirs ${_DATAFILE}"
+    mkdir -p ${TOPDIR}/config/inputdata/${_ENV}
+    mkdir -p ${TOPDIR}/config/output/${_ENV}
+
     _DATAFILE=${TOPDIR}/config/inputdata/${_ENV}/${_ENV}-${_DATAFILENAME}
 
-
-
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~ CLEANING UP Leftovers From Previous Runs"
+    echo "~~ CLEANING UP Leftovers From Previous Runs (if any)"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     rm -f ${_DATAFILE}
 
