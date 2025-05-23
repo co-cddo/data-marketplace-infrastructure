@@ -39,3 +39,6 @@ terraform.rc
 **/node_modules/
 **/test-results/
 **/screenshots/
+
+app/config/inputdata/*
+app/config/output/*
