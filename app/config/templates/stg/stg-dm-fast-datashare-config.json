@@ -1,0 +1,69 @@
+{
+  "Jwt": {
+    "Key": "mock-256-bit-secret-1234567890123456",
+    "Issuer": "https://mock-issuer.local",
+    "Audience": "https://mock-audience.local"
+  },
+  "TestUser": {
+    "Enabled": false
+  },
+  "ConnectionStrings": {
+    "sql_connection_string": "Server=$MS_DBSERVER,$MS_PORT;Database=$MS_DATABASE_SHARE;User Id=$MS_USERID;Password=$MS_PW;TrustServerCertificate=$MS_TRUSTSVRCERT"
+  },
+  "ClientIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "Notifications": {
+    "gov_notify_api_key": "$GOV_NOTIFY_API_KEY",
+    "TemplateIds": {
+      "new_data_share_request_received_template_id": "$NEW_DATA_SHARE_REQUEST_RECEIVED_TEMPLATE_ID",
+      "data_share_request_cancelled_template_id": "$DATA_SHARE_REQUEST_CANCELLED_TEMPLATE_ID",
+      "data_share_request_accepted_template_id": "$DATA_SHARE_REQUEST_ACCEPTED_TEMPLATE_ID",
+      "data_share_request_rejected_template_id": "$DATA_SHARE_REQUEST_REJECTED_TEMPLATE_ID",
+      "data_share_request_returned_with_comments_template_id": "$DATA_SHARE_REQUEST_RETURNED_WITH_COMMENTS_TEMPLATE_ID"
+    },
+    "cddo_admin_supplier_dsr_notification_email_address": "adam.roper@agrimetrics.co.uk",
+    "cddo_admin_supplier_dsr_notification_name": "Adam as CDDO Admin"
+  },
+"Authentication": {
+    "Domain": "$DOMAIN_NAME",
+    "Authority": "https://sso.service.security.gov.uk/",
+    "ClientId": "$SSO_CLIENT_ID",
+    "ClientSecret": "$SSO_CLIENT_SECRET",
+    "ClientIds": [
+      "00000000-0000-0000-0000-000000000000"
+    ],
+    "ApiKey": "JWT Key",
+    "AllowedScopes": [
+      "mock-scope-1",
+      "mock-scope-2"
+    ],
+    "ApiIssuer": "mock-issuer.local"
+  },
+  "ExternalServices": {
+    "UsersApi": {
+      "api_address": "http://dm-fast-users"
+    },
+    "UtilityApi": {
+      "api_address": "http://dm-fast-api"
+    }
+  },
+  "PageLinks": {
+    "data_marketplace_sign_in_address": "https://$DOMAIN_NAME/auth/signin"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "InputConstraints": {
+    "MaximumLengthOfFreeFormTextResponse": "4000",
+    "MaximumLengthOfFreeFormMultiResponseTextResponse": "250",
+    "MaximumLengthOfSupplementaryTextResponse": "250"
+  },
+  "BaseUrl": "https://$DOMAIN_NAME/",
+  "AGMJwtSettings": {
+    "SecretKey": "$SECRETKEY"
+  }
+}
