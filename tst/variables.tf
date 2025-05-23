@@ -22,18 +22,18 @@ variable "project_code" {
 # DO NOT FORGET TO UPDATE BACKEND FILE ALSO
 variable "env_name" {
   type    = string
-  default = "dev"
+  default = "tst"
 }
 #vpc vars
 variable "vpc_cidr" {
   type    = string
-  default = "10.10.0.0/16"
+  default = "10.11.0.0/16"
 }
 variable "private_subnets" {
-  default = ["10.10.3.0/24", "10.10.4.0/24"]
+  default = ["10.11.3.0/24", "10.11.4.0/24"]
 }
 variable "public_subnets" {
-  default = ["10.10.1.0/24", "10.10.2.0/24"]
+  default = ["10.11.1.0/24", "10.11.2.0/24"]
 }
 # eks cluster vars
 variable "cluster_version" {

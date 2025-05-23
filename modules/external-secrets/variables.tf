@@ -1,4 +1,5 @@
 variable "region" {}
+variable "account_id" {}
 variable "project_code" {}
 variable "env_name" {}
 
@@ -10,7 +11,7 @@ variable "sa_name" {}
 variable "sa_namespace" {}
 
 variable "private_subnet_one_id" {
-    
+
 }
 variable "private_subnet_two_id" {
 
@@ -70,4 +71,10 @@ variable "mod_dependency" {
 variable "settings" {
   default     = {}
   description = "Additional settings which will be passed to the Helm chart values, see https://github.com/external-secrets/external-secrets/tree/main/deploy/charts/external-secrets"
+}
+
+variable "network_dependency" {
+  description = "Used to enforce dependency on VPC peering and EKS routing"
+  type        = string
+  default     = ""
 }
