@@ -1,0 +1,14 @@
+services:
+  e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: e2e-tests-dev
+    environment:
+      - BASE_URL=${BASE_URL}
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - AUTH_COOKIE=${AUTH_COOKIE}
+    volumes:
+      - ./:/e2e
+    working_dir: /e2e
+    command: npm run test

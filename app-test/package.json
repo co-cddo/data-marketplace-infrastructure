@@ -1,0 +1,15 @@
+{
+  "name": "e2e-tests",
+  "version": "1.0.0",
+  "description": "BDD Playwright E2E Tests with Cucumber",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:debug": "PWDEBUG=1 cucumber-js",
+    "test:dev": "cucumber-js --watch"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.3.0",
+    "@playwright/test": "^1.52.0"
+  },
+  "type": "module"
+}
