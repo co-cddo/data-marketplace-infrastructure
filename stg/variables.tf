@@ -2,6 +2,19 @@ variable "region" {
   type    = string
   default = "eu-west-2"
 }
+variable "account_type" {
+  type        = string
+  description = "prod | dev"
+  default = "prod"
+}
+variable "account_id_dev" {
+  type    = string
+  default = "855859226163"
+}
+variable "account_id_prod" {
+  type    = string
+  default = "614007084099"
+}
 variable "project_code" {
   type    = string
   default = "dm"
@@ -117,7 +130,3 @@ variable "rds_postgres_snapshot_identifier" {
   type = string
 }
 #-------------------------------------------------
-variable "account_type" {
-  type        = string
-  description = "prod | dev"
-}

@@ -2,6 +2,19 @@ variable "region" {
   type    = string
   default = "eu-west-2"
 }
+variable "account_type" {
+  type        = string
+  description = "prod | dev"
+  default = "dev"
+}
+variable "account_id_dev" {
+  type    = string
+  default = "855859226163"
+}
+variable "account_id_prod" {
+  type    = string
+  default = "614007084099"
+}
 variable "project_code" {
   type    = string
   default = "dm"
@@ -87,7 +100,7 @@ variable "rds_postgres_engine_version" {
 }
 variable "rds_postgres_instance_class" {
   type    = string
-  default = "db.t3.large"
+  default = "db.t3.medium"
 }
 variable "rds_postgres_allocated_storage" {
   type    = number

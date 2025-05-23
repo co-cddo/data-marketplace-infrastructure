@@ -76,6 +76,7 @@ module "external_secrets" {
   openid_connector      = module.eks_cluster.openid_connector
   env_name              = var.env_name
   region                = var.region
+  account_id            = var.account_type == "prod" ? var.account_id_prod : var.account_id_dev
   private_subnet_one_id = module.vpcmodule.private_subnets_output[0]
   private_subnet_two_id = module.vpcmodule.private_subnets_output[1]
   sa_name               = "externalsecret-sa"

@@ -50,8 +50,27 @@ resource "aws_iam_role" "sa_role" {
 }
 
 resource "aws_iam_policy" "sa_role_policy" {
-  policy = file("${path.module}/sa-role-policy.json")
+#  policy = file("${path.module}/sa-role-policy.json")
   name   = "${var.project_code}-${var.env_name}-policy-externalsecrets"
+
+
+  policy = jsonencode (
+        {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameters",
+                "ssm:GetParameter"
+            ],
+            "Resource": [
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/${var.project_code}/${var.env_name}/*",
+            ]
+        }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "policy_attach" {

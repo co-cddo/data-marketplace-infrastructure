@@ -1,4 +1,5 @@
 variable "region" {}
+variable "account_id" {}
 variable "project_code" {}
 variable "env_name" {}
 
