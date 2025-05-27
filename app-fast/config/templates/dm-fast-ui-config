@@ -10,31 +10,32 @@
     "Email": "<TEST_USER_EMAIL>",
     "DisplayName": "<TEST_USER_DISPLAY_NAME>"
   },
-"Kestrel": {
-  "Endpoints": {
-    "Http": {
-      "Url": "http://0.0.0.0:8080"
+  "Kestrel": {
+   "Endpoints": {
+     "Http": {
+       "Url": "http://0.0.0.0:8080"
+     }
+   }
+  },
+  "DetailedErrors": true,
+  "Form": {
+    "ShowDebugOutput": false,
+    "MayBeDeclinedPrompt": false,
+    "CombineQuestionPartValidationErrors": true
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft.AspNetCore": "Warning"
     }
-  }
-},
-
-"DetailedErrors": true,
-"Form": {
-  "ShowDebugOutput": false,
-  "MayBeDeclinedPrompt": false,
-  "CombineQuestionPartValidationErrors": true
-},
-"Logging": {
-  "LogLevel": {
-     "Default": "Information",     "Microsoft.AspNetCore": "Warning"
-  }},
-"Api": {
+  },
+  "Api": {
     "Main": "http://dm-fast-api/",
     "Local": "http://localhost:8344/",
     "DataShare": "http://dm-fast-datashare/"
   },
   "ApiSettings": {
-    "UsersAPI": "http://dm-fast-users/"
+    "UsersAPI": "http://dm-fast-users/" 
   },
 
   "Authentication": {
@@ -46,7 +47,7 @@
   "HotjarSettings": {
     "HotjarEnabled": true,
     "GAEnabled": true,
-    "GAEnvironment": "GTM-5B4FC6N7"
+    "GAEnvironment": "<GA_ENVIRONMENT>"
   },
   "ApplicationInsights": {
     "ConnectionString": "<APPINSIGHTS_CONNECTION_STRING>"

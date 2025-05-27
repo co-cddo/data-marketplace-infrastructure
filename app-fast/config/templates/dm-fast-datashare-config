@@ -10,9 +10,7 @@
   "ConnectionStrings": {
     "sql_connection_string": "Server=${MS_DBSERVER},${MS_PORT};Database=${MS_DATABASE_SHARE};User Id=${MS_USERID};Password=${MS_PW};TrustServerCertificate=${MS_TRUSTSVRCERT}"
   },
-  "ClientIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "ClientIds": [ "00000000-0000-0000-0000-000000000000" ],
   "Notifications": {
     "gov_notify_api_key": "${GOV_NOTIFY_API_KEY}",
     "TemplateIds": {
@@ -25,19 +23,14 @@
     "cddo_admin_supplier_dsr_notification_email_address": "adam.roper@agrimetrics.co.uk",
     "cddo_admin_supplier_dsr_notification_name": "Adam as CDDO Admin"
   },
-"Authentication": {
+  "Authentication": {
     "Domain": "${DOMAIN_NAME}",
     "Authority": "https://sso.service.security.gov.uk/",
     "ClientId": "${SSO_CLIENT_ID}",
     "ClientSecret": "${SSO_CLIENT_SECRET}",
-    "ClientIds": [
-      "00000000-0000-0000-0000-000000000000"
-    ],
+    "ClientIds": [ "00000000-0000-0000-0000-000000000000" ],
     "ApiKey": "JWT Key",
-    "AllowedScopes": [
-      "mock-scope-1",
-      "mock-scope-2"
-    ],
+    "AllowedScopes": [ "mock-scope-1", "mock-scope-2" ],
     "ApiIssuer": "mock-issuer.local"
   },
   "ExternalServices": {

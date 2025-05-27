@@ -1,6 +1,6 @@
 {
   "AGMJwtSettings": {
-    "SecretKey": "${SECRETKEY}"
+    "SecretKey": "${SECRETKEY}" //a_secret_key
   },
   "ApplicationInsights": {
     "ConnectionString": ""
@@ -8,13 +8,13 @@
   "ASPNETCORE_ENVIRONMENT": "Development",
   "Authentication": {
     "Audiences": [
-      "${AUDIENCES}"
+      "${SSO_CLIENT_ID}"
     ],
     "Domain": "${DOMAIN_NAME}",
     "Authority": "https://sso.service.security.gov.uk/",
     "ClientId": "${SSO_CLIENT_ID}",
     "ClientSecret": "${SSO_CLIENT_SECRET}",
-    "ClientIds": [ "" ],
+    "ClientIds": [ "" ], // can be left blank
     "ApiKey": "mock-256-bit-secret-1234567890123456",
     "AllowedScopes": [ "publish", "discover", "delete" ],
     "ApiIssuer": "${DOMAIN_NAME}"
@@ -27,6 +27,7 @@
     }
   },
   "BaseUrl": "https://${DOMAIN_NAME}/",
+
   "CatalogDataStoreHealthCheckUrl": "https://${DOMAIN_NAME}/health",
   "Ckan": {
     "ApiKey": "",

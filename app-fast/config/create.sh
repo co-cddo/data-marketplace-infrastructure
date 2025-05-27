@@ -53,10 +53,10 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
     echo "--------------------------------------------"
 
     echo "--- INFO: creating new dirs ${_DATAFILE}"
-    mkdir -p ${TOPDIR}/config/inputdata/${_ENV}
-    mkdir -p ${TOPDIR}/config/output/${_ENV}
+    mkdir -p ${TOPDIR}/config/inputdata/
+    mkdir -p ${TOPDIR}/config/output/
 
-    _DATAFILE=${TOPDIR}/config/inputdata/${_ENV}/${_ENV}-${_DATAFILENAME}
+    _DATAFILE=${TOPDIR}/config/inputdata/${_ENV}-${_DATAFILENAME}
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~ CLEANING UP Leftovers From Previous Runs (if any)"
@@ -66,7 +66,7 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
     echo "--- INFO: Getting new ${_DATAFILE}"
 
     aws ssm get-parameters \
-    --name "/dm/${_ENV}/config-inputs" \
+    --name "/dm/${_ENV}/config-inputs-json" \
     --with-decryption \
     --query "Parameters[*].{Value:Value}" \
     --output text > ${_DATAFILE}
@@ -79,7 +79,15 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         continue
     fi
 
-    _TEMPLATEFILES=$(ls -1 config/templates/${_ENV}/)
+    echo "~~ PWD:  $(pwd)"
+    _TEMPLATEFILES=$(ls -1 templates/)
+
+    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "#~~ INFO:   _TEMPLATEFILES"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "$_TEMPLATEFILES"
+    echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
     _TFILEARRAY=($_TEMPLATEFILES)
     for _TFILE in "${_TFILEARRAY[@]}"; do
 
@@ -87,8 +95,8 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         echo "~~ TFILE:  $_TFILE"
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         source ${_DATAFILE}
-        cfgtemplate="${TOPDIR}/config/templates/${_ENV}/${_TFILE}"
-        outputfile="${TOPDIR}/config/output/${_ENV}/${_TFILE}"
+        cfgtemplate="${TOPDIR}/config/templates/${_TFILE}"
+        outputfile="${TOPDIR}/config/output/${_TFILE}"
         tmpfile=$(mktemp)
         $CP --attributes-only --preserve $cfgtemplate $tmpfile
         cat $cfgtemplate | ${ENVSUBST} > $tmpfile && mv $tmpfile $outputfile
@@ -97,27 +105,35 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         echo "------------------------"
         cat $outputfile
 
-        _IDTAG=`echo ${_TFILE} | awk -F\- '{print $4}'`
+        _IDTAG=`echo ${_TFILE} | awk -F\- '{print $3}'`
+       #_UPLDFILENAME="/dm/${_ENV}/appsettings/${_IDTAG}"
+        _UPLDFILENAME="/dm/dmy/appsettings/${_IDTAG}"
 
         echo "--------------------------------------------"
-        echo "--- TFILE           :  $_TFILE"
-        echo "--- IDTAG           :  ${_IDTAG}"
-        echo "--- UPLOADING PSTORE:  output/$(basename $outputfile)"
-        echo "--- UPLOADING AS    :  ${_ENV}-dm-fast-${_IDTAG}-config.json"
+        echo "--- TFILE          :  $_TFILE"
+        echo "--- IDTAG          :  ${_IDTAG}"
+        echo "--- UPLOADING FROM :  output/$(basename $outputfile)"
+        echo "--- UPLOADING AS   :  ${_UPLDFILENAME}"
         echo "--------------------------------------------"
 
         echo "aws ssm put-parameter \\"
-        echo "--name "/dm/${_ENV}/appsettings/${_IDTAG}" \\"
+        echo "--name "${_UPLDFILENAME}" \\"
         echo "--type SecureString \\"
         echo "--value file://${outputfile} \\"
         echo "--overwrite"
 
         xaws ssm put-parameter \
-        --name "/dm/${_ENV}/appsettings/${_IDTAG}" \
+        --name "${_UPLDFILENAME}" \
         --type SecureString \
         --value file://${outputfile} \
         --overwrite
 
         echo
+        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        echo "~~ CLEANING UP"
+        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+       #rm -f ${outputfile}
+        rm -f ${tmpfile}
     done
+    rm -f ${_DATAFILE}
 done

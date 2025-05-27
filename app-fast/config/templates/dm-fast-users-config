@@ -15,13 +15,13 @@
     "Authority": "https://sso.service.security.gov.uk/",
     "ClientId": "${SSO_CLIENT_ID}",
     "ClientSecret": "${SSO_CLIENT_SECRET}",
-    "ClientIds": [ "" ],
-    "ApiKey": "mock-256-bit-secret-1234567890123456",
+    "ClientIds": [ "" ], 
+    "ApiKey": "${SECRETKEY}",
     "AllowedScopes": [ "publish", "discover", "delete" ],
     "ApiIssuer": "${DOMAIN_NAME}"
   },
   "NotifyAPIKey": "${GOV_NOTIFY_API_KEY}",
-  "WelcomeTemplate": "${WELCOME_TEMPLATE}",
+  "WelcomeTemplate": "${WELCOMETEMPLATE}",
   "ApplicationInsights": {
     "WorkspaceId": "You will need application insights instance for this.",
     "ApiKey": "Same as above",
