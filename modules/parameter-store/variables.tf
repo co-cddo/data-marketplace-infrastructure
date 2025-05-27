@@ -76,46 +76,6 @@ variable "stringlist_initial_value" {
   description = "Initial value for StringList(s)"
 }
 
-variable "config-inputs-json-default" {
-  type    = string
-  default = <<EOF
-export DOMAIN_NAME=""
-export SSO_CLIENT_ID=""
-export SSO_CLIENT_SECRET=""
-export MS_DBSERVER=""
-export MS_PORT=""
-export MS_DATABASE_SHARE=""
-export MS_DATABASE_USERS=""
-export MS_TRUSTSVRCERT=""
-export PG_DBSERVER=""
-export PG_PORT=""
-export PG_DATABASE=""
-export PG_USERID=""
-export PG_PW=""
-export MS_USERID=""
-export MS_PW=""
-
-# OPTIONAL (FOR NOW)
-export SECRETKEY=""
-export AUDIENCES=""
-export GOV_NOTIFY_API_KEY=""
-export NEW_DATA_SHARE_REQUEST_RECEIVED_TEMPLATE_ID=""
-export DATA_SHARE_REQUEST_CANCELLED_TEMPLATE_ID=""
-export DATA_SHARE_REQUEST_ACCEPTED_TEMPLATE_ID=""
-export DATA_SHARE_REQUEST_REJECTED_TEMPLATE_ID=""
-export DATA_SHARE_REQUEST_RETURNED_WITH_COMMENTS_TEMPLATE_ID=""
-export WELCOMETEMPLATE=""
-export PG_DATABASE_URL=""
-export GOOGLE_CLIENT_ID=""
-export GOOGLE_CLIENT_SECRET=""
-export RACK_ENV=""
-export RAILS_ENV=""
-export SECRET_KEY_BASE=""
-EOF
-}
-
-
-
 # Locals - all variables are fetched as locals to allow manipulation of values in future versions
 
 locals {
