@@ -140,12 +140,8 @@ module "app_params" {
 
 module "app_config" {
   source = "../modules/parameter-store"
-  prefix = "/${var.project_code}/${var.env_name}/appsettings/"
-  securestring_config_parameters = [
-    "api",
-    "catalogue",
-    "datashare",
-    "ui",
-    "users"
+  prefix = "/${var.project_code}/${var.env_name}/"
+  securestring_parameters = [
+    "config-inputs-json"
   ]
 }
