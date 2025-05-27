@@ -138,3 +138,14 @@ module "app_params" {
     "catalogue"
   ]
 }
+
+module "app_config" {
+  source = "../modules/parameter-store"
+  prefix = "/${var.project_code}/${var.env_name}/"
+  securestring_parameters = [
+    "config-inputs-json"
+  ]
+
+  securestring_initial_value = var.config-inputs-json-default
+
+}
