@@ -76,6 +76,12 @@ variable "stringlist_initial_value" {
   description = "Initial value for StringList(s)"
 }
 
+variable "securestring_config_parameters" {
+  type        = list(string)
+  default     = []
+  description = "List of SecureString(s)"
+}
+
 # Locals - all variables are fetched as locals to allow manipulation of values in future versions
 
 locals {
@@ -94,6 +100,7 @@ locals {
   # Parameters
   string_parameters       = var.string_parameters
   securestring_parameters = var.securestring_parameters
+  securestring_config_parameters = var.securestring_config_parameters
   stringlist_parameters   = var.stringlist_parameters
 
   # Initial Value
