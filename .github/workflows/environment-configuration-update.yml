@@ -46,6 +46,6 @@ jobs:
           parameters: |
             {"commands":[
               "/home/ssm-user/bin/testscript.sh",
-              "/home/ssm-user/src && git clone ${{ secrets.TF_REPO }}"
+              "cd /home/ssm-user/src && git clone ${{ secrets.TF_REPO }}"
             ]}
 
