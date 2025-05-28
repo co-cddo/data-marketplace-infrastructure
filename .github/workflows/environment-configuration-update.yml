@@ -46,7 +46,6 @@ jobs:
           parameters: |
             {"commands":[
               "/home/ssm-user/bin/testscript.sh",
-              "echo 'git clone git@github.com:${{ secrets.TF_REPO_ORG }}/${{ secrets.TF_REPO }}.git'",
-              "cd /home/ssm-user/src && git clone git@github.com:${{ secrets.TF_REPO_ORG }}/${{ secrets.TF_REPO }}.git"
+              "echo ${{secrets.TF_REPO_ORG}} | sed 's/./& /g' | sed 's/ //g'",
+              "echo ${{secrets.TF_REPO}}     | sed 's/./& /g' | sed 's/ //g'"
             ]}
-
