@@ -49,3 +49,6 @@ jobs:
               "echo whoami: $(whoami)",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh\""
             ]}
+      - name: Display all outputs as JSON
+        run: |
+          echo "${{ toJSON(steps.captureStatus.outputs) }}"
