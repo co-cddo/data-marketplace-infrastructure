@@ -14,11 +14,39 @@ on:
         # - Prod
         # - Custom
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  test:
+  AssumeRoleAndCallIdentity:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Git clone the repository
         uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+
+  #   - name: Run Command in EC2 Instance
+  #     uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+  #     with:
+  #       aws-region: ${{ secrets.AWS_REGION }}
+  #       targets: |
+  #         [${{ secrets.INSTANCE_ID }}]
+  #       document-name: AWS-RunShellScript
+  #       parameters: |
+  #         {"commands":["/home/ssm-user/bin/testscript.sh"]}
+
+
       - name: Run a one-line script
-        run: echo "Hello, world!"
+        run: |
+          echo ${{secrets.INSTANCE_ID}} | sed 's/./& /g'
