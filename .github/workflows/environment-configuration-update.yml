@@ -48,5 +48,5 @@ jobs:
               "/home/ssm-user/bin/testscript.sh",
               "echo 'Environment: ${{ github.event.inputs.environment }}'",
               "echo whoami: $(whoami)",
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh\"",
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh\""
             ]}
