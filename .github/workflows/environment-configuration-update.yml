@@ -47,6 +47,6 @@ jobs:
             {"commands":[
               "/home/ssm-user/bin/testscript.sh",
               "echo 'Environment: ${{ github.event.inputs.environment }}'",
-              "echo 'whoami: $(whoami)'",
+              "echo whoami: $(whoami)",
               "cd /home/ssm-user/src && git clone git@github.com:co-cddo/data-marketplace-infrastructure.git"
             ]}
