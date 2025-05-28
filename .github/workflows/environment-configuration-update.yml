@@ -36,17 +36,16 @@ jobs:
         run: |
           aws sts get-caller-identity
 
-  #   - name: Run Command in EC2 Instance
-  #     uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
-  #     with:
-  #       aws-region: ${{ secrets.AWS_REGION }}
-  #       targets: |
-  #         [${{ secrets.INSTANCE_ID }}]
-  #       document-name: AWS-RunShellScript
-  #       parameters: |
-  #         {"commands":["/home/ssm-user/bin/testscript.sh"]}
+      - name: Run Command in EC2 Instance
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "/home/ssm-user/bin/testscript.sh",
+              "/home/ssm-user/src && git clone ${{ secrets.TF_REPO }}",
+            ]}
 
-
-      - name: Run a one-line script
-        run: |
-          echo ${{secrets.INSTANCE_ID}} | sed 's/./& /g' | sed 's/ //g'
