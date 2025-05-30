@@ -57,6 +57,7 @@ jobs:
 
   TerraformApply:
     runs-on: ubuntu-latest
+    needs: ["TerraformInitiate"] 
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
