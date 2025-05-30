@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 jobs:
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TerraformInitPlan:
     runs-on: ubuntu-latest
     steps:
@@ -55,11 +55,12 @@ jobs:
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
-  manual-approval:
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  manual-approval-for-apply:
     name: Manual Approval
     runs-on: ubuntu-latest
     needs: ["TerraformInitPlan"]
-    if: success()
+    if: success() && inputs.TerraformAction == 'init+plan+apply'
 
     permissions:
       issues: write
@@ -71,12 +72,64 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
           minimum-approvals: 1
-          issue-title: "Manual Approval Required for Terraform Apply"
+          issue-title: "Manual Approval Required for Terraform APPLY"
           issue-body: "Please approve or deny the deployment."
 
   TerraformApply:
     runs-on: ubuntu-latest
-    needs: ["manual-approval"]
+    needs: ["manual-approval-for-apply"]
+    if: inputs.TerraformAction == 'init+plan+apply'
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions2
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: TerraformApply EC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+            ]}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  manual-approval-for-destroy:
+    name: Manual Approval
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'approval+destroy'
+#   needs: ["TerraformInitPlan"]
+#   if: success()
+
+    permissions:
+      issues: write
+
+    steps:
+      - name: Await Manual Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
+          minimum-approvals: 1
+          issue-title: "Manual Approval Required for Terraform DESTROY"
+          issue-body: "Please approve or deny the destroy."
+
+
+  TerraformDestroy:
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'approval+destroy'
+    needs: ["manual-approval-for-destroy"]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
