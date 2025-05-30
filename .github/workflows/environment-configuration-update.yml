@@ -19,9 +19,9 @@ on:
         required: true
         default: 'init + plan'
         options:
-          - 'init + plan'
-          - 'init + plan + apply'
-          - 'approval + destroy'
+          - 'init+plan'
+          - 'init+plan+apply'
+          - 'approval+destroy'
 
 permissions:
   id-token: write
@@ -55,6 +55,6 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.tfaction }}'",
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.tfaction }} \""
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} \""
             ]}
