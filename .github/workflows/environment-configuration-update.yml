@@ -13,6 +13,15 @@ on:
         # - Test
         # - Prod
         # - Custom
+      tfaction:
+        type: choice
+        description: 'Terraform Action'
+        default: 'plan'
+        options:
+          - init
+          - plan
+          - apply
+          - destroy
 
 permissions:
   id-token: write
@@ -47,8 +56,5 @@ jobs:
             {"commands":[
               "echo 'Environment: ${{ github.event.inputs.environment }}'",
               "echo whoami: $(whoami)",
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh\""
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.tfaction }} \""
             ]}
-      - name: Display all outputs as JSON
-        run: |
-          echo "${{ toJSON(steps.captureStatus.outputs) }}"
