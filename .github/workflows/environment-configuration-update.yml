@@ -13,23 +13,23 @@ on:
         # - Test
         # - Prod
         # - Custom
-      tfaction:
+      TerraformAction:
         type: choice
-        description: 'Terraform Action'
+        description: 'Terraform With Approvals'
         required: true
-        default: 'plan'
+        default: 'init + plan'
         options:
-          - init
-          - plan
-          - apply
-          - destroy
+          - 'init + plan'
+          - 'init + plan + apply'
+          - 'approval + destroy'
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  AssumeRoleAndCallIdentity:
+
+  GetRepoAndAssumeRole:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -46,7 +46,12 @@ jobs:
         run: |
           aws sts get-caller-identity
 
-      - name: Run Command in EC2 Instance
+#-----------------
+
+  TerraformInitiate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Terraform in EC2 Instance
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
@@ -55,7 +60,6 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'Environment: ${{ github.event.inputs.environment }}'",
-              "echo whoami: $(whoami)",
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.tfaction }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.tfaction }} \""
             ]}
