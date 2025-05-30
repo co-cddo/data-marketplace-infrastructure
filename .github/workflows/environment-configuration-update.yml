@@ -42,11 +42,33 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-#     - name: Sts GetCallerIdentity
-#       run: |
-#         aws sts get-caller-identity
+      - name: TerraformInitiate EC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} \""
+            ]}
 
-      - name: Run Terraform in EC2 Instance
+  TerraformApply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions2
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: TerraformApply EC2
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
