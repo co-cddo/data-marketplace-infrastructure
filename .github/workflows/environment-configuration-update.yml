@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Await Manual Approval
-        uses: trstringer/manual-approval@v1
+        uses: trstringer/manual-approval@v1.10.0
         with:
           secret: ${{ github.TOKEN }}
           approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - name: Await Manual Approval
-        uses: trstringer/manual-approval@v1
+        uses: trstringer/manual-approval@v1.10.0
         with:
           secret: ${{ github.TOKEN }}
           approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
