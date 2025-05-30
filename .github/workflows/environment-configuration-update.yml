@@ -29,7 +29,7 @@ permissions:
 
 jobs:
 
-  GetRepoAndAssumeRole:
+  TerraformInitiate:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -42,15 +42,10 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sts GetCallerIdentity
-        run: |
-          aws sts get-caller-identity
+#     - name: Sts GetCallerIdentity
+#       run: |
+#         aws sts get-caller-identity
 
-#-----------------
-
-  TerraformInitiate:
-    runs-on: ubuntu-latest
-    steps:
       - name: Run Terraform in EC2 Instance
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
