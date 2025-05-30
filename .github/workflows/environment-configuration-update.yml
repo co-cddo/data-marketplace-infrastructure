@@ -16,6 +16,7 @@ on:
       tfaction:
         type: choice
         description: 'Terraform Action'
+        required: true
         default: 'plan'
         options:
           - init
