@@ -31,6 +31,8 @@ jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TerraformInitPlan:
     runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'init+plan' || inputs.TerraformAction == 'init+plan+apply'
+
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
