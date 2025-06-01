@@ -53,11 +53,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   manual-approval-for-apply:
     name: Manual Approval
     runs-on: ubuntu-latest
@@ -101,7 +102,7 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
@@ -152,6 +153,6 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }}'",
+              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
