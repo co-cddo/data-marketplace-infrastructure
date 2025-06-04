@@ -60,7 +60,7 @@ jobs:
       - name: Download file from S3
         run: |
           aws s3 cp s3://jpbackupbucket20250502/TESTFILE.txt ./TESTFILE.txt
-          echo "#~~~ INFO TESTFILE CONTENT ~~~~~~~~~~~~~""
+          echo "#~~~ INFO TESTFILE CONTENT ~~~~~~~~~~~~~"
           cat ./TESTFILE.txt
           echo "#~~~ END INFO TESTFILE CONTENT ~~~~~~~~"
 
