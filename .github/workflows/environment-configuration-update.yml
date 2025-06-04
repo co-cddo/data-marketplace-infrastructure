@@ -57,12 +57,12 @@ jobs:
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
-      - name: Download file from S3
+      - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://jpbackupbucket20250502/TESTFILE.txt ./TESTFILE.txt
-          echo "#~~~ INFO TESTFILE CONTENT ~~~~~~~~~~~~~"
-          cat ./TESTFILE.txt
-          echo "#~~~ END INFO TESTFILE CONTENT ~~~~~~~~"
+          aws s3 cp s3://jpbackupbucket20250502/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
+          cat ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -112,6 +112,13 @@ jobs:
               "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
+
+      - name: Get and Show APPLYLOG
+        run: |
+          aws s3 cp s3://jpbackupbucket20250502/APPLYLOG.txt ./APPLYLOG.txt
+          echo "#~~ INFO: APPLYLOG CONTENT START ~~~~~~~"
+          cat ./APPLYLOG.txt
+          echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -163,3 +170,10 @@ jobs:
               "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
               "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
+
+      - name: Get and Show DESTROYLOG
+        run: |
+          aws s3 cp s3://jpbackupbucket20250502/DESTROYLOG.txt ./DESTROYLOG.txt
+          echo "#~~ INFO: DESTROYLOG CONTENT START ~~~~~~~"
+          cat ./DESTROYLOG.txt
+          echo "#~~ INFO: DESTROYLOG CONTENT END ~~~~~~~~~"
