@@ -130,3 +130,94 @@ variable "rds_postgres_snapshot_identifier" {
   type = string
 }
 #-------------------------------------------------
+#-- EC2 INSTANCE
+#-------------------------------------------------
+variable "ec2_instance_count" {
+  type    = number
+  default = 1
+}
+variable "ec2_instance_ami" {
+  type    = string
+  default = "ami-0d79dee6fcbdf37d0"
+}
+variable "ec2_instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+variable "ec2_instance_keypair" {
+  type    = string
+  default = ""
+}
+variable "ec2_user_data" {
+  type    = string
+  default = <<-EOF
+            #!/bin/bash
+            yum update -y
+            amazon-linux-extras install postgresql14 -y
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+            curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.33.0/2025-05-01/bin/darwin/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && mv ./kubectl $HOME/bin/kubectl
+            echo "unset rc"                                        >> ~/.bash_profile
+            echo "source <(kubectl completion bash)"               >> ~/.bash_profile
+            echo "alias k=kubectl"                                 >> ~/.bash_profile
+            echo "complete -o default -F __start_kubectl k"        >> ~/.bash_profile
+            echo "alias lll='ls -al '"                             >> ~/.bash_profile
+            ARCH=amd64
+            PLATFORM=$(uname -s)_$ARCH
+            curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+            tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+            mv /tmp/eksctl $HOME/bin/
+            sudo yum install -y yum-utils shadow-utils
+            sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+            sudo yum -y install terraform
+            cd $HOME/bin && ln -s /usr/bin/terraform tf
+            EOF
+}
+variable "ec2_instance_security_group_ids" {
+  type    = list(string)
+  default = ["sg-0a87fe1ab34d7ecb5"]
+}
+variable "ec2_instance_subnet_id" {
+  type    = string
+  default = "subnet-01badad5191669762"
+}
+variable "ec2_instance_tags" {
+  type = map(string)
+  default = {
+    Name          = "dm-dev-ec2-instance"
+    "Project"     = var.project_code
+    "Environment" = var.env_name
+    "Terraform"   = "true"
+    "Owner"       = "data-marketplace"  }
+}
+variable "ec2_instance_iam_role" {
+  type    = string
+  default = "test-adm-instance-profile-role"
+}
+variable "ec2_associate_public_ip_address" {
+  type    = bool
+  default = false
+}
+variable "lifecycle_create_before_destroy" {
+  type    = bool
+  default = true
+}
+variable "ec2_root_volume_size" {
+  type    = number
+  default = 32
+}
+variable "ec2_root_volume_type" {
+  type    = string
+  default = "gp3"
+}
+variable "ec2_root_volume_encrypted" {
+  type    = bool
+  default = true
+}
+variable "ec2_root_volume_kms_key_id" {
+  type    = string
+  default = "arn:aws:kms:${region}:${account_id_dev}:key/00000000-0000-0000-0000-000000000000"
+}

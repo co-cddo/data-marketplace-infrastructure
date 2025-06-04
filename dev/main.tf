@@ -125,6 +125,23 @@ module "postgres" {
   rds_postgres_snapshot_identifier     = var.rds_postgres_snapshot_identifier
 }
 
+module "ec2-instance" {
+  source                               = "../modules/ec2-instance"
+  ec2_instance_count                   = var.ec2_instance_count
+  ec2_instance_ami                     = var.ec2_instance_ami
+  ec2_instance_type                    = var.ec2_instance_type
+  ec2_instance_keypair                 = var.ec2_instance_keypair
+  ec2_user_data                        = var.ec2_user_data
+  ec2_instance_security_group_ids      = var.ec2_instance_security_group_ids
+  ec2_associate_public_ip_address      = var.ec2_associate_public_ip_address
+  ec2_instance_subnet_id               = var.ec2_instance_subnet_id
+  project_code                         = var.project_code
+  lifecycle_create_before_destroy      = var.lifecycle_create_before_destroy
+  ec2_instance_tags                    = var.ec2_instance_tags
+  ec2_root_volume_size                 = var.ec2_root_volume_size
+  ec2_root_volume_type                 = var.ec2_root_volume_type
+  ec2_root_volume_encrypted            = var.ec2_root_volume_encrypted
+}
 
 module "app_params" {
   source = "../modules/parameter-store"

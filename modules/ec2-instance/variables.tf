@@ -1,0 +1,14 @@
+variable "ec2_instance_count" {}
+variable "ec2_instance_ami" {}
+variable "ec2_instance_type" {}
+variable "ec2_instance_keypair" {}
+variable "project_code" {}
+variable "ec2_user_data" {}
+variable "ec2_instance_security_group_ids" {}
+variable "ec2_associate_public_ip_address" {}
+variable "ec2_instance_subnet_id" {}
+variable "lifecycle_create_before_destroy" {}
+variable "ec2_instance_tags" {}
+variable "ec2_root_volume_size" {}
+variable "ec2_root_volume_type" {}
+variable "ec2_root_volume_encrypted" {}
