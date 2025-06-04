@@ -27,26 +27,29 @@ GITCHECKOUTLOG=${LOGDIR}/git-checkout-${DSTAMP}.log
 MYIP=$(ip addr show dev enX0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 MYTYPE=$(cat /etc/os-release | grep ^NAME | awk -F= '{print $2}' | sed 's/"//g')
 REPODIR=data-marketplace-infrastructure
-
+REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+AWSACCID=$(aws sts get-caller-identity --query Account --output text)
+if [[ -z "${REGION}" ]] || [[ -z "${AWSACCID}" ]]; then
+    echo "ERROR: Unable to determine AWS Region or Account ID" >&2
+    exit 1
+fi
+CONTEXTLOWERCASE=$(echo "${CONTEXT}" | tr '[:upper:]' '[:lower:]')
 CURRENTCONTEXT=$(kubectl config current-context)
 
 if [[ -z "$CURRENTCONTEXT" ]]; then
-    echo "ERROR: Must provide CURRENTCONTEXT" 1>&2
-    exit 1
+    echo "INFO: Creating a new CURRENTCONTEXT"
+    aws eks update-kubeconfig --region ${REGION} --name dm-${CONTEXTLOWERCASE}-eks-cluster
+    CURRENTCONTEXT=$(kubectl config current-context)
 fi
 
 echo "CURRENTCONTEXT:  ${CURRENTCONTEXT}"
 
-CONTEXTLOWERCASE=$(echo "${CONTEXT}" | tr '[:upper:]' '[:lower:]')
 CURRENTCONTEXTEXTRACTED=$(echo "${CURRENTCONTEXT}" | awk -F: '{print $6}' | awk -F\/ '{print $2}' | awk -F\- '{print $2}')
 
 if   [ "${CONTEXTLOWERCASE}" != "${CURRENTCONTEXTEXTRACTED}" ];then
     echo "ERROR: CONTEXT Mismatch with \"Pipeline\"  to \"Local\" compared" 1>&2
     exit 1
 fi
-
-REGION=$(echo   "${CURRENTCONTEXT}" | awk -F: '{print $4}')
-AWSACCID=$(echo "${CURRENTCONTEXT}" | awk -F: '{print $5}')
 
 case ${CONTEXT} in
   dev|Dev)
@@ -152,15 +155,13 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
     terraform apply -no-color -out=${APPLYOUTFILE} \
     -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
-    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${APPLYLOG}
+    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" ${PLANOUTFILE} > ${APPLYLOG}
     echo "#~~ INFO:  ENV: ${ENV} terraform apply exitcode $?"
 
 elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "TerraformDestroy" ]; then
     echo "#~~ INFO: |3| ENV: ${ENV} Running terraform destroy"
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform destroy -no-color -out=${DESTROYOUTFILE} \
-    -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
-    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${DESTROYLOG}
+    terraform destroy -no-color -out=${DESTROYOUTFILE} > ${DESTROYLOG}
     echo "#~~ INFO:  ENV: ${ENV} terraform destroy exitcode $?"
 
 else
