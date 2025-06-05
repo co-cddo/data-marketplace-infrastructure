@@ -129,6 +129,10 @@ variable "rds_postgres_skip_final_snapshot" {
 variable "rds_postgres_snapshot_identifier" {
   type = string
 }
+variable "auto_minor_version_upgrade" {
+  type    = bool
+  default = false
+}
 #-------------------------------------------------
 
 variable "config-inputs-json-default" {

@@ -22,7 +22,7 @@ resource "aws_db_instance" "postgresql_instance" {
   backup_retention_period = var.rds_postgres_backup_retention_period
   skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   snapshot_identifier     = var.rds_postgres_snapshot_identifier != "" ? var.rds_postgres_snapshot_identifier : null
- 
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   tags = {
     Name = "${var.project_code}-${var.env_name}-eks-sg"
   }
