@@ -29,6 +29,7 @@ permissions:
 
 jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 01 TerraformInitPlanOnly
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TerraformInitPlanOnly:
     name: TerraformInitPlanOnly
@@ -67,6 +68,7 @@ jobs:
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 02 TerraformInitPlan
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TerraformInitPlan:
     name: TerraformInitPlan
@@ -104,7 +106,9 @@ jobs:
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 02b Manual Approval For Apply
+#~~~~~~~~~~~~~~~~~~~~~~~
 
   manual-approval-for-apply:
     name: Manual Approval For Apply
@@ -162,6 +166,7 @@ jobs:
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 03 Manual Approval + Destroy
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   manual-approval-for-destroy:
