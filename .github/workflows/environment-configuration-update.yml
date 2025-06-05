@@ -29,9 +29,47 @@ permissions:
 
 jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  TerraformInitPlanOnly:
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'init+plan'
+
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: TerraformInitiate EC2
+        id: TerraformInitiateEC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+            ]}
+
+      - name: Get and Show PLANOUTFILE
+        run: |
+          aws s3 cp s3://jpbackupbucket20250502/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
+          cat ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TerraformInitPlan:
     runs-on: ubuntu-latest
-    if: inputs.TerraformAction == 'init+plan' || inputs.TerraformAction == 'init+plan+apply'
+    if: inputs.TerraformAction == 'init+plan+apply'
 
     steps:
       - name: Git clone the repository
@@ -120,6 +158,7 @@ jobs:
           cat ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   manual-approval-for-destroy:
