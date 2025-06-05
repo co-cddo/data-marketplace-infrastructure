@@ -17,6 +17,7 @@ DESTROYOUTDIR=${BASEDIR}/out
 LOGDIR=${BASEDIR}/log
 APPLYOUTFILE=${PLANOUTDIR}/tfapplyout.${DSTAMP}
 PLANOUTFILE=${PLANOUTDIR}/tfplanout.${DSTAMP}
+PLANOUTFILECURRENT=${PLANOUTDIR}/tfplanout.CURRENT
 DESTROYOUTFILE=${PLANOUTDIR}/tfdestroyout.${DSTAMP}
 INITLOG=${LOGDIR}/tf-init.${DSTAMP}.log
 APPLYLOG=${LOGDIR}/tf-apply-${DSTAMP}.log
@@ -24,6 +25,8 @@ PLANLOG=${LOGDIR}/tf-plan-${DSTAMP}.log
 DESTROYLOG=${LOGDIR}/tf-destroy-${DSTAMP}.log
 GITCLONELOG=${LOGDIR}/git-clone-${DSTAMP}.log
 GITCHECKOUTLOG=${LOGDIR}/git-checkout-${DSTAMP}.log
+GITBRANCH="feature/jp-gitactions"
+S3BUCKET="jpbackupbucket20250502"
 MYIP=$(ip addr show dev enX0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 MYTYPE=$(cat /etc/os-release | grep ^NAME | awk -F= '{print $2}' | sed 's/"//g')
 REPODIR=data-marketplace-infrastructure
@@ -92,18 +95,24 @@ echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "DATE/TIME  \"${DSTAMP}\""
 
 echo "#~~ INFO: ENVIRONMENT: ${1} | TFACTION: ${2} GITHUBJOB: ${3}"
+echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
+echo "#~~ INFO: REGION:         ${REGION}"
+echo "#~~ INFO: AWSACCID:       ${AWSACCID}"
 
 echo "#~~ INFO: Setting Kubernetes Context to ${CONTEXT}"
 kubectl config use-context ${KSCONTEXT}
 
-cd ${BASEDIR} && rm -fR ./${REPODIR}
-echo "#~~ INFO: git clone repo"
-cd ${BASEDIR} && git clone --progress git@github.com:co-cddo/${REPODIR}.git       2> ${GITCLONELOG}
-echo "#~~ INFO: git clone repo exitcode $?"
-cd  ${BASEDIR}/${REPODIR} && git checkout --progress feature/jp-infraappconfig    2> ${GITCHECKOUTLOG}
-echo "#~~ INFO: git checkout branch exitcode $?"
 
-if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ]; then
+if   [ "${GITHUBJOBNAME}" != "TerraformApply" ]; then
+    cd ${BASEDIR} && rm -fR ./${REPODIR}
+    echo "#~~ INFO: git clone repo"
+    cd ${BASEDIR} && git clone --progress git@github.com:co-cddo/${REPODIR}.git       2> ${GITCLONELOG}
+    echo "#~~ INFO: git clone repo exitcode $?"
+    cd  ${BASEDIR}/${REPODIR} && git checkout --progress ${GITBRANCH}                 2> ${GITCHECKOUTLOG}
+    echo "#~~ INFO: git checkout branch exitcode $?"
+fi
+
+if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitPlanOnly" ]; then
     echo "#~~ INFO: |1| ENV: ${ENV} Running terraform init"
     cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
     terraform init -no-color > ${INITLOG}
@@ -111,7 +120,7 @@ if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitP
 
     echo "#~~ INFO:  ENV: ${ENV} Running terraform plan"
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform plan -no-color -out=${PLANOUTFILE} \
+    terraform plan -no-color -input=false -out=${PLANOUTFILE} \
     -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
     -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${PLANLOG}
     echo "#~~ INFO:  ENV: ${ENV} terraform plan exitcode $?"
@@ -126,43 +135,61 @@ if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitP
         exit 1
     fi
     echo -e "-----"
+    echo "#~~ INFO:  Uploading PLANOUTFILE to S3"
+    terraform show -no-color ${PLANOUTFILE}  2>&1 > ${PLANOUTFILE}.txt
+    aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/PLANOUTFILE.txt
+
 
 elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ] || [ "${GITHUBJOBNAME}" == "TerraformApply" ] ); then
-    echo "#~~ INFO: |2| ENV: ${ENV} Running terraform init"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
-    terraform init -no-color > ${INITLOG}
-    echo "#~~ INFO:  ENV: ${ENV} terraform init exitcode $?"
 
-    echo "#~~ INFO:  ENV: ${ENV} Running terraform plan"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform plan -no-color -out=${PLANOUTFILE} \
-    -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
-    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${PLANLOG}
-    echo "#~~ INFO:  ENV: ${ENV} terraform plan exitcode $?"
-    echo -e "#~~ INFO:  ENV: ${ENV} Review the below terraform plan output summary"
-    echo -e "-----"
-    if   [ "$(terraform show -no-color ${PLANOUTFILE}  2>&1 | grep -c '^Plan:')" -ge 1 ]; then
-              terraform show -no-color ${PLANOUTFILE}  2>&1 | grep    '^Plan:'
-    elif [ "$(terraform show -no-color ${PLANOUTFILE}  2>&1 | grep -c '^No changes')" -ge 1 ]; then
-              terraform show -no-color ${PLANOUTFILE}  2>&1 | grep    '^No changes'
-    else
-        echo "Error: Exiting"
-        exit 1
+    if [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ]; then
+        echo "#~~ INFO: |2| ENV: ${ENV} Running terraform init"
+        cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+        terraform init -no-color > ${INITLOG}
+        echo "#~~ INFO:  ENV: ${ENV} terraform init exitcode $?"
+
+        echo "#~~ INFO:  ENV: ${ENV} Running terraform plan"
+        cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
+        terraform plan -no-color -input=false -out=${PLANOUTFILE} \
+        -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
+        -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${PLANLOG}
+        echo "#~~ INFO:  ENV: ${ENV} terraform plan exitcode $?"
+        echo -e "#~~ INFO:  ENV: ${ENV} Review the below terraform plan output summary"
+        echo -e "-----"
+        if   [ "$(terraform show -no-color ${PLANOUTFILE}  2>&1 | grep -c '^Plan:')" -ge 1 ]; then
+                  terraform show -no-color ${PLANOUTFILE}  2>&1 | grep    '^Plan:'
+        elif [ "$(terraform show -no-color ${PLANOUTFILE}  2>&1 | grep -c '^No changes')" -ge 1 ]; then
+                  terraform show -no-color ${PLANOUTFILE}  2>&1 | grep    '^No changes'
+        else
+            echo "Error: Exiting"
+            exit 1
+        fi
+        echo -e "-----"
+        cp ${PLANOUTFILE} ${PLANOUTFILECURRENT}
+        echo "#~~ INFO:  Uploading PLANOUTFILE to S3"
+        terraform show -no-color ${PLANOUTFILE}  2>&1 > ${PLANOUTFILE}.txt
+        aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/PLANOUTFILE.txt
     fi
-    echo -e "-----"
 
-    echo "#~~ INFO:  ENV: ${ENV} Running terraform apply"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform apply -no-color -out=${APPLYOUTFILE} \
-    -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
-    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" ${PLANOUTFILE} > ${APPLYLOG}
-    echo "#~~ INFO:  ENV: ${ENV} terraform apply exitcode $?"
+    if [ "${GITHUBJOBNAME}" == "TerraformApply" ]; then
+        echo "#~~ INFO:  ENV: ${ENV} Running terraform apply"
+        cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+        terraform apply -no-color -auto-approve \
+        -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
+        -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}"  \
+        ${PLANOUTFILECURRENT} 2>&1 > ${APPLYLOG}.txt
+        echo "#~~ INFO:  ENV: ${ENV} terraform apply exitcode $?"
+        echo "#~~ INFO:  Uploading APPLYLOG to S3"
+        aws s3 cp ${APPLYLOG}.txt s3://${S3BUCKET}/APPLYLOG.txt
+    fi
 
 elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "TerraformDestroy" ]; then
     echo "#~~ INFO: |3| ENV: ${ENV} Running terraform destroy"
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform destroy -no-color -out=${DESTROYOUTFILE} > ${DESTROYLOG}
+    terraform destroy -no-color -auto-approve  2>&1 > ${DESTROYLOG}.txt
     echo "#~~ INFO:  ENV: ${ENV} terraform destroy exitcode $?"
+    echo "#~~ INFO:  Uploading DESTROYLOG to S3"
+    aws s3 cp ${DESTROYLOG}.txt s3://${S3BUCKET}/DESTROYLOG.txt
 
 else
         echo "Error: Unknown Option, Exiting"
@@ -170,3 +197,4 @@ else
 fi
 
 echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
