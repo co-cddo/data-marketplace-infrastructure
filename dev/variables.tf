@@ -96,7 +96,7 @@ variable "rds_postgres_engine" {
 }
 variable "rds_postgres_engine_version" {
   type    = string
-  default = "16.6"
+  default = "16.8"
 }
 variable "rds_postgres_instance_class" {
   type    = string
