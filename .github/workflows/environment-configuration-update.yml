@@ -10,7 +10,7 @@ on:
         type: choice
         options:
           - Dev
-        # - Test
+          - Test
         # - Prod
         # - Custom
       TerraformAction:
