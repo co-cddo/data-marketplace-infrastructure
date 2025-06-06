@@ -39,42 +39,30 @@ fi
 CONTEXTLOWERCASE=$(echo "${CONTEXT}" | tr '[:upper:]' '[:lower:]')
 CURRENTCONTEXT=$(kubectl config current-context)
 
-#if [[ -z "$CURRENTCONTEXT" ]]; then
     echo "INFO: Creating a new CURRENTCONTEXT"
-    aws eks update-kubeconfig --region ${REGION} --name dm-${CONTEXTLOWERCASE}-eks-cluster
+    aws eks update-kubeconfig --name dm-${CONTEXTLOWERCASE}-eks-cluster --region ${REGION}
+    kubectl config use-context "arn:aws:eks:${REGION}:${AWSACCID}:cluster/dm-${CONTEXTLOWERCASE}-eks-cluster"
     CURRENTCONTEXT=$(kubectl config current-context)
-#fi
 
 echo "CURRENTCONTEXT:  ${CURRENTCONTEXT}"
 
-CURRENTCONTEXTEXTRACTED=$(echo "${CURRENTCONTEXT}" | awk -F: '{print $6}' | awk -F\/ '{print $2}' | awk -F\- '{print $2}')
-
-#if   [ "${CONTEXTLOWERCASE}" != "${CURRENTCONTEXTEXTRACTED}" ];then
-#    echo "ERROR: CONTEXT Mismatch with \"Pipeline\"  to \"Local\" compared" 1>&2
-#    exit 1
-#fi
-
 case ${CONTEXT} in
   dev|Dev)
-    KSCONTEXT="${CURRENTCONTEXT}"
     MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
     PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
     ENV=dev
     ;;
   tst|Tst|Test)
-    KSCONTEXT="${CURRENTCONTEXT}"
     MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
     PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
     ENV=tst
     ;;
   stg|Stg|Stage)
-    KSCONTEXT="${CURRENTCONTEXT}"
     MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
     PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
     ENV=stg
     ;;
   pro|Pro|Prod)
-    KSCONTEXT="${CURRENTCONTEXT}"
     MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-prod-base-initial"
     PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-prod-base-initial"
     ENV=pro
@@ -82,7 +70,6 @@ case ${CONTEXT} in
   *)
     echo "ERROR: unknown CONTEXT"
     echo "Expected one of Dev | Test | Stage | Prod"
-    KSCONTEXT="unknown"
     exit 1
     ;;
 esac
@@ -98,10 +85,6 @@ echo "#~~ INFO: ENVIRONMENT: ${1} | TFACTION: ${2} GITHUBJOB: ${3}"
 echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
 echo "#~~ INFO: REGION:         ${REGION}"
 echo "#~~ INFO: AWSACCID:       ${AWSACCID}"
-
-echo "#~~ INFO: Setting Kubernetes Context to ${CONTEXT}"
-kubectl config use-context ${KSCONTEXT}
-
 
 if   [ "${GITHUBJOBNAME}" != "TerraformApply" ]; then
     cd ${BASEDIR} && rm -fR ./${REPODIR}
