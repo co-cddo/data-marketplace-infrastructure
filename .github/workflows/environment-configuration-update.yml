@@ -14,7 +14,7 @@ on:
         # - Prod
         # - Custom
       gitbranch:
-        description: 'Select Git Branch'
+        description: 'Select Git Branch to Clone'
         required: true
         default: 'feature/jp-gitactions'
         type: choice
