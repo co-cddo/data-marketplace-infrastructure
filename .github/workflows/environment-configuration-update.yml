@@ -13,6 +13,14 @@ on:
           - Test
         # - Prod
         # - Custom
+      gitbranch:
+        description: 'Select Git Branch'
+        required: true
+        default: 'feature/jp-gitactions'
+        type: choice
+        options:
+          - 'feature/jp-gitactions'
+          - 'main'
       TerraformAction:
         type: choice
         description: 'Terraform With Approvals'
@@ -31,6 +39,7 @@ env:
   REPO_NAME: "data-marketplace-infrastructure"
   BUCKET_NAME: "jpbackupbucket20250502"
   TFRUNNER_SCRIPT: "/home/ssm-user/data-marketplace-infrastructure/.github/scripts/tfrunner.sh"
+  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,7 +72,7 @@ jobs:
           parameters: |
             {"commands":[
               "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
+              "su - ssm-user -c \"git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformInitiate EC2
@@ -116,7 +125,7 @@ jobs:
           parameters: |
             {"commands":[
               "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
+              "su - ssm-user -c \"git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformInitiate EC2
@@ -157,7 +166,7 @@ jobs:
         uses: trstringer/manual-approval@v1.10.0
         with:
           secret: ${{ github.TOKEN }}
-          approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
+          approvers: ${{ env.APPROVERS  }}
           minimum-approvals: 1
           issue-title: "Manual Approval Required for Terraform APPLY"
           issue-body: "Please approve or deny the deployment."
@@ -205,8 +214,6 @@ jobs:
     name: Manual Approval For Destroy
     runs-on: ubuntu-latest
     if: inputs.TerraformAction == 'approval+destroy'
-#   needs: ["TerraformInitPlan"]
-#   if: success()
 
     permissions:
       issues: write
@@ -216,7 +223,7 @@ jobs:
         uses: trstringer/manual-approval@v1.10.0
         with:
           secret: ${{ github.TOKEN }}
-          approvers: soydaner,JohnPalmerGDS,denis-davidov-gds
+          approvers: ${{ env.APPROVERS  }}
           minimum-approvals: 1
           issue-title: "Manual Approval Required for Terraform DESTROY"
           issue-body: "Please approve or deny the destroy."
@@ -249,7 +256,7 @@ jobs:
           parameters: |
             {"commands":[
               "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
+              "su - ssm-user -c \"git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformApply EC2
