@@ -131,6 +131,6 @@ variable "rds_postgres_snapshot_identifier" {
 }
 variable "auto_minor_version_upgrade" {
   type    = bool
-  default = true
+  default = false
 }
 #-------------------------------------------------
