@@ -27,6 +27,11 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  REPO_NAME: "data-marketplace-infrastructure"
+  BUCKET_NAME: "jpbackupbucket20250502"
+  TFRUNNER_SCRIPT: "/home/ssm-user/data-marketplace-infrastructure/.github/scripts/tfrunner.sh"
+
 jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~ 01 TerraformInitPlanOnly
@@ -57,8 +62,8 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR /home/ssm-user/data-marketplace-infrastructure ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+              "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformInitiate EC2
@@ -71,12 +76,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+              "su - ssm-user -c \"${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://jpbackupbucket20250502/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -110,8 +115,8 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR /home/ssm-user/data-marketplace-infrastructure ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+              "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformInitiate EC2
@@ -124,12 +129,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "su - ssm-user -c \"/home/ssm-user/data-marketplace-infrastructure/.github/scripts/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://jpbackupbucket20250502/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -182,13 +187,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
       - name: Get and Show APPLYLOG
         run: |
-          aws s3 cp s3://jpbackupbucket20250502/APPLYLOG.txt ./APPLYLOG.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/APPLYLOG.txt ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT START ~~~~~~~"
           cat ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
@@ -244,8 +248,8 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR /home/ssm-user/data-marketplace-infrastructure ; fi",
-              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+              "#!/bin/bash","if [ -d /home/ssm-user/${{ env.REPO_NAME }} ];then rm -fR /home/ssm-user/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git /home/ssm-user/${{ env.REPO_NAME }} \""
             ]}
 
       - name: TerraformApply EC2
@@ -257,13 +261,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "echo 'ENV: ${{ inputs.environment }} TFACTION: ${{ inputs.TerraformAction }} GHJOB: ${{ github.job }}'",
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
       - name: Get and Show DESTROYLOG
         run: |
-          aws s3 cp s3://jpbackupbucket20250502/DESTROYLOG.txt ./DESTROYLOG.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/DESTROYLOG.txt ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT START ~~~~~~~"
           cat ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT END ~~~~~~~~~"
