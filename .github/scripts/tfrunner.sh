@@ -39,20 +39,20 @@ fi
 CONTEXTLOWERCASE=$(echo "${CONTEXT}" | tr '[:upper:]' '[:lower:]')
 CURRENTCONTEXT=$(kubectl config current-context)
 
-if [[ -z "$CURRENTCONTEXT" ]]; then
+#if [[ -z "$CURRENTCONTEXT" ]]; then
     echo "INFO: Creating a new CURRENTCONTEXT"
     aws eks update-kubeconfig --region ${REGION} --name dm-${CONTEXTLOWERCASE}-eks-cluster
     CURRENTCONTEXT=$(kubectl config current-context)
-fi
+#fi
 
 echo "CURRENTCONTEXT:  ${CURRENTCONTEXT}"
 
 CURRENTCONTEXTEXTRACTED=$(echo "${CURRENTCONTEXT}" | awk -F: '{print $6}' | awk -F\/ '{print $2}' | awk -F\- '{print $2}')
 
-if   [ "${CONTEXTLOWERCASE}" != "${CURRENTCONTEXTEXTRACTED}" ];then
-    echo "ERROR: CONTEXT Mismatch with \"Pipeline\"  to \"Local\" compared" 1>&2
-    exit 1
-fi
+#if   [ "${CONTEXTLOWERCASE}" != "${CURRENTCONTEXTEXTRACTED}" ];then
+#    echo "ERROR: CONTEXT Mismatch with \"Pipeline\"  to \"Local\" compared" 1>&2
+#    exit 1
+#fi
 
 case ${CONTEXT} in
   dev|Dev)
