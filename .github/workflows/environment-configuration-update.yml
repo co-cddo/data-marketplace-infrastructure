@@ -57,6 +57,7 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
+              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR /home/ssm-user/data-marketplace-infrastructure ; fi",
               "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
             ]}
 
@@ -70,7 +71,6 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR /home/ssm-user/data-marketplace-infrastructure ; fi",
               "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
             ]}
 
