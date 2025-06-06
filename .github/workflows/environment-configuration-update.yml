@@ -47,6 +47,19 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: CloneGitRepoToEC2
+        id: CloneGitRepoToEC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+            ]}
+
       - name: TerraformInitiate EC2
         id: TerraformInitiateEC2
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
@@ -86,6 +99,19 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: CloneGitRepoToEC2
+        id: CloneGitRepoToEC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+            ]}
+
       - name: TerraformInitiate EC2
         id: TerraformInitiateEC2
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
@@ -96,7 +122,7 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"/home/ssm-user/data-marketplace-infrastructure/.github/scripts/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
             ]}
 
       - name: Get and Show PLANOUTFILE
@@ -205,6 +231,19 @@ jobs:
           role-session-name: github-actions2
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CloneGitRepoToEC2
+        id: CloneGitRepoToEC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
+            ]}
 
       - name: TerraformApply EC2
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
