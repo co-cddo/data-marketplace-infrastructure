@@ -47,8 +47,8 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: CloneGitRepoToEC2
-        id: CloneGitRepoToEC2
+      - name: CloneGitRepoToEC2-01
+        id: CloneGitRepoToEC2-01
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
@@ -70,7 +70,8 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "su - ssm-user -c \"/home/ssm-user/bin/tfrunner.sh ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR data-marketplace-infrastructure ; fi",
+              "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
             ]}
 
       - name: Get and Show PLANOUTFILE
@@ -99,8 +100,8 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: CloneGitRepoToEC2
-        id: CloneGitRepoToEC2
+      - name: CloneGitRepoToEC2-02
+        id: CloneGitRepoToEC2-02
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
@@ -233,8 +234,8 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: CloneGitRepoToEC2
-        id: CloneGitRepoToEC2
+      - name: CloneGitRepoToEC2-03
+        id: CloneGitRepoToEC2-03
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
           aws-region: ${{ secrets.AWS_REGION }}
@@ -243,6 +244,7 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
+              "#!/bin/bash","if [ -d /home/ssm-user/data-marketplace-infrastructure ];then rm -fR data-marketplace-infrastructure ; fi",
               "su - ssm-user -c \"git clone -b feature/jp-gitactions --single-branch git@github.com:co-cddo/data-marketplace-infrastructure.git /home/ssm-user/data-marketplace-infrastructure \""
             ]}
 
