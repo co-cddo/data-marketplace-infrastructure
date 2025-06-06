@@ -36,15 +36,6 @@ if [[ -z "${REGION}" ]] || [[ -z "${AWSACCID}" ]]; then
     echo "ERROR: Unable to determine AWS Region or Account ID" >&2
     exit 1
 fi
-CONTEXTLOWERCASE=$(echo "${CONTEXT}" | tr '[:upper:]' '[:lower:]')
-CURRENTCONTEXT=$(kubectl config current-context)
-
-    echo "INFO: Creating a new CURRENTCONTEXT"
-    aws eks update-kubeconfig --name dm-${CONTEXTLOWERCASE}-eks-cluster --region ${REGION}
-    kubectl config use-context "arn:aws:eks:${REGION}:${AWSACCID}:cluster/dm-${CONTEXTLOWERCASE}-eks-cluster"
-    CURRENTCONTEXT=$(kubectl config current-context)
-
-echo "CURRENTCONTEXT:  ${CURRENTCONTEXT}"
 
 case ${CONTEXT} in
   dev|Dev)
@@ -74,6 +65,11 @@ case ${CONTEXT} in
     ;;
 esac
 
+echo "#~~ INFO: Creating a new CURRENTCONTEXT"
+aws eks update-kubeconfig --name dm-${ENV}-eks-cluster --region ${REGION}
+kubectl config use-context "arn:aws:eks:${REGION}:${AWSACCID}:cluster/dm-${ENV}-eks-cluster"
+CURRENTCONTEXT=$(kubectl config current-context)
+
 mkdir -p ${PLANOUTDIR} ${LOGDIR}
 
 echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -82,9 +78,9 @@ echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "DATE/TIME  \"${DSTAMP}\""
 
 echo "#~~ INFO: ENVIRONMENT: ${1} | TFACTION: ${2} GITHUBJOB: ${3}"
-echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
 echo "#~~ INFO: REGION:         ${REGION}"
 echo "#~~ INFO: AWSACCID:       ${AWSACCID}"
+echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
 
 if   [ "${GITHUBJOBNAME}" != "TerraformApply" ]; then
     cd ${BASEDIR} && rm -fR ./${REPODIR}
@@ -121,7 +117,6 @@ if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitP
     echo "#~~ INFO:  Uploading PLANOUTFILE to S3"
     terraform show -no-color ${PLANOUTFILE}  2>&1 > ${PLANOUTFILE}.txt
     aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/PLANOUTFILE.txt
-
 
 elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ] || [ "${GITHUBJOBNAME}" == "TerraformApply" ] ); then
 
