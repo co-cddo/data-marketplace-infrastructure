@@ -25,7 +25,7 @@ on:
         type: choice
         description: 'Terraform With Approvals'
         required: true
-        default: 'init + plan'
+        default: 'init+plan'
         options:
           - 'init+plan'
           - 'init+plan+apply'
