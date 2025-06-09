@@ -170,7 +170,9 @@ elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "Terrafo
 
     echo "#~~ INFO: |3| ENV: ${ENV} Running terraform destroy"
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
-    terraform destroy -no-color -auto-approve  2>&1 > ${DESTROYLOG}.txt
+    terraform destroy -no-color -auto-approve  \
+    -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
+    -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" 2>&1 > ${DESTROYLOG}.txt
     echo "#~~ INFO:  ENV: ${ENV} terraform destroy exitcode $?"
     echo "#~~ INFO:  Uploading DESTROYLOG to S3"
     aws s3 cp ${DESTROYLOG}.txt s3://${S3BUCKET}/DESTROYLOG.txt
