@@ -176,7 +176,9 @@ fi
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "~~ CLEANING UP (REMOVING): ${BASEDIR}/${REPODIR}"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-rm -fR ${BASEDIR}/${REPODIR}
+if [ "${GITHUBJOBNAME}" != "TerraformInitPlan" ]; then
+    rm -fR ${BASEDIR}/${REPODIR}
+fi
 
 echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
