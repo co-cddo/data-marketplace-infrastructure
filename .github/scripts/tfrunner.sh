@@ -162,6 +162,12 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
     fi
 
 elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "TerraformDestroy" ]; then
+
+    echo "#~~ INFO: |2| ENV: ${ENV} Running terraform init"
+    cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+    terraform init -no-color > ${INITLOG}
+    echo "#~~ INFO:  ENV: ${ENV} terraform init exitcode $?"
+
     echo "#~~ INFO: |3| ENV: ${ENV} Running terraform destroy"
     cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
     terraform destroy -no-color -auto-approve  2>&1 > ${DESTROYLOG}.txt
