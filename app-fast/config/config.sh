@@ -61,7 +61,7 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     rm -f ${_DATAFILE}
 
-    echo "--- INFO: Getting new ${_DATAFILE}"
+    echo "--- INFO: Getting Master Data File for Environment: ${_ENV}"
 
     aws ssm get-parameters \
     --name "/dm/${_ENV}/config-inputs" \
