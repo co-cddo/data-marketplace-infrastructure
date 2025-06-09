@@ -82,15 +82,6 @@ echo "#~~ INFO: REGION:         ${REGION}"
 echo "#~~ INFO: AWSACCID:       ${AWSACCID}"
 echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
 
-if   [ "${GITHUBJOBNAME}" != "TerraformApply" ]; then
-    cd ${BASEDIR} && rm -fR ./${REPODIR}
-    echo "#~~ INFO: git clone repo"
-    cd ${BASEDIR} && git clone --progress git@github.com:co-cddo/${REPODIR}.git       2> ${GITCLONELOG}
-    echo "#~~ INFO: git clone repo exitcode $?"
-    cd  ${BASEDIR}/${REPODIR} && git checkout --progress ${GITBRANCH}                 2> ${GITCHECKOUTLOG}
-    echo "#~~ INFO: git checkout branch exitcode $?"
-fi
-
 if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitPlanOnly" ]; then
     echo "#~~ INFO: |1| ENV: ${ENV} Running terraform init"
     cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
@@ -181,6 +172,11 @@ else
         echo "Error: Unknown Option, Exiting"
         exit 1
 fi
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~ CLEANING UP (REMOVING): ${BASEDIR}/${REPODIR}"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+rm -fR ${BASEDIR}/${REPODIR}
 
 echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
