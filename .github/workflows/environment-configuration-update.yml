@@ -153,8 +153,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: ["TerraformInitPlan"]
     if: success() && inputs.TerraformAction == 'init+plan+apply'
-    outputs:
-      approved: ${{ steps.await-manual-approval.outputs.approved }}
 
     permissions:
       issues: write
