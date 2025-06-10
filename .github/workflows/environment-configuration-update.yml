@@ -98,7 +98,7 @@ jobs:
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt --recursive --exclude "*" --include "*.txt"
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -139,7 +139,7 @@ jobs:
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt --recursive --exclude "*" --include "*.txt"
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -197,7 +197,7 @@ jobs:
 
       - name: Get and Show APPLYLOG
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/APPLYLOG.txt ./APPLYLOG.txt --recursive --exclude "*" --include "*.txt"
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/APPLYLOG.txt ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT START ~~~~~~~"
           cat ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
@@ -258,7 +258,7 @@ jobs:
 
       - name: Get and Show DESTROYLOG
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/DESTROYLOG.txt ./DESTROYLOG.txt --recursive --exclude "*" --include "*.txt"
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/DESTROYLOG.txt ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT START ~~~~~~~"
           cat ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT END ~~~~~~~~~"
