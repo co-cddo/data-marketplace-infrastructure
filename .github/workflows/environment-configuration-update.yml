@@ -9,8 +9,8 @@ on:
         default: 'Dev'
         type: choice
         options:
-          - Dev
-          - Test
+          - dev
+          - tst
         # - Prod
         # - Custom
       gitbranch:
@@ -21,6 +21,24 @@ on:
         options:
           - 'feature/jp-gitactions'
           - 'main'
+      mssqlsnapshot:
+        description: 'MSSQL Snapshot Name'
+        required: true
+        default: 'dm-mssql-sample-base-initial'
+        type: choice
+        options:
+          - 'dm-mssql-sample-base-initial'
+          - 'dm-mssql-prod-base-initial'
+          - 'database-1-snapshot'
+      pgsqlsnapshot:
+        description: 'POSTGRES Snapshot Name'
+        required: true
+        default: 'dm-postgres-sample-base-initial'
+        type: choice
+        options:
+          - 'dm-postgres-sample-base-initial'
+          - 'dm-postgres-prod-base-initial'
+          - 'database-2-snapshot'
       TerraformAction:
         type: choice
         description: 'Terraform With Approvals'
@@ -38,7 +56,8 @@ permissions:
 env:
   REPO_NAME: "data-marketplace-infrastructure"
   REPO_BASEDIR: "/home/ssm-user/src"
-  BUCKET_NAME: "jpbackupbucket20250502"
+  BUCKET_NAME: "dm-gen-config"
+  BUCKET_FOLDER: "terraform"
   TFRUNNER_SCRIPT: ".github/scripts/tfrunner.sh"
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
@@ -74,12 +93,12 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
             ]}
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -115,12 +134,12 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }}  \""
             ]}
 
       - name: Get and Show PLANOUTFILE
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
           cat ./PLANOUTFILE.txt
           echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
@@ -173,12 +192,12 @@ jobs:
           document-name: AWS-RunShellScript
           parameters: |
             {"commands":[
-              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
             ]}
 
       - name: Get and Show APPLYLOG
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/APPLYLOG.txt ./APPLYLOG.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/APPLYLOG.txt ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT START ~~~~~~~"
           cat ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
@@ -234,12 +253,12 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} \""
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
             ]}
 
       - name: Get and Show DESTROYLOG
         run: |
-          aws s3 cp s3://${{ env.BUCKET_NAME }}/DESTROYLOG.txt ./DESTROYLOG.txt
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/DESTROYLOG.txt ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT START ~~~~~~~"
           cat ./DESTROYLOG.txt
           echo "#~~ INFO: DESTROYLOG CONTENT END ~~~~~~~~~"

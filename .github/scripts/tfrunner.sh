@@ -2,7 +2,7 @@
 
 DSTAMP=$(/bin/date +"%Y%m%d%H%M%S")
 
-if [[ $# -ne 3 ]]; then
+if [[ $# -ne 5 ]]; then
     echo "Incorrect number of parameters" >&2
     exit 2
 fi
@@ -10,6 +10,8 @@ fi
 CONTEXT=${1}
 TFACTION=${2}
 GITHUBJOBNAME=${3}
+MSSQLSNAPSHOT=${4}
+PGSQLSNAPSHOT=${5}
 BASEDIR=/home/ssm-user/src
 APPLYOUTDIR=${BASEDIR}/out
 PLANOUTDIR=${BASEDIR}/out
@@ -25,10 +27,8 @@ PLANLOG=${LOGDIR}/tf-plan-${DSTAMP}.log
 DESTROYLOG=${LOGDIR}/tf-destroy-${DSTAMP}.log
 GITCLONELOG=${LOGDIR}/git-clone-${DSTAMP}.log
 GITCHECKOUTLOG=${LOGDIR}/git-checkout-${DSTAMP}.log
-GITBRANCH="feature/jp-gitactions"
-S3BUCKET="jpbackupbucket20250502"
-MYIP=$(ip addr show dev enX0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
-MYTYPE=$(cat /etc/os-release | grep ^NAME | awk -F= '{print $2}' | sed 's/"//g')
+S3BUCKET="dm-gen-config"
+S3FOLDER="terraform"
 REPODIR=data-marketplace-infrastructure
 REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 AWSACCID=$(aws sts get-caller-identity --query Account --output text)
@@ -39,23 +39,23 @@ fi
 
 case ${CONTEXT} in
   dev|Dev)
-    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
-    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
+    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${MSSQLSNAPSHOT}"
+    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${PGSQLSNAPSHOT}"
     ENV=dev
     ;;
   tst|Tst|Test)
-    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
-    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
+    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${MSSQLSNAPSHOT}"
+    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${PGSQLSNAPSHOT}"
     ENV=tst
     ;;
   stg|Stg|Stage)
-    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-sample-base-initial"
-    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-sample-base-initial"
+    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${MSSQLSNAPSHOT}"
+    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${PGSQLSNAPSHOT}"
     ENV=stg
     ;;
   pro|Pro|Prod)
-    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-mssql-prod-base-initial"
-    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:dm-postgres-prod-base-initial"
+    MSSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${MSSQLSNAPSHOT}"
+    PGSQL_SNAPSHOT="arn:aws:rds:${REGION}:${AWSACCID}:snapshot:${PGSQLSNAPSHOT}"
     ENV=pro
     ;;
   *)
@@ -107,7 +107,7 @@ if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitP
     echo -e "-----"
     echo "#~~ INFO:  Uploading PLANOUTFILE to S3"
     terraform show -no-color ${PLANOUTFILE}  2>&1 > ${PLANOUTFILE}.txt
-    aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/PLANOUTFILE.txt
+    aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/${S3FOLDER}/${ENV}/PLANOUTFILE.txt
 
 elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ] || [ "${GITHUBJOBNAME}" == "TerraformApply" ] ); then
 
@@ -137,7 +137,7 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
         cp ${PLANOUTFILE} ${PLANOUTFILECURRENT}
         echo "#~~ INFO:  Uploading PLANOUTFILE to S3"
         terraform show -no-color ${PLANOUTFILE}  2>&1 > ${PLANOUTFILE}.txt
-        aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/PLANOUTFILE.txt
+        aws s3 cp ${PLANOUTFILE}.txt s3://${S3BUCKET}/${S3FOLDER}/${ENV}/PLANOUTFILE.txt
     fi
 
     if [ "${GITHUBJOBNAME}" == "TerraformApply" ]; then
@@ -149,7 +149,7 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
         ${PLANOUTFILECURRENT} 2>&1 > ${APPLYLOG}.txt
         echo "#~~ INFO:  ENV: ${ENV} terraform apply exitcode $?"
         echo "#~~ INFO:  Uploading APPLYLOG to S3"
-        aws s3 cp ${APPLYLOG}.txt s3://${S3BUCKET}/APPLYLOG.txt
+        aws s3 cp ${APPLYLOG}.txt s3://${S3BUCKET}/${S3FOLDER}/${ENV}/APPLYLOG.txt
     fi
 
 elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "TerraformDestroy" ]; then
@@ -166,7 +166,7 @@ elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "Terrafo
     -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" 2>&1 > ${DESTROYLOG}.txt
     echo "#~~ INFO:  ENV: ${ENV} terraform destroy exitcode $?"
     echo "#~~ INFO:  Uploading DESTROYLOG to S3"
-    aws s3 cp ${DESTROYLOG}.txt s3://${S3BUCKET}/DESTROYLOG.txt
+    aws s3 cp ${DESTROYLOG}.txt s3://${S3BUCKET}/${S3FOLDER}/${ENV}/DESTROYLOG.txt
 
 else
         echo "Error: Unknown Option, Exiting"
