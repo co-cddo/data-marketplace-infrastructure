@@ -56,7 +56,7 @@ permissions:
 env:
   REPO_NAME: "data-marketplace-infrastructure"
   REPO_BASEDIR: "/home/ssm-user/src"
-  BUCKET_NAME: "dm-gen-config"
+  BUCKET_NAME: "dm-fast-assets"
   BUCKET_FOLDER: "terraform"
   TFRUNNER_SCRIPT: ".github/scripts/tfrunner.sh"
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
