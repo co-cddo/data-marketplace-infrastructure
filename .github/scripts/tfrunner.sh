@@ -173,10 +173,10 @@ else
         exit 1
 fi
 
+if [ "${GITHUBJOBNAME}" != "TerraformInitPlan" ]; then
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "~~ CLEANING UP (REMOVING): ${BASEDIR}/${REPODIR}"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-if [ "${GITHUBJOBNAME}" != "TerraformInitPlan" ]; then
     rm -fR ${BASEDIR}/${REPODIR}
 fi
 
