@@ -206,30 +206,30 @@ jobs:
           cat ./APPLYLOG.txt
           echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
 
-  RemoveRepoDirEC2Job:
-    name: RemoveRepoDirEC2Job
-    runs-on: ubuntu-latest
-    needs: ["manual-approval-for-apply"]
-    if: needs.manual-approval-for-apply.outputs.approval-status == 'deny'
-    steps:
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4.2.1
-        with:
-          role-session-name: github-actions2
-          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: RemoveRepoDirEC2
-        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          targets: |
-            [${{ secrets.INSTANCE_ID }}]
-          document-name: AWS-RunShellScript
-          parameters: |
-            {"commands":[
-              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
-            ]}
+# RemoveRepoDirEC2Job:
+#   name: RemoveRepoDirEC2Job
+#   runs-on: ubuntu-latest
+#   needs: ["manual-approval-for-apply"]
+#   if: needs.manual-approval-for-apply.outputs.approval-status == 'deny'
+#   steps:
+#     - name: configure aws credentials
+#       uses: aws-actions/configure-aws-credentials@v4.2.1
+#       with:
+#         role-session-name: github-actions2
+#         role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+#         aws-region: ${{ secrets.AWS_REGION }}
+#
+#     - name: RemoveRepoDirEC2
+#       uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+#       with:
+#         aws-region: ${{ secrets.AWS_REGION }}
+#         targets: |
+#           [${{ secrets.INSTANCE_ID }}]
+#         document-name: AWS-RunShellScript
+#         parameters: |
+#           {"commands":[
+#             "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+#           ]}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~ 03 Manual Approval + Destroy
