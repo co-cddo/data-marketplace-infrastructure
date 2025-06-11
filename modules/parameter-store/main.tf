@@ -39,7 +39,7 @@ resource "aws_ssm_parameter" "stringlist_parameters" {
   type      = "StringList"
   value     = local.stringlist_initial_value
   tier      = local.stringlist_tier
-  key_id    = local.key_id
+ #key_id    = local.key_id
  #overwrite = true
   lifecycle {
     ignore_changes = [
