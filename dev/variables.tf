@@ -188,10 +188,11 @@ variable "ec2_instance_tags" {
   type = map(string)
   default = {
     Name          = "dm-dev-ec2-instance"
-    "Project"     = var.project_code
-    "Environment" = var.env_name
-    "Terraform"   = true
-    "Owner"       = "data-marketplace"  }
+    "Project"     = "dm"
+    "Environment" = "dev"
+    "Terraform"   = "true"
+    "Owner"       = "data-marketplace"
+  }
 }
 variable "ec2_instance_iam_role" {
   type    = string
