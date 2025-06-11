@@ -4,11 +4,19 @@ This changed code can be used to create infrasturcture which includes for servic
 
 ### Pre-requisites:
 
+* You need to create an AWS EC2 instance on Default VPC (172.xx.xx.xx/xx)  
+* And in a _PRIVATE  SUBNET_.  
+* Remember that no SSH or any other IP based access would work  
+* You need to access through AWS SSM Connect access.  
+* And remember you need to update the instance profile too that making sure GitHub Actions Pipelines can access that instance.  
+* e.g. `GitHubxxxxxxxxxxxx` Role  
+* And attach an instance role & profile that have the rights to run required operations.  
+* e.g. `xxx-xxx-instance-profile-role`  
+* 
 * Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
 * Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli (Required version - Terraform v1.5.7)
 * Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 * Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
-* Cognito user pool and client app
 * a domain name and tls certificate for the domainname.
 * SSO settings on the security.gov.uk
 
@@ -85,12 +93,21 @@ Although this section will be automated soon, at the moment manual effort needed
 ### Creating DNS entries at AWS route53
 Again similar to above section this section will be automated soon, at the moment manual effort needed for it.  
 
-* You need the environment's ALB UI DNS Name  
-* for example for the 'dev' environment **dm-dev-eks-alb-catalogue**
-* on AWS Console go to  
+* You need the obtain environment's internal ALB UI DNS Name  
+* for example for the 'dev' environment **dm-dev-eks-alb-ui** from the _DEV_ Accunt.  
 * EC2 --> Load Balancers --> dm-dev-eks-alb-ui  
-* then you can copy (click would be enough) on DNS Name (A Record) section  
-* TBC
+* then you can copy (click would be enough) on DNS Name (A Record) section
+* The external DNS entries that are serves public are hosted on our _PRODUCTION_ account.  
+* You need to be able to login into our AWS Prod Account and switch a role that have enough permissions to edit AWS Route53 entries.  
+* Once you logged in to PROD AWS Console  
+* Go to Route 53 --> Hosted zones --> datamarketplace.gov.uk  
+* and click for editing on `dev.datamarketplace.gov.uk` entry.  
+* You'll find there a CNAME record that points out to internal DEV (as in our example) Account's `dm-dev-eks-alb-ui-xxxxxxxxxxxx.xxx.xxxxx.xxx`  
+* you need to edit (or create if not exist alredy) with the current & correct ALB DNS Name  
+* Then save  
+* Please remember that this actions needed to be done on  
+** new environment create  
+** and, environment update
 
 
 ### Deleting Completely (destroy) the platform 
@@ -107,6 +124,7 @@ If you want to destroy the dev environment:
 * `cd app`.
 * Create .env file with parameters (dev.env file is a template file for .env)
 * Then run `sh dm-deploy.sh update`.  
+* Please attention that this could be service outage creation action that application Docker pods on Kubernetes Cluster may need to be terminated and re-created.
   
 ### Backup and Restore 
 
