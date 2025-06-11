@@ -50,13 +50,13 @@ resource "aws_instance" "ec2_instance" {
   user_data                   = var.ec2_user_data
   tags                        = var.ec2_instance_tags
   lifecycle {
-    create_before_destroy = var.lifecycle_create_before_destroy
+    create_before_destroy = true
   }
 
 
   root_block_device {
     volume_size = var.ec2_root_volume_size
-    volume_type = var.ec2_root_volume_size
+    volume_type = var.ec2_root_volume_type
     encrypted   = var.ec2_root_volume_encrypted
    #kms_key_id  = data.aws_kms_key.customer_master_key.arn
   }
