@@ -220,5 +220,5 @@ variable "ec2_root_volume_encrypted" {
 }
 variable "ec2_root_volume_kms_key_id" {
   type    = string
-  default = "arn:aws:kms:${region}:${account_id_dev}:key/00000000-0000-0000-0000-000000000000"
+  default = "alias/aws/ebs"
 }
