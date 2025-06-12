@@ -1,4 +1,4 @@
-name: application-configuration-update
+name: environment-configuration-update
 
 on:
   workflow_dispatch:
@@ -9,16 +9,285 @@ on:
         default: 'Dev'
         type: choice
         options:
-          - Dev
-        # - Test
+          - dev
+          - tst
         # - Prod
         # - Custom
+      gitbranch:
+        description: 'Select Git Branch to Clone'
+        required: true
+        default: 'feature/jp-gitactions'
+        type: choice
+        options:
+          - 'feature/jp-gitactions'
+          - 'main'
+      mssqlsnapshot:
+        description: 'MSSQL Snapshot Name'
+        required: true
+        default: 'dm-mssql-sample-base-initial'
+        type: choice
+        options:
+          - 'dm-mssql-sample-base-initial'
+          - 'dm-mssql-prod-base-initial'
+          - 'database-1-snapshot'
+      pgsqlsnapshot:
+        description: 'POSTGRES Snapshot Name'
+        required: true
+        default: 'dm-postgres-sample-base-initial'
+        type: choice
+        options:
+          - 'dm-postgres-sample-base-initial'
+          - 'dm-postgres-prod-base-initial'
+          - 'database-2-snapshot'
+      TerraformAction:
+        type: choice
+        description: 'Terraform With Approvals'
+        required: true
+        default: 'init+plan'
+        options:
+          - 'init+plan'
+          - 'init+plan+apply'
+          - 'approval+destroy'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REPO_NAME: "data-marketplace-infrastructure"
+  REPO_BASEDIR: "/home/ssm-user/src"
+  BUCKET_NAME: "dm-fast-assets"
+  BUCKET_FOLDER: "terraform"
+  TFRUNNER_SCRIPT: ".github/scripts/tfrunner.sh"
+  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
-  test:
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 01 TerraformInitPlanOnly
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  TerraformInitPlanOnly:
+    name: TerraformInitPlanOnly
     runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'init+plan'
+
     steps:
-      - name: Checkout code
+      - name: Git clone the repository
         uses: actions/checkout@v4.2.2
-      - name: Run a one-line script
-        run: echo "Hello, world!"
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CloneAndRunTForm-01
+        id: CloneAndRunTForm-01
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
+            ]}
+
+      - name: Get and Show PLANOUTFILE
+        run: |
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
+          cat ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 02 TerraformInitPlan
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  TerraformInitPlan:
+    name: TerraformInitPlan
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'init+plan+apply'
+
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CloneAndRunTForm-02
+        id: CloneAndRunTForm-02
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }}  \""
+            ]}
+
+      - name: Get and Show PLANOUTFILE
+        run: |
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/PLANOUTFILE.txt ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT START ~~~~~~~"
+          cat ./PLANOUTFILE.txt
+          echo "#~~ INFO: PLANOUTFILE CONTENT END ~~~~~~~~~"
+
+#~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 02b Manual Approval For Apply
+#~~~~~~~~~~~~~~~~~~~~~~~
+
+  manual-approval-for-apply:
+    name: Manual Approval For Apply
+    runs-on: ubuntu-latest
+    needs: ["TerraformInitPlan"]
+    if: success() && inputs.TerraformAction == 'init+plan+apply'
+
+    permissions:
+      issues: write
+
+    outputs:
+      approval-status: ${{ steps.await-manual-approval.outputs.approval-status }}
+
+    steps:
+      - name: Await Manual Approval
+        id: await-manual-approval
+        uses: trstringer/manual-approval@v1.10.0
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ env.APPROVERS  }}
+          minimum-approvals: 1
+          issue-title: "Manual Approval Required for Terraform APPLY"
+          issue-body: "Please approve or deny the deployment."
+
+  TerraformApply:
+    name: TerraformApply
+    runs-on: ubuntu-latest
+    needs: ["manual-approval-for-apply"]
+    if: inputs.TerraformAction == 'init+plan+apply'
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions2
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: TerraformApply EC2
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
+            ]}
+
+      - name: Get and Show APPLYLOG
+        run: |
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/APPLYLOG.txt ./APPLYLOG.txt
+          echo "#~~ INFO: APPLYLOG CONTENT START ~~~~~~~"
+          cat ./APPLYLOG.txt
+          echo "#~~ INFO: APPLYLOG CONTENT END ~~~~~~~~~"
+
+# RemoveRepoDirEC2Job:
+#   name: RemoveRepoDirEC2Job
+#   runs-on: ubuntu-latest
+#   needs: ["manual-approval-for-apply"]
+#   if: needs.manual-approval-for-apply.outputs.approval-status == 'deny'
+#   steps:
+#     - name: configure aws credentials
+#       uses: aws-actions/configure-aws-credentials@v4.2.1
+#       with:
+#         role-session-name: github-actions2
+#         role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+#         aws-region: ${{ secrets.AWS_REGION }}
+#
+#     - name: RemoveRepoDirEC2
+#       uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+#       with:
+#         aws-region: ${{ secrets.AWS_REGION }}
+#         targets: |
+#           [${{ secrets.INSTANCE_ID_NEW }}]
+#         document-name: AWS-RunShellScript
+#         parameters: |
+#           {"commands":[
+#             "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+#           ]}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~ 03 Manual Approval + Destroy
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  manual-approval-for-destroy:
+    name: Manual Approval For Destroy
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'approval+destroy'
+
+    permissions:
+      issues: write
+
+    steps:
+      - name: Await Manual Approval
+        uses: trstringer/manual-approval@v1.10.0
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ env.APPROVERS  }}
+          minimum-approvals: 1
+          issue-title: "Manual Approval Required for Terraform DESTROY"
+          issue-body: "Please approve or deny the destroy."
+
+
+  TerraformDestroy:
+    name: TerraformDestroy
+    runs-on: ubuntu-latest
+    if: inputs.TerraformAction == 'approval+destroy'
+    needs: ["manual-approval-for-destroy"]
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions2
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CloneAndRunTForm-03
+        id: CloneAndRunTForm-03
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
+              "su - ssm-user -c \"${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/${{ env.TFRUNNER_SCRIPT }} ${{ inputs.environment }} ${{ inputs.TerraformAction }} ${{ github.job }} ${{ inputs.mssqlsnapshot }} ${{ inputs.pgsqlsnapshot }} \""
+            ]}
+
+      - name: Get and Show DESTROYLOG
+        run: |
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/DESTROYLOG.txt ./DESTROYLOG.txt
+          echo "#~~ INFO: DESTROYLOG CONTENT START ~~~~~~~"
+          cat ./DESTROYLOG.txt
+          echo "#~~ INFO: DESTROYLOG CONTENT END ~~~~~~~~~"
