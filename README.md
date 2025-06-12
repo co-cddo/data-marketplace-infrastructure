@@ -1,137 +1,153 @@
-# Data-marketplace infrastructure
 
-This changed code can be used to create infrasturcture which includes for services of data marketplace.
+# Data Marketplace Infrastructure Deployment Guide
 
-### Pre-requisites:
+This guideline provides step-by-step instructions to **create**, **update**, and **destroy** the AWS infrastructure that hosts the services of the Data Marketplace platform.
 
-* You need to create an AWS EC2 instance on Default VPC (172.xx.xx.xx/xx)  
-* And in a _PRIVATE  SUBNET_.  
-* Remember that no SSH or any other IP based access would work  
-* You need to access through AWS SSM Connect access.  
-* And remember you need to update the instance profile too that making sure GitHub Actions Pipelines can access that instance.  
-* e.g. `GitHubxxxxxxxxxxxx` Role  
-* And attach an instance role & profile that have the rights to run required operations.  
-* e.g. `xxx-xxx-instance-profile-role`  
-* Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
-* Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli (Required version - Terraform v1.5.7)
-* Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-* Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
-* a domain name and tls certificate for the domainname.
-* SSO settings on the security.gov.uk
+## Environments
 
-### For Environment Creation:
-We set up GitHub Actions Pipeline.  
-Steps to use the pipeline:  
-* Login into GitHub with your credentials  
-* Go to this repo location  
-* Go To "Actions" (on the top ribbon 4th one from left)  
-* Choose (click) "environment-configuration-update" pipeline (on the left Actions / All Workflows / 3rd entry). 
-* Then click on the right in the blue highlighted section, dropdown menu" Run Workflow.  
-* From the dropdown menu choose your desired branch, like "main" or feature/foo  
-* Then you'll be represented with multiple choices of  
-** Select environment  
-** Select Git Branch to Clone  
-** MSSQL Snapshot Name  
-** POSTGRES Snapshot Name  
-** Terraform With Approvals  
-The last option would have choices of  
-- **'init+plan'**  
-- **'init+plan+apply'**  
-- **'approval+destroy'**  
-As it describes you can Terraform with those options.
+There are multiple environments:
+- `gen` – Shared/general environment for common resources (must be deployed **first**)
+- `dev` – Development environment
+- `tst` – Test environment
+- `stg` – Staging/Pre-production environment
+- `pro` – Production environment
 
-### Installing the platform from scratch
-Choose 'init+plan+apply' option.  
-This will run in order of  
-**`terraform init`**  
-**`terraform plan`**  
-**`terraform apply`**  
-Then click on the green "Run Workflow" button  
-Once pipeline starts running you can see visual representation of pipeline on GitHub UI.  
-First you'll see dark beige animated circle and "environment-configuration-update" appears after a some delay (typically around 15 seconds)  
-If you click to that newly appeared link you'll go to visual representation / graphical view of pipeline.  
-Once pipeline is running you can click on the activated section of the Job Boxes to see what is going on in the pipeline.   
-One thing to attention that there is a "Manual Approve" section after plan and before apply section.  
-That one opens a an issue on "Issues" section on the top ribbon (second one from left)  
-That will have the "Manual Approval Required for Terraform APPLY" header.  
-Once you click on the issue, you can either "approve" or "deny" the request.  
-It is self explanatory and easy to complete.  
-Once you click on the green "Comment" button afterwards are automated. Means that it will submit and around ten seconds later automatically close the issue, you do not need to do anything.  
-Pipeline continues running, does `terraform apply` and finalise the environment creation terraform section.  
+> `dev` and `tst` are deployed in the **development AWS account**.  
+> `stg` and `pro` are deployed in the **production AWS account**.
 
-### Running config.sh for initial Parameter store configuration entries
-Although this section will be automated soon, at the moment manual effort needed for it.  
-* on the EC2 Linux instance checkout this repository  
-* `cd data-marketplace-infrastructure/app-fast/`  
-* folder with the command above  
-* then run as `./config/config.sh [env]`, e.g.  
-* `./config/config.sh dev`  
-* This will create necessary entries at AWS Parameter Store automatically for you  
+## Infrastructure Overview
 
-### Creating .env file entries prior to app installation
-* on this repository at EC2 Linux Instance  
-* `cd data-marketplace-infrastructure/app-fast/`  
-* `cp .env_template .env`  
-* then edit the `.env` file as filling the blanks
+In this version, the deployment is managed via:
+- A deployment server (an EC2 instance)
+- Terraform
+- GitHub Actions workflows
 
-### Application installation
-* once `.env` file is created with parameters  
-* `cd app-fast` folder on this reposiotory  
-* Then run `sh dm-deploy.sh install` for application installation
+> A fully automated proper CI/CD pipeline will be introduced in future versions.
 
-### Application removal uninstallation
-* once `.env` file is created with parameters  
-* `cd app-fast` folder on this reposiotory  
-* Then run `sh dm-deploy.sh uninstall` for application uninstallation  
+---
 
-### Application update
-* once `.env` file is created with parameters  
-* `cd app-fast` folder on this reposiotory  
-* Then run `sh dm-deploy.sh update` for application update
+## Prerequisites
 
-### Creating DNS entries at AWS route53
-Again similar to above section this section will be automated soon, at the moment manual effort needed for it.  
+1. **General Environment Setup (gen)**:
+   - Run the deployment for the `gen` environment **manually** on AWS (using CloudShell or EC2).
+   - This deploys shared resources (S3 buckets, IAM roles, Secrets, Parameter Store entries) and a private subnet in the default VPC.
 
-* You need the obtain environment's internal ALB UI DNS Name  
-* for example for the 'dev' environment **dm-dev-eks-alb-ui** from the _DEV_ Accunt.  
-* EC2 --> Load Balancers --> dm-dev-eks-alb-ui  
-* then you can copy (click would be enough) on DNS Name (A Record) section
-* The external DNS entries that are serves public are hosted on our _PRODUCTION_ account.  
-* You need to be able to login into our AWS Prod Account and switch a role that have enough permissions to edit AWS Route53 entries.  
-* Once you logged in to PROD AWS Console  
-* Go to Route 53 --> Hosted zones --> datamarketplace.gov.uk  
-* and click for editing on `dev.datamarketplace.gov.uk` entry.  
-* You'll find there a CNAME record that points out to internal DEV (as in our example) Account's `dm-dev-eks-alb-ui-xxxxxxxxxxxx.xxx.xxxxx.xxx`  
-* you need to edit (or create if not exist alredy) with the current & correct ALB DNS Name  
-* Then save  
-* Please remember that this actions needed to be done on  
-** new environment create  
-** and, environment update
+2. **Deployment Server Setup**:
+   - Use **Amazon Linux 2023** EC2 instance, placed in the **private subnet** of the default VPC.
+   - Attach the IAM role `dm-gen-ec2-profile-role` (soon to be renamed to `dm-gen-ec2-profile-deployment-role`).
+   - Connect to the instance via **SSM Session Manager**.
+   - Install the following tools:
+     - AWS CLI: [Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)
+     - Git: [Install Guide](https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/)
+     - Terraform v1.5.7: [Install Guide](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+     - kubectl: [Install Guide](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 
+3. **Additional Requirements**:
+   - GitHub Actions IAM role defined in AWS.
+   - A domain or subdomain name for each environment (e.g. `dev.datamarketplace.gov.uk`).
+   - TLS Certificate for the domain.
+   - SSO configuration on `security.gov.uk`.
 
-### Deleting Completely (destroy) the platform 
+---
 
-If you want to destroy the dev environment:
+## Environment Creation
 
-* Run `sh dm-deploy.sh uninstall` from the app folder.
-* From the pipeline run 'approval+destroy' choice at he bottom. (Terraform With Approvals) that runs `terraform destroy`.  
-* There will be "Manual Approve" section like described above. 
-* Approving with "approve" on the newly created issue (like as above) activates the destroy section.
-* remove kubernetes config for the environment.
+Environment creation is handled via GitHub Actions pipeline:
 
-### Update the services 
-* `cd app`.
-* Create .env file with parameters (dev.env file is a template file for .env)
-* Then run `sh dm-deploy.sh update`.  
-* Please attention that this could be service outage creation action that application Docker pods on Kubernetes Cluster may need to be terminated and re-created.
-  
-### Backup and Restore 
+### Workflow: `environment-configuration-update`
 
-Backend database fuseki using EFS as persistence and its protected by AWS backup service.
-Backup restore can be done manually in the event of any data loss using AWS backup restore feature.
+Input Parameters:
+- **Branch Name** – Select the relevant Git branch
+- **Environment Name** – Choose from: `dev`, `tst`, `stg`, `pro`
+- **MSSQL Snapshot Name**
+- **PostgreSQL Snapshot Name**
+- **Action Type**:
+  - `init+plan`: Runs `terraform plan` and shows proposed changes.
+  - `init+plan+apply`: Runs plan, requests manual approval, then applies if approved.
+  - `approval+destroy`: Runs `terraform destroy` after manual approval.
 
+#### ‘init+plan+apply’ Workflow
+1. Terraform plan runs and shows changes.
+2. An issue is created for manual approval.
+3. Enter **Approve** or **Deny** in the issue.
+4. If **Approved**, the environment is created.
+5. If **Denied**, the pipeline cancels.
 
-### TODO by Code
-* Add DNS record for the new environment
-* CI/CD for IaC & app deployment
-* Import AWS backup resource creation in IaC
+---
+
+## Application Parameters Setup (Manual)
+
+> This will be automated in the future.
+
+Steps:
+1. Ensure all required config entries exist in AWS Parameter Store at `/dm/gen/config-inputs`.
+2. On the Deployment Server:
+   ```bash
+   git clone [this repository]
+   cd data-marketplace-infrastructure/app-fast/
+   ./config/config.sh [env]  # e.g., ./config/config.sh dev
+   ```
+   This script sets up app-specific parameters in Parameter Store.
+
+---
+
+## Application Deployment (Manual)
+
+> This will also be automated later.
+
+Steps:
+1. Complete **Application Parameters Setup**.
+2. On the Deployment Server:
+   ```bash
+   cd data-marketplace-infrastructure/app-fast/
+   # Create and edit .env file with deployment settings
+   sh dm-deploy.sh install     # for installation
+   sh dm-deploy.sh update      # for updating
+   sh dm-deploy.sh uninstall   # for removal
+   ```
+
+---
+
+## Post-Deployment Steps (Manual)
+
+> These will eventually be automated.
+
+1. **Create or update DNS** entry for the environment.
+2. **Create or update WAF** associated with the ALB created by the application deployment.
+3. **Always update DNS** CNAME when the ALB changes.
+
+---
+
+## Complete Teardown (Destroy Environment)
+
+To completely delete an environment (e.g., `dev`):
+
+1. **DNS Cleanup**:
+   - Delete the CNAME record for the environment.
+   - Wait for DNS propagation (~15–30 mins).
+
+2. **WAF Removal**:
+   - Remove the WAF linked to the ALB.
+
+3. **Application Uninstall**:
+   ```bash
+   sh dm-deploy.sh uninstall
+   ```
+
+4. **Environment Destruction via Pipeline**:
+   - Run `approval+destroy` option in the GitHub Actions workflow.
+   - Approve the destruction in the created issue.
+
+---
+
+## Updating Services
+
+1. On the Deployment Server:
+   ```bash
+   cd app-fast/
+   cp dev.env .env   # adjust as needed
+   sh dm-deploy.sh update
+   ```
+2. If the ALB is changed then update WAF and the CNAME accordingly.
+
+> ⚠️ This may cause a **temporary service outage**. Application pods in the Kubernetes cluster will be restarted.
