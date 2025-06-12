@@ -147,7 +147,7 @@ module "ec2-instance" {
 module "app_params" {
   source = "../modules/parameter-store"
   prefix = "/${var.project_code}/${var.env_name}/appsettings/"
-  securestring_parameters = [
+  stringlist_parameters = [
     "ui",
     "api",
     "users",
