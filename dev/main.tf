@@ -135,7 +135,6 @@ module "app_params" {
     "api",
     "users",
     "datashare",
-    "catalogue",
-    "ZZZDELETEME"
+    "catalogue"
   ]
 }
