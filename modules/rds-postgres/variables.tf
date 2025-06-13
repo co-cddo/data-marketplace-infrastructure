@@ -14,3 +14,4 @@ variable "rds_postgres_multi_az" {}
 variable "rds_postgres_backup_retention_period" {}
 variable "rds_postgres_skip_final_snapshot" {}
 variable "rds_postgres_snapshot_identifier" {}
+variable "auto_minor_version_upgrade" {}
