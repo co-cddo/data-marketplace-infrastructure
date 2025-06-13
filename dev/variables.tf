@@ -104,7 +104,7 @@ variable "rds_postgres_instance_class" {
 }
 variable "rds_postgres_allocated_storage" {
   type    = number
-  default = 200
+  default = 20
 }
 variable "rds_postgres_storage_type" {
   type    = string
