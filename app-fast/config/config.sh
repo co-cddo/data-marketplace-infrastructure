@@ -52,9 +52,13 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
     echo "--- ENVIRONMENT:  $_ENV"
     echo "--------------------------------------------"
 
-    _DATAFILE=${TOPDIR}/config/inputdata/${_ENV}-${_DATAFILENAME}
     _TEMPLATEDIR=${TOPDIR}/config/templates
     _OUTPUTDIR=${TOPDIR}/config/output
+    _DATAFILEDIR=${TOPDIR}/config/inputdata
+    _DATAFILECOMBINEDNAME=${_ENV}-${_DATAFILENAME}
+    _DATAFILE=${_DATAFILEDIR}/${_DATAFILECOMBINEDNAME}
+
+    mkdir -p  ${_TEMPLATEDIR} ${_OUTPUTDIR} ${_DATAFILEDIR}
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~ CLEANING UP Leftovers From Previous Runs (if any)"
