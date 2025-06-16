@@ -44,14 +44,23 @@ env:
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
-  set-timestamp-job:
+  set-timestamp:
     runs-on: ubuntu-latest
     outputs:
-      steps: ${{ steps.timestamp.outputs }}
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
     steps:
       - name: Set Timestamp
         id: timestamp
-        run: echo "TIMESTAMP=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+        run: echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
+
+  use-timestamp:
+    needs: set-timestamp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Timestamp
+        run: echo "Timestamp is ${{ needs.set-timestamp.outputs.timestamp }}"
+        env:
+          TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
 
   TerraformInitPlanOnly:
     name: TerraformInitPlanOnly
