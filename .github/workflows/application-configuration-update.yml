@@ -93,7 +93,7 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy.sh ${{ inputs.AppDeployChoice }} 2>&1 > ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy.sh ${{ inputs.AppDeployChoice }} 2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
               "su - ssm-user -c \"aws s3 cp ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/DEPLOYLOG.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
               ]}
