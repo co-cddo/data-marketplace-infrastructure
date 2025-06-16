@@ -31,7 +31,6 @@ on:
           - 'update'
           - 'uninstall'
 
-
 permissions:
   id-token: write
   contents: read
@@ -56,12 +55,17 @@ jobs:
   ApplicationDeploy:
     name: ApplicationDeploy
     runs-on: ubuntu-latest
-    if: inputs.AppDeployChoice == 'install'
     needs: set-timestamp
     env:
       TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
 
     steps:
+      - name: Run a one-line script
+        run: |
+          echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
+          echo "#~~ ACTION: ${{ inputs.AppDeployChoice }}"
+          echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
+
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
 
