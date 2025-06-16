@@ -30,6 +30,9 @@ if [[ ${userapprove} != "YES" ]]; then
 exit
 fi
 
+echo -e "#~~~ FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO ~~~#"
+exit
+
 ACTION=${1}
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
 AWS_GENERIC_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-aws-generic-serviceaccount
