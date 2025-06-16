@@ -123,13 +123,14 @@ module "postgres" {
   rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   rds_postgres_license_model           = var.rds_postgres_license_model
   rds_postgres_snapshot_identifier     = var.rds_postgres_snapshot_identifier
+  auto_minor_version_upgrade           = var.auto_minor_version_upgrade
 }
 
 
 module "app_params" {
   source = "../modules/parameter-store"
   prefix = "/${var.project_code}/${var.env_name}/appsettings/"
-  securestring_parameters = [
+  stringlist_parameters = [
     "ui",
     "api",
     "users",

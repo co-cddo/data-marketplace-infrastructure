@@ -96,7 +96,7 @@ variable "rds_postgres_engine" {
 }
 variable "rds_postgres_engine_version" {
   type    = string
-  default = "16.6"
+  default = "16.8"
 }
 variable "rds_postgres_instance_class" {
   type    = string
@@ -128,5 +128,9 @@ variable "rds_postgres_skip_final_snapshot" {
 }
 variable "rds_postgres_snapshot_identifier" {
   type = string
+}
+variable "auto_minor_version_upgrade" {
+  type    = bool
+  default = true
 }
 #-------------------------------------------------
