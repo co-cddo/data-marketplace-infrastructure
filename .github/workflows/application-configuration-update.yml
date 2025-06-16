@@ -53,19 +53,22 @@ jobs:
         id: timestamp
         run: echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
 
-  use-timestamp:
-    needs: set-timestamp
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use Timestamp
-        run: echo "Timestamp is ${{ needs.set-timestamp.outputs.timestamp }}"
-        env:
-          TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
+#  use-timestamp:
+#    needs: set-timestamp
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Use Timestamp
+#        run: echo "Timestamp is ${{ needs.set-timestamp.outputs.timestamp }}"
+##       env:
+##         TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
 
   ApplicationDeploy:
     name: ApplicationDeploy
     runs-on: ubuntu-latest
     if: inputs.AppDeployChoice == 'install'
+    needs: set-timestamp
+    env:
+      TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
 
     steps:
       - name: Git clone the repository
