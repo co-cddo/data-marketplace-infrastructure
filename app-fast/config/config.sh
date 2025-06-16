@@ -115,7 +115,7 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         echo "--value file://${outputfile} \\"
         echo "--overwrite"
 
-        aws ssm put-parameter \
+        xaws ssm put-parameter \
         --name "${_UPLDFILENAME}" \
         --type SecureString \
         --value file://${outputfile} \
@@ -128,10 +128,5 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         rm -f ${outputfile}
         rm -f ${tmpfile}
     done
-   #echo "--------------------------------------------"
-   #echo "--- DATAFILE:     ${_DATAFILE}"
-   #echo "--- DATAFILE:     `ls -l ${_DATAFILE}`"
-   #echo "--------------------------------------------"
     rm -f ${_DATAFILE}
-
 done
