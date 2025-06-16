@@ -1,4 +1,4 @@
-name: environment-configuration-update
+name: application-deploy
 
 on:
   workflow_dispatch:
