@@ -31,29 +31,6 @@ exit
 fi
 
 
-echo "
-ACCOUNT:             ${ACCOUNT}
-REGION:              ${REGION}
-ENV_NAME:            ${ENV_NAME}
-ENV_FULLNAME:        ${ENV_FULLNAME}
-
-ECR_ACCOUNT:         ${ECR_ACCOUNT}
-
-UI_VERSION:          ${UI_VERSION}
-API_VERSION:         ${API_VERSION}
-USERS_VERSION:       ${USERS_VERSION}
-DATASHARE_VERSION:   ${DATASHARE_VERSION}
-CATALOGUE_VERSION:   ${CATALOGUE_VERSION}
-
-CERTIFICATEARN:      ${CERTIFICATEARN}
-"
-
-echo -e "#~~~ FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO ~~~#"
-exit
-
-
-
-
 ACTION=${1}
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
 AWS_GENERIC_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-aws-generic-serviceaccount
