@@ -1,11 +1,11 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests',
-  timeout: 60000,
+  testDir: "./features",
+  testMatch: "*.js",
   retries: 0,
   use: {
     headless: true,
-    baseURL: process.env.BASE_URL || 'http://localhost',
+    baseURL: process.env.BASE_URL || "http://localhost",
   },
 });

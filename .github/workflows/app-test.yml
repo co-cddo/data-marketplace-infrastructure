@@ -53,7 +53,7 @@ jobs:
 
       - name: Build and run E2E tests in Docker
         run: |
-          docker build -t e2e-tests ./e2e
+          docker build -t e2e-tests ./app-test
           docker run --rm \
             -e BASE_URL=${BASE_URL} \
             -e TOKEN="${{ github.event.inputs.token }}" \
