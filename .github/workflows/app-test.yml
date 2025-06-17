@@ -11,8 +11,8 @@ on:
         options:
           - Dev
           - Test
-          - Prod
-          - Custom
+         #- Prod
+         #- Custom
       custom_url:
         description: 'Custom URL (if "Custom" selected)'
         required: false
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEV_URL: https://dev.datamarketplace.gov.uk/
+      DEV_URL:  https://dev.datamarketplace.gov.uk/
       TEST_URL: https://test.datamarketplace.gov.uk/
       PROD_URL: https://www.datamarketplace.gov.uk/
 
@@ -40,7 +40,7 @@ jobs:
         id: set-url
         run: |
           case "${{ github.event.inputs.environment }}" in
-            Dev) echo "BASE_URL=${{ env.DEV_URL }}" >> $GITHUB_ENV ;;
+            Dev)  echo "BASE_URL=${{ env.DEV_URL }}"  >> $GITHUB_ENV ;;
             Test) echo "BASE_URL=${{ env.TEST_URL }}" >> $GITHUB_ENV ;;
             Prod) echo "BASE_URL=${{ env.PROD_URL }}" >> $GITHUB_ENV ;;
             Custom)
