@@ -64,5 +64,6 @@ jobs:
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && ./testscript.sh ${{ inputs.environment }} 2>&1 > ${{ env.REPO_BASEDIR }}/log/TESTLOG.txt \"",
               "su - ssm-user -c \"aws s3 cp ${{ env.REPO_BASEDIR }}/log/TESTLOG.txt s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/TESTLOG.txt \"",
+              "su - ssm-user -c \"cat ${{ env.REPO_BASEDIR }}/log/TESTLOG.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
             ]}
