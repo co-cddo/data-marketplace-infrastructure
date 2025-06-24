@@ -16,9 +16,10 @@ on:
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'feature/jp-infraappconfig-new'
+        default: 'feature/DM-1009-DockerEC2Instance'
         type: choice
         options:
+          - 'feature/DM-1009-DockerEC2Instance'
           - 'feature/jp-infraappconfig-new'
           - 'main'
 
