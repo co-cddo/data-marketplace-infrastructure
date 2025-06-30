@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "BDD Playwright E2E Tests with Cucumber",
   "scripts": {
-    "test": "cucumber-js",
+    "test": "cucumber-js ",
     "test:debug": "PWDEBUG=1 cucumber-js",
     "test:dev": "cucumber-js --watch"
   },
