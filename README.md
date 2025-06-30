@@ -150,4 +150,4 @@ To completely delete an environment (e.g., `dev`):
    ```
 2. If the ALB is changed then update WAF and the CNAME accordingly.
 
-> ⚠️ This may cause a **temporary service outage**. Application pods in the Kubernetes cluster will be restarted.
+> ⚠️ These may cause a **temporary service outage**. Application pods in the Kubernetes cluster might be restarted.
