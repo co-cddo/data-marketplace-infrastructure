@@ -16,10 +16,11 @@ on:
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'feature/jp-gitactions'
+        default: 'dev'
         type: choice
         options:
-          - 'feature/jp-gitactions'
+          - 'dev'
+          - 'test'
           - 'main'
       mssqlsnapshot:
         description: 'MSSQL Snapshot Name'
