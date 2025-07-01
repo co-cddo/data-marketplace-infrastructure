@@ -115,7 +115,7 @@ for _ENV in "${_ENVIRONMENTS[@]}"; do
         echo "--value file://${outputfile} \\"
         echo "--overwrite"
 
-        xaws ssm put-parameter \
+        aws ssm put-parameter \
         --name "${_UPLDFILENAME}" \
         --type SecureString \
         --value file://${outputfile} \
