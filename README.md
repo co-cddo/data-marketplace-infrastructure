@@ -106,6 +106,17 @@ Steps:
    sh dm-deploy.sh uninstall   # for removal
    ```
 
+## Application Deployment (Pipeline)
+
+- Please create a `.env` file with deployment settings in advance via using the template provided `.env_template`  
+- Please upload the newly created `.env` file to S3 Bucket  
+  (the name of the bucket can be obtained from Pipeline file `data-marketplace-infrastructure/.github/workflows/application-configuration-update.yml`)  
+- Then you can run GitHub Workflows pipeline of `application-configuration-update.yml` via UI or GitHub API  
+
+
+
+
+
 ---
 
 ## Post-Deployment Steps (Manual)
