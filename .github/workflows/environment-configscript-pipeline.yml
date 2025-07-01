@@ -1,4 +1,4 @@
-name: run-config-sh-pipeline
+name: environment-configscript-pipeline
 
 on:
   workflow_dispatch:
