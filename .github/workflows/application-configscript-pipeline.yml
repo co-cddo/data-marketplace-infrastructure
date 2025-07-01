@@ -11,15 +11,16 @@ on:
         options:
           - dev
           - tst
-        # - pro
-        # - stg
+          - stg
+          - pro
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'feature/jp-infraappconfig-new'
+        default: 'dev'
         type: choice
         options:
-          - 'feature/jp-infraappconfig-new'
+          - 'dev'
+          - 'tst'
           - 'main'
 
 permissions:
