@@ -1,4 +1,4 @@
-name: BlankMinimumPipelineTemplate
+name: run-config-sh-pipeline
 
 on:
   workflow_dispatch:
@@ -6,19 +6,62 @@ on:
       environment:
         description: 'Select environment'
         required: true
-        default: 'Dev'
+        default: 'dev'
         type: choice
         options:
-          - Dev
-        # - Test
-        # - Prod
-        # - Custom
+          - dev
+          - tst
+        # - pro
+        # - stg
+      gitbranch:
+        description: 'Select Git Branch to Clone'
+        required: true
+        default: 'feature/jp-infraappconfig-new'
+        type: choice
+        options:
+          - 'feature/jp-infraappconfig-new'
+          - 'main'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REPO_NAME: "data-marketplace-infrastructure"
+  REPO_BASEDIR: "/home/ssm-user/src"
+  BUCKET_NAME: "dm-fast-assets"
+  BUCKET_FOLDER: "terraform"
+  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
-  test:
+  RunConfigScript:
+    name: RunConfigScript
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Git clone the repository
         uses: actions/checkout@v4.2.2
-      - name: Run a one-line script
-        run: echo "Hello, world!"
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: RunConfigScript
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: RunConfigScriptEC2Instance
+        id: RunConfigScriptEC2Instance
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && ./config/config.sh ${{ inputs.environment }} 2>&1 > ${{ env.REPO_BASEDIR }}/log/RUNLOG.txt \"",
+              "su - ssm-user -c \"aws s3 cp ${{ env.REPO_BASEDIR }}/log/RUNLOG.txt s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/RUNLOG.txt \"",
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
+            ]}
