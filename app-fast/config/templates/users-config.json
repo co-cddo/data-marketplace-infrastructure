@@ -1,0 +1,34 @@
+{
+  "Jwt": {
+    "Key": "mock-256-bit-secret-1234567890123456",
+    "Issuer": "https://mock-issuer.local",
+    "Audience": "https://mock-audience.local"
+  },
+  "TestUser": {
+    "Enabled": false
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=$MS_DBSERVER,$MS_PORT;Database=$MS_DATABASE_USERS;User Id=$MS_USERID;Password=$MS_PW;TrustServerCertificate=$MS_TRUSTSVRCERT"
+  },
+  "Authentication": {
+    "Domain": "$DOMAIN_NAME",
+    "Authority": "https://sso.service.security.gov.uk/",
+    "ClientId": "$SSO_CLIENT_ID",
+    "ClientSecret": "$SSO_CLIENT_SECRET",
+    "ClientIds": [ "" ],
+    "ApiKey": "mock-256-bit-secret-1234567890123456",
+    "AllowedScopes": [ "publish", "discover", "delete" ],
+    "ApiIssuer": "$DOMAIN_NAME"
+  },
+  "NotifyAPIKey": "$GOV_NOTIFY_API_KEY",
+  "WelcomeTemplate": "$WELCOME_TEMPLATE",
+  "ApplicationInsights": {
+    "WorkspaceId": "You will need application insights instance for this.",
+    "ApiKey": "Same as above",
+    "Uri": "Same as above"
+  },
+  "BaseUrl": "https://$DOMAIN_NAME/",
+  "AGMJwtSettings": {
+    "SecretKey": "$SECRETKEY"
+  }
+}
