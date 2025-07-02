@@ -1,4 +1,4 @@
-name: John AWS Tests
+name: appl deploy new
 
 on:
   workflow_dispatch:
@@ -133,26 +133,3 @@ jobs:
               2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
               ]}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Run a one-line script
-        run: echo "Hello, world!"
