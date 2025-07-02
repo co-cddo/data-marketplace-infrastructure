@@ -32,19 +32,11 @@ on:
           - 'install'
           - 'update'
           - 'uninstall'
-
-
       UI_VERSION:
         description: 'Select UI_VERSION'
         required: true
         default: '0.8'
-        type: choice
-        options:
-          - '0.8'
-          - '0.9'
-          - '1.0'
-          - '1.1'
-          - '1.2'
+        type: string
       API_VERSION:
         description: 'Select API_VERSION'
         required: true
