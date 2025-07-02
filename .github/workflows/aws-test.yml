@@ -6,13 +6,147 @@ on:
       environment:
         description: 'Select environment'
         required: true
-        default: 'Dev'
+        default: 'dev'
         type: choice
         options:
-          - Dev
-        # - Test
+          - dev
+          - tst
         # - Prod
         # - Custom
+      gitbranch:
+        description: 'Select Git Branch to Clone'
+        required: true
+        default: 'feature/DM-1034-app-deploy-pipeline'
+        type: choice
+        options:
+          - 'dev'
+          - 'test'
+          - 'main'
+      AppDeployChoice:
+        type: choice
+        description: 'App Deploy Choices'
+        required: true
+        default: 'install'
+        options:
+          - 'install'
+          - 'update'
+          - 'uninstall'
+
+
+      UI_VERSION:
+        description: 'Select UI_VERSION'
+        required: true
+        default: '0.8'
+        type: choice
+        options:
+          - '0.8'
+          - '0.9'
+          - '1.0'
+          - '1.1'
+          - '1.2'
+      API_VERSION:
+        description: 'Select API_VERSION'
+        required: true
+        default: '0.8'
+        type: string
+      USERS_VERSION:
+        description: 'Select USERS_VERSION'
+        required: true
+        default: '0.4'
+        type: string
+      DATASHARE_VERSION:
+        description: 'Select DATASHARE_VERSION'
+        required: true
+        default: '0.4'
+        type: string
+      CATALOGUE_VERSION:
+        description: 'Select CATALOGUE_VERSION'
+        required: true
+        default: '0.13'
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REPO_NAME: "data-marketplace-infrastructure"
+  REPO_BASEDIR: "/home/ssm-user/src"
+  BUCKET_NAME: "dm-fast-assets"
+  BUCKET_FOLDER: "terraform"
+  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
+
+jobs:
+  set-timestamp:
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
+    steps:
+      - name: Set Timestamp
+        id: timestamp
+        run: echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
+
+  ApplicationDeploy:
+    name: ApplicationDeploy
+    runs-on: ubuntu-latest
+    needs: set-timestamp
+    env:
+      TIMESTAMP: ${{ needs.set-timestamp.outputs.timestamp }}
+
+    steps:
+      - name: Run a one-line script
+        run: |
+          echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
+          echo "#~~ ACTION: ${{ inputs.AppDeployChoice }}"
+          echo "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
+
+      - name: Git clone the repository
+        uses: actions/checkout@v4.2.2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-session-name: github-actions
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: CloneAndRunDeploySh
+        id: CloneAndRunDeploySh
+        uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          targets: |
+            [${{ secrets.INSTANCE_ID_NEW }}]
+          document-name: AWS-RunShellScript
+          parameters: |
+            {"commands":[
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
+              "su - ssm-user -c \"aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/env ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy-new.sh \
+              ${{ inputs.AppDeployChoice }} \
+              ${{ inputs.UI_VERSION }} \
+              ${{ inputs.API_VERSION }} \
+              ${{ inputs.USERS_VERSION }} \
+              ${{ inputs.DATASHARE_VERSION }} \
+              ${{ inputs.CATALOGUE_VERSION }} \
+              2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
+              "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
+              ]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 jobs:
   test:
