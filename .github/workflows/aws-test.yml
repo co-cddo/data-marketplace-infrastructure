@@ -58,6 +58,32 @@ on:
         default: '0.13'
         type: string
 
+      ACCOUNT:
+        description: 'Select ACCOUNT'
+        required: true
+        default: '855859226163'
+        type: string
+      REGION:
+        description: 'Select REGION'
+        required: true
+        default: 'eu-west-2'
+        type: string
+      ENV_FULLNAME:
+        description: 'Select ENV_FULLNAME'
+        required: true
+        default: 'Development'
+        type: string
+      ECR_ACCOUNT:
+        description: 'Select ECR_ACCOUNT'
+        required: true
+        default: '855859226163'
+        type: string
+      CERTIFICATEARN:
+        description: 'Select CERTIFICATEARN'
+        required: true
+        default: 'arn:aws:acm:eu-west-2:855859226163:certificate/8e0c958c-0949-411d-88b5-9e5ec88453e5'
+        type: string
+
 permissions:
   id-token: write
   contents: read
