@@ -19,6 +19,7 @@ on:
         default: 'feature/DM-1034-app-deploy-pipeline'
         type: choice
         options:
+          - 'feature/DM-1034-app-deploy-pipeline'
           - 'dev'
           - 'test'
           - 'main'
