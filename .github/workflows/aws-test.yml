@@ -123,13 +123,6 @@ jobs:
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
               "su - ssm-user -c \"aws s3 cp s3://${{ env.BUCKET_NAME }}/${{ env.BUCKET_FOLDER }}/${{ inputs.environment }}/env ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
-              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy-new.sh \
-              ${{ inputs.AppDeployChoice }} \
-              ${{ inputs.UI_VERSION }} \
-              ${{ inputs.API_VERSION }} \
-              ${{ inputs.USERS_VERSION }} \
-              ${{ inputs.DATASHARE_VERSION }} \
-              ${{ inputs.CATALOGUE_VERSION }} \
-              2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy-new.sh ${{ inputs.AppDeployChoice }} ${{ inputs.UI_VERSION }} ${{ inputs.API_VERSION }} ${{ inputs.USERS_VERSION }} ${{ inputs.DATASHARE_VERSION }} ${{ inputs.CATALOGUE_VERSION }} 2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
               ]}
