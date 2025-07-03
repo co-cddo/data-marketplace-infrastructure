@@ -120,7 +120,7 @@ jobs:
         id: CloneAndRunDeploySh
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         with:
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.REGION }}
           targets: |
             [${{ secrets.INSTANCE_ID_NEW }}]
           document-name: AWS-RunShellScript
