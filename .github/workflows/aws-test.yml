@@ -79,7 +79,6 @@ env:
   BUCKET_FOLDER: "terraform"
   REGION: "eu-west-2"
   ENV_FULLNAME: "Development"
-# CERTIFICATEARN: "'arn:aws:acm:eu-west-2:855859226163:certificate/8e0c958c-0949-411d-88b5-9e5ec88453e5"
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
