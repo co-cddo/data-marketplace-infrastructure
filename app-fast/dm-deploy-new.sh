@@ -46,8 +46,8 @@ echo "DATASHARE_VERSION     ${DATASHARE_VERSION}"
 echo "CATALOGUE_VERSION     ${CATALOGUE_VERSION}"
 echo
 
-echo "#~~~ FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO ~~~#"
-exit 0
+#echo "#~~~ FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO FOO ~~~#"
+#exit 0
 
 EXT_SECRET_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-externalsecrets
 AWS_GENERIC_ROLE=arn:aws:iam::${ACCOUNT}:role/dm-${ENV_NAME}-role-eks-aws-generic-serviceaccount
