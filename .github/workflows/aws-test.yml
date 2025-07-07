@@ -56,16 +56,16 @@ on:
         required: true
         default: '0.13'
         type: string
-      ACCOUNT:
-        description: 'Select ACCOUNT'
-        required: true
-        default: '855859226163'
-        type: string
-      ECR_ACCOUNT:
-        description: 'Select ECR_ACCOUNT'
-        required: true
-        default: '855859226163'
-        type: string
+#     ACCOUNT:
+#       description: 'Select ACCOUNT'
+#       required: true
+#       default: '855859226163'
+#       type: string
+#     ECR_ACCOUNT:
+#       description: 'Select ECR_ACCOUNT'
+#       required: true
+#       default: '855859226163'
+#       type: string
 
 permissions:
   id-token: write
@@ -77,7 +77,7 @@ env:
   BUCKET_NAME: "dm-fast-assets"
   BUCKET_FOLDER: "terraform"
   REGION: "eu-west-2"
-  ENV_FULLNAME: "Development"
+# ENV_FULLNAME: "Development"
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
@@ -107,6 +107,24 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
 
+      - name: Set VARS
+        id: set-vars
+        run: |
+          case "${{ github.event.inputs.environment }}" in
+            dev) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=${{ vars.ENV_DEV_FULLNAME }}"  >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_DEV_ACCOUNT }}"    >> $GITHUB_ENV
+                 ;;
+            tst) echo "ACCOUNT=${{ vars.TST_ACCOUNT }}"            >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=${{ vars.ENV_TST_FULLNAME }}"  >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_TST_ACCOUNT }}"    >> $GITHUB_ENV
+                 ;;
+            pro) echo "ACCOUNT=${{ vars.PRO_ACCOUNT }}"            >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=${{ vars.ENV_PRO_FULLNAME }}"  >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_PRO_ACCOUNT }}"    >> $GITHUB_ENV
+                 ;;
+          esac
+
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4.2.1
         with:
@@ -126,7 +144,7 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"echo -e 'ACCOUNT=${{ inputs.ACCOUNT }}\nREGION=${{ env.REGION }}\nENV_NAME=${{ inputs.environment }}\nENV_FULLNAME=${{ env.ENV_FULLNAME }}\nECR_ACCOUNT=${{ inputs.ECR_ACCOUNT }}\nUI_VERSION=${{ inputs.UI_VERSION }}\nAPI_VERSION=${{ inputs.API_VERSION }}\nUSERS_VERSION=${{ inputs.USERS_VERSION }}\nDATASHARE_VERSION=${{ inputs.DATASHARE_VERSION }}\nCATALOGUE_VERSION=${{ inputs.CATALOGUE_VERSION }}\nCERTIFICATEARN=${{ vars.CERTIFICATEARN }}'  > ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
-              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy.sh ${{ inputs.AppDeployChoice }} 2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
+              "su - ssm-user -c \"echo -e 'ACCOUNT=${ACCOUNT}\nREGION=${{ env.REGION }}\nENV_NAME=${{ inputs.environment }}\nENV_FULLNAME=${ENV_FULLNAME}\nECR_ACCOUNT=${ECR_ACCOUNT}\nUI_VERSION=${{ inputs.UI_VERSION }}\nAPI_VERSION=${{ inputs.API_VERSION }}\nUSERS_VERSION=${{ inputs.USERS_VERSION }}\nDATASHARE_VERSION=${{ inputs.DATASHARE_VERSION }}\nCATALOGUE_VERSION=${{ inputs.CATALOGUE_VERSION }}\nCERTIFICATEARN=${{ vars.CERTIFICATEARN }}'  > ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
+              "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy-new.sh ${{ inputs.AppDeployChoice }} 2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
               ]}
