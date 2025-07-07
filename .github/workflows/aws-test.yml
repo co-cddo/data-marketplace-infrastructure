@@ -19,6 +19,7 @@ on:
         default: 'DM-1035-hide-from-enduser'
         type: choice
         options:
+          - 'DM-1035-hide-from-enduser'
           - 'dev'
           - 'test'
           - 'main'
