@@ -16,10 +16,9 @@ on:
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'feature/DM-1034-app-deploy-pipeline'
+        default: 'dev'
         type: choice
         options:
-          - 'feature/DM-1034-app-deploy-pipeline'
           - 'dev'
           - 'test'
           - 'main'
