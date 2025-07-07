@@ -136,6 +136,10 @@ jobs:
       - name: CloneAndRunDeploySh
         id: CloneAndRunDeploySh
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
+        env:
+          ACCOUNT: ${{ env.ACCOUNT }}
+          ENV_FULLNAME: ${{ env.ENV_FULLNAME }}
+          ECR_ACCOUNT: ${{ env.ECR_ACCOUNT }}
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           targets: |
@@ -145,7 +149,7 @@ jobs:
             {"commands":[
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }} && git clone -b ${{ inputs.gitbranch }} --single-branch git@github.com:co-cddo/${{ env.REPO_NAME }}.git ${{ env.REPO_NAME }} \"",
-              "su - ssm-user -c \"echo -e 'ACCOUNT=${ACCOUNT}\nREGION=${{ env.REGION }}\nENV_NAME=${{ inputs.environment }}\nENV_FULLNAME=${ENV_FULLNAME}\nECR_ACCOUNT=${ECR_ACCOUNT}\nUI_VERSION=${{ inputs.UI_VERSION }}\nAPI_VERSION=${{ inputs.API_VERSION }}\nUSERS_VERSION=${{ inputs.USERS_VERSION }}\nDATASHARE_VERSION=${{ inputs.DATASHARE_VERSION }}\nCATALOGUE_VERSION=${{ inputs.CATALOGUE_VERSION }}\nCERTIFICATEARN=${{ vars.CERTIFICATEARN }}'  > ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
+              "su - ssm-user -c \"echo -e 'ACCOUNT=${{ env.ACCOUNT }}\nREGION=${{ env.REGION }}\nENV_NAME=${{ inputs.environment }}\nENV_FULLNAME=${{ env.ENV_FULLNAME }}\nECR_ACCOUNT=${{ env.ECR_ACCOUNT }}\nUI_VERSION=${{ inputs.UI_VERSION }}\nAPI_VERSION=${{ inputs.API_VERSION }}\nUSERS_VERSION=${{ inputs.USERS_VERSION }}\nDATASHARE_VERSION=${{ inputs.DATASHARE_VERSION }}\nCATALOGUE_VERSION=${{ inputs.CATALOGUE_VERSION }}\nCERTIFICATEARN=${{ vars.CERTIFICATEARN }}'  > ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/.env \"",
               "su - ssm-user -c \"cd ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }}/app-fast/ && echo \"YES\" | ./dm-deploy-new.sh ${{ inputs.AppDeployChoice }} 2>&1 | tee ${{ env.REPO_BASEDIR }}/log/DEPLOYLOG.${{ env.TIMESTAMP }}.txt \"",
               "#!/bin/bash","if [ -d ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ];then rm -fR ${{ env.REPO_BASEDIR }}/${{ env.REPO_NAME }} ; fi"
               ]}
