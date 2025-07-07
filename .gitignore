@@ -39,3 +39,4 @@ terraform.rc
 **/node_modules/
 **/test-results/
 **/screenshots/
+.env

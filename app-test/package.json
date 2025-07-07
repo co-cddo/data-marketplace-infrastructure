@@ -11,5 +11,8 @@
     "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.52.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.0.1"
+  }
 }
