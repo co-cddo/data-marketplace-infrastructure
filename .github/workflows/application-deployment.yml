@@ -129,10 +129,10 @@ jobs:
         run: |
           case "${{ github.event.inputs.ECR_ACCOUNT }}" in
             dev)
-                 echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.DEV_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
             pro)
-                 echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.PRO_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
           esac
 
