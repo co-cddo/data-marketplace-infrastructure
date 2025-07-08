@@ -18,11 +18,10 @@ on:
         default: 'dev'
         type: choice
         options:
-          - 'DM-1035-hide-from-enduser'
+          - 'main'
           - 'dev'
           - 'tst'
           - 'pro'
-          - 'main'
       AppDeployChoice:
         type: choice
         description: 'App Deploy Choices'
