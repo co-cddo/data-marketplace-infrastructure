@@ -18,6 +18,7 @@ on:
         default: 'dev'
         type: choice
         options:
+          - 'DM-1035-hide-from-enduser'
           - 'dev'
           - 'tst'
           - 'pro'
