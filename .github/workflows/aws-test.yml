@@ -83,7 +83,7 @@ env:
   BUCKET_NAME: "dm-fast-assets"
   BUCKET_FOLDER: "terraform"
   REGION: "eu-west-2"
-  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
+  APPROVERS: "soydaner,JohnPalmerGDS"
 
 jobs:
   set-timestamp:
@@ -112,10 +112,10 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4.2.2
 
-      - name: Set VARS
+      - name: Set ACCOUNT vars
         id: set-vars
         run: |
-          case "${{ github.event.inputs.environment }}" in
+          case "${{ github.event.inputs.ACCOUNT }}" in
             dev) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
                  echo "ENV_FULLNAME=Development"                   >> $GITHUB_ENV
                  echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}         >> $GITHUB_ENV
