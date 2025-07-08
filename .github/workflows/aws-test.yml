@@ -11,8 +11,7 @@ on:
         options:
           - dev
           - tst
-        # - Prod
-        # - Custom
+          - pro
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
@@ -20,7 +19,8 @@ on:
         type: choice
         options:
           - 'dev'
-          - 'test'
+          - 'tst'
+          - 'pro'
           - 'main'
       AppDeployChoice:
         type: choice
@@ -56,6 +56,22 @@ on:
         required: true
         default: '0.13'
         type: string
+      ACCOUNT:
+        description: 'Select ACCOUNT'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - 'dev'
+          - 'prod'
+      ECR_ACCOUNT:
+        description: 'Select ECR_ACCOUNT'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - 'dev'
+          - 'prod'
 
 permissions:
   id-token: write
@@ -101,16 +117,16 @@ jobs:
         run: |
           case "${{ github.event.inputs.environment }}" in
             dev) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
-                 echo "ENV_FULLNAME=${{ vars.ENV_DEV_FULLNAME }}"  >> $GITHUB_ENV
-                 echo "ECR_ACCOUNT=${{ vars.ECR_DEV_ACCOUNT }}"    >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=Development"                   >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}         >> $GITHUB_ENV
                  ;;
-            tst) echo "ACCOUNT=${{ vars.TST_ACCOUNT }}"            >> $GITHUB_ENV
-                 echo "ENV_FULLNAME=${{ vars.ENV_TST_FULLNAME }}"  >> $GITHUB_ENV
-                 echo "ECR_ACCOUNT=${{ vars.ECR_TST_ACCOUNT }}"    >> $GITHUB_ENV
+            tst) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=Test"                          >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
             pro) echo "ACCOUNT=${{ vars.PRO_ACCOUNT }}"            >> $GITHUB_ENV
-                 echo "ENV_FULLNAME=${{ vars.ENV_PRO_FULLNAME }}"  >> $GITHUB_ENV
-                 echo "ECR_ACCOUNT=${{ vars.ECR_PRO_ACCOUNT }}"    >> $GITHUB_ENV
+                 echo "ENV_FULLNAME=Production"                    >> $GITHUB_ENV
+                 echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
           esac
 
