@@ -16,10 +16,9 @@ on:
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'DM-1035-hide-from-enduser'
+        default: 'dev'
         type: choice
         options:
-          - 'DM-1035-hide-from-enduser'
           - 'dev'
           - 'test'
           - 'main'
