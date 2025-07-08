@@ -57,16 +57,6 @@ on:
         required: true
         default: '0.13'
         type: string
-#     ACCOUNT:
-#       description: 'Select ACCOUNT'
-#       required: true
-#       default: '855859226163'
-#       type: string
-#     ECR_ACCOUNT:
-#       description: 'Select ECR_ACCOUNT'
-#       required: true
-#       default: '855859226163'
-#       type: string
 
 permissions:
   id-token: write
@@ -78,7 +68,6 @@ env:
   BUCKET_NAME: "dm-fast-assets"
   BUCKET_FOLDER: "terraform"
   REGION: "eu-west-2"
-# ENV_FULLNAME: "Development"
   APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
 
 jobs:
