@@ -153,9 +153,9 @@ jobs:
         id: CloneAndRunDeploySh
         uses: forgedconcepts/aws-ssm-send-command-action@v1.1.1
         env:
-          ACCOUNT: ${{ env.ACCOUNT }}
+          ACCOUNT:      ${{ env.ACCOUNT }}
           ENV_FULLNAME: ${{ env.ENV_FULLNAME }}
-          ECR_ACCOUNT: ${{ env.ECR_ACCOUNT }}
+          ECR_ACCOUNT:  ${{ env.ECR_ACCOUNT }}
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           targets: |
