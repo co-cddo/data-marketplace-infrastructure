@@ -113,18 +113,30 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Set ACCOUNT vars
-        id: set-vars
+        id: set-account-vars
         run: |
           case "${{ github.event.inputs.ACCOUNT }}" in
             dev) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
+                 ;;
+            tst) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
+                 ;;
+            pro) echo "ACCOUNT=${{ vars.PRO_ACCOUNT }}"            >> $GITHUB_ENV
+                 ;;
+          esac
+
+      - name: Set Environment vars
+        id: set-environment-vars
+        run: |
+          case "${{ github.event.inputs.environment }}" in
+            dev)
                  echo "ENV_FULLNAME=Development"                   >> $GITHUB_ENV
                  echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}         >> $GITHUB_ENV
                  ;;
-            tst) echo "ACCOUNT=${{ vars.DEV_ACCOUNT }}"            >> $GITHUB_ENV
+            tst)
                  echo "ENV_FULLNAME=Test"                          >> $GITHUB_ENV
                  echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
-            pro) echo "ACCOUNT=${{ vars.PRO_ACCOUNT }}"            >> $GITHUB_ENV
+            pro)
                  echo "ENV_FULLNAME=Production"                    >> $GITHUB_ENV
                  echo "ECR_ACCOUNT=${{ vars.ECR_ACCOUNT }}"        >> $GITHUB_ENV
                  ;;
