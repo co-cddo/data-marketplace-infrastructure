@@ -76,8 +76,25 @@ Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
     .getByRole("textbox", { name: "Documentation URL" })
     .fill("http://sampleapi.com/v1/sample");
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Save and return" }).click();
+});
 
+Then("I add new theme", async () => {
+  await page.getByRole("link", { name: "Themes" }).click();
+  await page.getByRole("checkbox", { name: "Geography" }).check();
+  await page.getByRole("button", { name: "Save and return" }).click();
+});
+
+Then("I add new keyword", async () => {
+  await page.getByRole("link", { name: "Keywords" }).click();
+  await page.getByRole("button", { name: "Add another keyword" }).click();
+  await page.getByRole("textbox", { name: "Keywords" }).click();
+  await page.getByRole("textbox", { name: "Keywords" }).fill("keyword2");
+  await page.getByRole("button", { name: "Save and return" }).click();
+});
+
+Then("I publish the listing", async () => {
+  await page.getByRole("link", { name: "Review and submit" }).click();
   await page.getByRole("button", { name: "Publish data listing" }).click();
 
   const listingPublishedHeading = page.getByRole("heading", {
