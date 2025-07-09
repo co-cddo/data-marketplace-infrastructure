@@ -102,6 +102,11 @@ jobs:
             -v "$(pwd)/screenshots:/app/screenshots" \
             e2e-tests
 
+      - name: Debug - List screenshots
+        run: |
+          echo "Checking screenshots folder contents..."
+          ls -la ./screenshots
+
       - name: Upload screenshots to S3
         if: always()
         run: |
