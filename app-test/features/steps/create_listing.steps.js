@@ -30,7 +30,7 @@ Given("I navigate to the Add New Listing URL", async () => {
   await page.screenshot({ path: "screenshots/dashboard.png", fullPage: true });
 });
 
-Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
+Then("I should add new listing", async () => {
   await page.getByRole("link", { name: "Add new listing" }).click();
   await page.getByRole("radio", { name: "Complete a web form" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
@@ -42,6 +42,7 @@ Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
   await page.getByRole("textbox", { name: "Listing title" }).fill(listingTitle);
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("link", { name: "Description" }).click();
+
   await page
     .getByRole("textbox", { name: "Description" })
     .fill("Test listing description");
