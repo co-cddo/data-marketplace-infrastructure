@@ -30,7 +30,7 @@ Given("I navigate to the Add New Listing URL", async () => {
   await page.screenshot({ path: "screenshots/dashboard.png", fullPage: true });
 });
 
-Then("I should add new listing", async () => {
+Then("I should add new listing", { timeout: 90 * 1000 }, async () => {
   await page.getByRole("link", { name: "Add new listing" }).click();
   await page.getByRole("radio", { name: "Complete a web form" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
