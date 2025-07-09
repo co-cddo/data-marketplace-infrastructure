@@ -90,12 +90,20 @@ Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
 });
 
 Then("I add new theme", async () => {
+  await page.screenshot({
+    path: path.join(screenshotsDir, "theme_entry.png"),
+    fullPage: true,
+  });
   await page.getByRole("link", { name: "Themes" }).click();
   await page.getByRole("checkbox", { name: "Geography" }).check();
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
 Then("I add new keyword", async () => {
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_entry.png"),
+    fullPage: true,
+  });
   await page.getByRole("link", { name: "Keywords" }).click();
   await page.getByRole("button", { name: "Add another keyword" }).click();
   await page.getByRole("textbox", { name: "Keywords" }).click();
