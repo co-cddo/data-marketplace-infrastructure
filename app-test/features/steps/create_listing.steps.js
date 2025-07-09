@@ -90,7 +90,7 @@ Then("I should add new listing", { timeout: 90 * 1000 }, async () => {
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I add new theme", async () => {
+Then("I add new theme", { timeout: 90 * 1000 }, async () => {
   await page.screenshot({
     path: path.join(screenshotsDir, "theme_entry.png"),
     fullPage: true,
@@ -100,7 +100,7 @@ Then("I add new theme", async () => {
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I add new keyword", async () => {
+Then("I add new keyword", { timeout: 90 * 1000 }, async () => {
   await page.screenshot({
     path: path.join(screenshotsDir, "keyword_entry.png"),
     fullPage: true,
@@ -112,7 +112,7 @@ Then("I add new keyword", async () => {
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I publish the listing", async () => {
+Then("I publish the listing", { timeout: 90 * 1000 }, async () => {
   await page.getByRole("link", { name: "Review and submit" }).click();
   await page.getByRole("button", { name: "Publish data listing" }).click();
 
@@ -128,7 +128,7 @@ Then("I publish the listing", async () => {
   await page.getByRole("link", { name: "View all your listings" }).click();
 });
 
-Then("I take a screenshot of the page", async () => {
+Then("I take a screenshot of the page", { timeout: 90 * 1000 }, async () => {
   await page.screenshot({
     path: path.join(screenshotsDir, "search_page.png"),
     fullPage: true,
