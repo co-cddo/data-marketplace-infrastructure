@@ -54,7 +54,7 @@ In this version, the deployment is managed via:
 
 Environment deployment is handled via GitHub Actions pipeline:
 
-### Workflow: `environment-configuration-update`
+### Workflow: `environment-deployment-pipeline`
 
 Input Parameters:
 - **Branch Name** – Select the relevant Git branch
