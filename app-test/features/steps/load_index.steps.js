@@ -21,7 +21,10 @@ Then(
   async (expectedText) => {
     const header = page.locator("span.govuk-header__product-name");
     await expect(header).toContainText(expectedText);
-    await page.screenshot({ path: "screenshots/base-url.png", fullPage: true });
+    await page.screenshot({
+      path: "./screenshots/base-url.png",
+      fullPage: true,
+    });
     await page.close();
     await myContext.close();
     await browser.close();

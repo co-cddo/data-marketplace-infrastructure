@@ -104,8 +104,9 @@ jobs:
 
       - name: Debug - List screenshots
         run: |
+          echo "Checking app-test folder contents..."
+          ls -la ./app-tests
           echo "Checking screenshots folder contents..."
-          ls -la 
           ls -la ./screenshots
 
       - name: Upload screenshots to S3
