@@ -92,6 +92,9 @@ jobs:
           role-to-assume: ${{ env.ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Create screenshots directory on host
+        run: mkdir -p screenshots
+
       - name: Build and run E2E tests in Docker
         run: |
           docker build -t e2e-tests ./app-test
@@ -104,8 +107,10 @@ jobs:
 
       - name: Debug - List screenshots
         run: |
+          echo "Checking app-test folder contents..."
+          ls -la ./app-test
           echo "Checking screenshots folder contents..."
-          ls -la /app/screenshots
+          ls -la ./screenshots
 
       - name: Upload screenshots to S3
         if: always()
