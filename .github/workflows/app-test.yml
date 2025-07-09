@@ -104,10 +104,8 @@ jobs:
 
       - name: Debug - List screenshots
         run: |
-          echo "Checking app-test folder contents..."
-          ls -la ./app-test
           echo "Checking screenshots folder contents..."
-          ls -la ./screenshots
+          ls -la /app/screenshots
 
       - name: Upload screenshots to S3
         if: always()
@@ -115,4 +113,4 @@ jobs:
           NOW=$(date +"%Y-%m-%d_%H-%M-%S")
           TARGET="s3://dm-fast-assets/tests/$NOW/"
           echo "Uploading screenshots to $TARGET"
-          aws s3 cp ./screenshots "$TARGET" --recursive --debug
+          aws s3 cp ./screenshots "$TARGET" --recursive
