@@ -1,4 +1,4 @@
-name: environment-configuration-update
+name: environment-deployment-pipeline
 
 on:
   workflow_dispatch:
