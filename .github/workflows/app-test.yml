@@ -105,7 +105,7 @@ jobs:
       - name: Debug - List screenshots
         run: |
           echo "Checking app-test folder contents..."
-          ls -la ./app-tests
+          ls -la ./app-test
           echo "Checking screenshots folder contents..."
           ls -la ./screenshots
 
