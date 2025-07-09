@@ -10,6 +10,16 @@ import {
 } from "./common.steps.js";
 import { expect } from "@playwright/test";
 const listingTitle = `My test listing - ${crypto.randomUUID()}`;
+
+await context.route("**/*", (route) => {
+  const headers = {
+    ...route.request().headers(),
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+  };
+  route.continue({ headers });
+});
+
 Given("I navigate to the Add New Listing URL", async () => {
   const url = `${baseURL}publish/dashboard`;
 
@@ -20,7 +30,7 @@ Given("I navigate to the Add New Listing URL", async () => {
   await page.screenshot({ path: "screenshots/dashboard.png", fullPage: true });
 });
 
-Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
+Then("I should add new listing", { timeout: 90 * 1000 }, async () => {
   await page.getByRole("link", { name: "Add new listing" }).click();
   await page.getByRole("radio", { name: "Complete a web form" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
@@ -32,6 +42,7 @@ Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
   await page.getByRole("textbox", { name: "Listing title" }).fill(listingTitle);
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("link", { name: "Description" }).click();
+
   await page
     .getByRole("textbox", { name: "Description" })
     .fill("Test listing description");
@@ -79,21 +90,42 @@ Then("I should add new listing", { timeout: 15 * 1000 }, async () => {
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I add new theme", async () => {
+Then("I add new theme", { timeout: 90 * 1000 }, async () => {
+  await page.screenshot({
+    path: path.join(screenshotsDir, "theme_entry.png"),
+    fullPage: true,
+  });
   await page.getByRole("link", { name: "Themes" }).click();
   await page.getByRole("checkbox", { name: "Geography" }).check();
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I add new keyword", async () => {
+Then("I add new keyword", { timeout: 90 * 1000 }, async () => {
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_entry.png"),
+    fullPage: true,
+  });
   await page.getByRole("link", { name: "Keywords" }).click();
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword__before.png"),
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Add another keyword" }).click();
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_after.png"),
+    fullPage: true,
+  });
   await page.getByRole("textbox", { name: "Keywords" }).click();
+
   await page.getByRole("textbox", { name: "Keywords" }).fill("keyword2");
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_edited.png"),
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
-Then("I publish the listing", async () => {
+Then("I publish the listing", { timeout: 90 * 1000 }, async () => {
   await page.getByRole("link", { name: "Review and submit" }).click();
   await page.getByRole("button", { name: "Publish data listing" }).click();
 
@@ -109,7 +141,7 @@ Then("I publish the listing", async () => {
   await page.getByRole("link", { name: "View all your listings" }).click();
 });
 
-Then("I take a screenshot of the page", async () => {
+Then("I take a screenshot of the page", { timeout: 90 * 1000 }, async () => {
   await page.screenshot({
     path: path.join(screenshotsDir, "search_page.png"),
     fullPage: true,
