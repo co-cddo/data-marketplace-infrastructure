@@ -1,9 +1,9 @@
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
+  config_path = "~/.kube/config"
 }
 provider "helm" {
   kubernetes {
-   config_path = "~/.kube/config"
+    config_path = "~/.kube/config"
   }
 }
 
@@ -21,25 +21,26 @@ resource "aws_eks_fargate_profile" "externalsecrets" {
 
   selector {
     namespace = "external-secrets"
+    labels    = {}
   }
 }
 
 # service account
 data "aws_iam_policy_document" "sa_assumerole_trust" {
-  statement{
+  statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
 
-  condition {
-    test     = "StringEquals"
-    variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
-    values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
-  }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
+    }
 
-  principals {
-    identifiers = [var.openid_connector.arn]
-    type        = "Federated"
-  }
+    principals {
+      identifiers = [var.openid_connector.arn]
+      type        = "Federated"
+    }
   }
 }
 
@@ -49,8 +50,27 @@ resource "aws_iam_role" "sa_role" {
 }
 
 resource "aws_iam_policy" "sa_role_policy" {
-  policy = file("${path.module}/sa-role-policy.json")
+#  policy = file("${path.module}/sa-role-policy.json")
   name   = "${var.project_code}-${var.env_name}-policy-externalsecrets"
+
+
+  policy = jsonencode (
+        {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameters",
+                "ssm:GetParameter"
+            ],
+            "Resource": [
+                "arn:aws:ssm:${var.region}:${var.account_id}:parameter/${var.project_code}/${var.env_name}/*",
+            ]
+        }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "policy_attach" {
@@ -59,11 +79,11 @@ resource "aws_iam_role_policy_attachment" "policy_attach" {
 }
 
 resource "helm_release" "external-secrets" {
-  name       = "${var.eks_cluster.name}-external-secrets"
-  repository = "https://charts.external-secrets.io"
-  chart      = "external-secrets"
-  verify     = "false"
-  namespace  = "external-secrets"
+  name             = "${var.eks_cluster.name}-external-secrets"
+  repository       = "https://charts.external-secrets.io"
+  chart            = "external-secrets"
+  verify           = "false"
+  namespace        = "external-secrets"
   create_namespace = true
   set {
     name  = "installCRDs"
@@ -71,8 +91,7 @@ resource "helm_release" "external-secrets" {
   }
   set {
     name  = "webhook.port"
-    value = "9443"
-    type  = "string"
+    value = 9443
   }
-  depends_on = [aws_eks_fargate_profile.externalsecrets]
+  depends_on = [aws_eks_fargate_profile.externalsecrets, var.network_dependency]
 }

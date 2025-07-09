@@ -1,92 +1,164 @@
-# Data-marketplace infrastructure
 
-This changed code can be used to create infrasturcture which includes for services of data marketplace.
+# Data Marketplace Infrastructure Deployment Guide
 
-### Pre-requisites:
+This guideline provides step-by-step instructions to **create**, **update**, and **destroy** the AWS infrastructure that hosts the services of the Data Marketplace platform.
 
-* Install git: https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/
-* Install Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli (Required version - Terraform v1.5.7)
-* Install kubectl: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-* Install awscli: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
-* Cognito user pool and client app
-* a domain name and tls certificate for the domainname.
-* SSO settings on the security.gov.uk
+## Environments
 
-### Local development
+There are multiple environments:
+- `gen` – Shared/general environment for common resources (must be deployed **first**)
+- `dev` – Development environment
+- `tst` – Test environment
+- `stg` – Staging/Pre-production environment
+- `pro` – Production environment
 
-Use assume role access to run terraform plan locally.
+> `dev` and `tst` are deployed in the **development AWS account**.  
+> `stg` and `pro` are deployed in the **production AWS account**.
 
-* Require AWS user account with assume role (ROLE_ARN=arn:aws:iam::855859226163:role/dm-gen-devops-role) access
-* Create sts session keys
+## Infrastructure Overview
 
-      export ROLE_ARN="arn:aws:iam::855859226163:role/dm-gen-devops-role"
-      export MFA_DEVICE_ARN="arn:aws:iam::855859226163:mfa/<MFANAME>"
+In this version, the deployment is managed via:
+- A deployment server (an EC2 instance)
+- Terraform
+- GitHub Actions workflows
 
-      aws sts assume-role \
-        --role-arn "$ROLE_ARN" \
-        --serial-number "$MFA_DEVICE_ARN" \
-        --token-code "<MFA_CODE>" \
-        --role-session-name "terraform-session"
+> A fully automated proper CI/CD pipeline will be introduced in future versions.
 
-      export AWS_PROFILE=terraform-session
+---
 
-Alternately, the jump host (adm-instance) on AWS account can be used for deployment as well.
+## Prerequisites
 
-### For Environment Creation:
-There are multiple environments: dev, tst, mvp. One can create any other environment by copying one of them and updating the variables section (for example, CIDR, env name, etc). Below process is for dev envrionment creation. By replacing the dev to other environment, one can create the other environment as well
-* Run `cd dev`
-* Run `terraform init`
-* Run `terraform plan` and check the output.
-If the output is what you expect and there are no errors:
-* Run `terraform apply`
+1. **General Environment Setup (gen)**:
+   - Run the deployment for the `gen` environment **manually** on AWS (using CloudShell or EC2).
+   - This deploys shared resources (S3 buckets, IAM roles, Secrets, Parameter Store entries) and a private subnet in the default VPC.
 
-    If CoreDNS patch failed for due to some error then run `terraform apply` again and then `kubectl rollout restart -n kube-system deployment coredns`
+2. **Deployment Server Setup**:
+   - Use **Amazon Linux 2023** EC2 instance, placed in the **private subnet** of the default VPC.
+   - Attach the IAM role `dm-gen-ec2-profile-role` (soon to be renamed to `dm-gen-ec2-profile-deployment-role`).
+   - Connect to the instance via **SSM Session Manager**.
+   - Install the following tools:
+     - AWS CLI: [Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)
+     - Git: [Install Guide](https://linux.how2shout.com/how-to-install-git-on-aws-ec2-amazon-linux-2/)
+     - Terraform v1.5.7: [Install Guide](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+     - kubectl: [Install Guide](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 
-* For SSO, define client settings on security.gov.uk (for first time, only once!)
-* For restricted access to the env, create cognito user pool and define app client in the userpool
-* Go to Paramater Store in AWS Systems Manager portal and fill in the values for the parameters for /dm/dev/*.
-* Generate ACM for the required domain (To be automated)
-* `cd app`.
-* Create .env file with parameters (dev.env file is a template file for .env)
-* Then run `sh dm-deploy.sh install`.
-* define a custom DNS record (CNAME) for Application Load Balancer DNS
-* Update the EFS backup for the newly create environment. 
+3. **Additional Requirements**:
+   - GitHub Actions IAM role defined in AWS.
+   - A domain or subdomain name for each environment (e.g. `dev.datamarketplace.gov.uk`).
+   - TLS Certificate for the domain.
+   - SSO configuration on `security.gov.uk`.
 
-### Destroy Resources:
+---
 
-If you want to destroy the dev environment:
+## Environment Deployment
 
-* Run `sh dm-deploy.sh uninstall` from the app folder.
-* `cd dev` , then run `terraform destroy`
-* remove kubernetes config for the environment.
+Environment deployment is handled via GitHub Actions pipeline:
 
-MVP & TST environments destroyed as new test environments created by AGM in Azure Cloud.
+### Workflow: `environment-deployment-pipeline`
 
-### Update the services 
-* `cd app`.
-* Create .env file with parameters (dev.env file is a template file for .env)
-* Then run `sh dm-deploy.sh update`.  
-  
-### Backup and Restore 
+Input Parameters:
+- **Branch Name** – Select the relevant Git branch
+- **Environment Name** – Choose from: `dev`, `tst`, `stg`, `pro`
+- **MSSQL Snapshot Name**
+- **PostgreSQL Snapshot Name**
+- **Action Type**:
+  - `init+plan`: Runs `terraform plan` and shows proposed changes.
+  - `init+plan+apply`: Runs plan, requests manual approval, then applies if approved.
+  - `approval+destroy`: Runs `terraform destroy` after manual approval.
 
-Backend database fuseki using EFS as persistence and its protected by AWS backup service.
-Backup restore can be done manually in the event of any data loss using AWS backup restore feature.
+#### ‘init+plan+apply’ Workflow
+1. Terraform plan runs and shows changes.
+2. An issue is created for manual approval.
+3. Enter **Approve** or **Deny** in the issue.
+4. If **Approved**, the environment is created.
+5. If **Denied**, the pipeline cancels.
 
-### Add IAM users to aws_auth config if required
-kubectl edit configmap aws-auth -n kube-system
+---
 
-    mapUsers: |
-        - userarn: arn:aws:iam::<AWS_ACCOUNT_ID>:user/<USERNAME>
-          username: admin
-          groups:
-            - system:masters
+## Application Parameters Setup (Manual)
 
-### Additional improvements notes
+> This will be automated in the future.
 
-CoreDNS plugin resources created for MVP environment to avoid applying DNS patching. Dev environment is still using CoreDNS patching which is controlled through terraform variable.
+Steps:
+1. Ensure all required config entries exist in AWS Parameter Store at `/dm/gen/config-inputs`.
+2. On the Deployment Server:
+   ```bash
+   git clone [this repository]
+   cd data-marketplace-infrastructure/app-fast/
+   ./config/config.sh [env]  # e.g., ./config/config.sh dev
+   ```
+   This script sets up app-specific parameters in Parameter Store.
 
-### TODO by Code
-* Generate certificate the new test domain
-* Add DNS record for the new environment
-* CI/CD for IaC & app deployment
-* Import AWS backup resource creation in IaC
+---
+
+## Application Deployment (Manual)
+
+> This will also be automated later.
+
+Steps:
+1. Complete **Application Parameters Setup**.
+2. On the Deployment Server:
+   ```bash
+   cd data-marketplace-infrastructure/app-fast/
+   # Create and edit .env file with deployment settings
+   sh dm-deploy.sh install     # for installation
+   sh dm-deploy.sh update      # for updating
+   sh dm-deploy.sh uninstall   # for removal
+   ```
+
+## Application Deployment (Pipeline)
+
+- Please create a `.env` file with deployment settings in advance via using the template provided `.env_template`  
+- Please upload the newly created `.env` file to S3 Bucket  
+  (the name of the bucket can be obtained from Pipeline file `data-marketplace-infrastructure/.github/workflows/application-configuration-update.yml`)  
+- Then you can run GitHub Workflows pipeline of `application-configuration-update.yml` via UI or GitHub API  
+
+
+
+
+
+---
+
+## Post-Deployment Steps (Manual)
+
+> These will eventually be automated.
+
+1. **Create or update DNS** entry for the environment.
+2. **Create or update WAF** associated with the ALB created by the application deployment.
+3. **Always update DNS** CNAME when the ALB changes.
+
+---
+
+## Complete Teardown (Destroy Environment)
+
+To completely delete an environment (e.g., `dev`):
+
+1. **DNS Cleanup**:
+   - Delete the CNAME record for the environment.
+   - Wait for DNS propagation (~15–30 mins).
+
+2. **WAF Removal**:
+   - Remove the WAF linked to the ALB.
+
+3. **Application Uninstall**:
+   ```bash
+   sh dm-deploy.sh uninstall
+   ```
+
+4. **Environment Destruction via Pipeline**:
+   - Run `approval+destroy` option in the GitHub Actions workflow.
+   - Approve the destruction in the created issue.
+
+---
+
+## Updating Services
+
+1. On the Deployment Server:
+   ```bash
+   cd app-fast/
+   cp dev.env .env   # adjust as needed
+   sh dm-deploy.sh update
+   ```
+2. If the ALB is changed then update WAF and the CNAME accordingly.
+
+> ⚠️ These may cause a **temporary service outage**. Application pods in the Kubernetes cluster might be restarted.

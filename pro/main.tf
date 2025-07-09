@@ -43,6 +43,7 @@ module "eks_cluster" {
   sa_name               = "aws-generic-sa"
   tags                  = local.tags
   network_dependency    = null_resource.network_ready.id
+  account_type          = var.account_type
 }
 
 module "load_balancer" {
@@ -123,14 +124,13 @@ module "postgres" {
   rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   rds_postgres_license_model           = var.rds_postgres_license_model
   rds_postgres_snapshot_identifier     = var.rds_postgres_snapshot_identifier
-  auto_minor_version_upgrade           = var.auto_minor_version_upgrade
 }
 
 
 module "app_params" {
   source = "../modules/parameter-store"
   prefix = "/${var.project_code}/${var.env_name}/appsettings/"
-  stringlist_parameters = [
+  securestring_parameters = [
     "ui",
     "api",
     "users",

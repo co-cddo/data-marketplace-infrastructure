@@ -1,0 +1,72 @@
+{
+  "AGMJwtSettings": {
+    "SecretKey": "$SECRETKEY"
+  },
+  "ApplicationInsights": {
+    "ConnectionString": ""
+  },
+  "ASPNETCORE_ENVIRONMENT": "Development",
+  "Authentication": {
+    "Audiences": [
+      "$AUDIENCES"
+    ],
+    "Domain": "$DOMAIN_NAME",
+    "Authority": "https://sso.service.security.gov.uk/",
+    "ClientId": "$SSO_CLIENT_ID",
+    "ClientSecret": "$SSO_CLIENT_SECRET",
+    "ClientIds": [ "" ],
+    "ApiKey": "mock-256-bit-secret-1234567890123456",
+    "AllowedScopes": [ "publish", "discover", "delete" ],
+    "ApiIssuer": "$DOMAIN_NAME"
+  },
+  "BackDoorAuthentication": {
+    "EnableTestUserBackdoor": false,
+    "TestUser": {
+      "Email": "testuser@digital.cabinet-office.gov.uk",
+      "Username": "agrimetrics"
+    }
+  },
+  "BaseUrl": "https://$DOMAIN_NAME/",
+  "CatalogDataStoreHealthCheckUrl": "https://$DOMAIN_NAME/health",
+  "Ckan": {
+    "ApiKey": "",
+    "Catalog": {
+      "Address": "https://azapp-cddockan-dev-001.azurewebsites.net",
+      "GroupName": "cddo-int",
+      "OrganisationName": "cddo"
+    },
+    "Solr": {
+      "Address": "SOLR ADDRESS"
+    }
+  },
+  "CorsSettings": {
+    "AllowedOrigins": "https://$DOMAIN_NAME"
+  },
+  "FileShares": {
+    "SpreadsheetUpload": {
+      "ConnectionString": "STORAGE ACCOUNT CONNECTION STRING",
+      "DirectoryName": "profiled-data-assets",
+      "ShareName": "excel-uploads"
+    }
+  },
+  "HealthCheckSettings": {
+    "HealthCheckUrl": "CKAN URL"
+  },
+  "Jwt": {
+    "Audience": "https://mock-audience.local",
+    "Authority": "https://sso.service.security.gov.uk",
+    "Issuer": "https://mock-issuer.local",
+    "Key": "mock-256-bit-secret-1234567890123456"
+  },
+  "SiteUrl": "https://$DOMAIN_NAME/",
+  "TestUser": {
+    "Enabled": false
+  },
+  "UsersApi": {
+    "api_address": "http://dm-fast-users/"
+  },
+  "WEBSITE_ENABLE_SYNC_UPDATE_SITE": true,
+  "WEBSITE_RUN_FROM_PACKAGE": "1",
+  "WEBSITE_VNET_ROUTE_ALL": "1",
+  "XDT_MicrosoftApplicationInsights_Mode": "default"
+}

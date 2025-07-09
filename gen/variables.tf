@@ -2,9 +2,9 @@ variable "region" {
   type    = string
   default = "eu-west-2"
 }
-variable "dynamodb_tablename" {
-  type    = string
-  default = "dm-gen-dynamodb-terraform-lock-table"
+variable "account_type" {
+  type        = string
+  description = "prod | dev" 
 }
 variable "devops_policy_name" {
   type    = string
@@ -33,4 +33,8 @@ variable "readonly_policy_name" {
 variable "readonly_role_name" {
   type    = string
   default = "dm-gen-role-readonly"
+}
+variable "adm_ec2_profile_role_name" {
+  type    = string
+  default = "dm-gen-ec2-profile-role"
 }

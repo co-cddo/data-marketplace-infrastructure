@@ -1,28 +1,28 @@
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
+  config_path = "~/.kube/config"
 }
 provider "helm" {
   kubernetes {
-   config_path = "~/.kube/config"
+    config_path = "~/.kube/config"
   }
 }
 
 //eks service account
 data "aws_iam_policy_document" "sa_assumerole_trust" {
-  statement{
+  statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
 
-  condition {
-    test     = "StringEquals"
-    variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
-    values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
-  }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(var.openid_connector.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:${var.sa_namespace}:${var.sa_name}"]
+    }
 
-  principals {
-    identifiers = [var.openid_connector.arn]
-    type        = "Federated"
-  }
+    principals {
+      identifiers = [var.openid_connector.arn]
+      type        = "Federated"
+    }
   }
 }
 
@@ -42,12 +42,12 @@ resource "aws_iam_role_policy_attachment" "policy_attach" {
 }
 
 resource "helm_release" "aws-load-balancer-controller" {
-  
+
   name       = "${var.project_code}-${var.env_name}-external-aws-alb-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
-  
+
   version = "1.4.1"
 
   set {
@@ -55,7 +55,7 @@ resource "helm_release" "aws-load-balancer-controller" {
     value = var.eks_cluster.id
   }
   set {
-    name = "image.repository"
+    name  = "image.repository"
     value = "public.ecr.aws/eks/aws-load-balancer-controller"
   }
 
@@ -77,14 +77,14 @@ resource "helm_release" "aws-load-balancer-controller" {
   # EKS Fargate specific
   set {
     name  = "region"
-    value = "${var.region}"
+    value = var.region
   }
 
   set {
     name  = "vpcId"
     value = var.vpc_id
   }
-  timeout = 600
-  depends_on = [var.eks_fargate_profile_kubesystem ]
+  timeout    = 600
+  depends_on = [var.eks_fargate_profile_kubesystem]
 }
 

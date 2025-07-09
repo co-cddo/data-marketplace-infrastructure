@@ -1,12 +1,13 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_kms_key" "state_backend_bucket_kms_key" {
   description             = "Encrypt the state bucket objects"
   deletion_window_in_days = 10
 }
 
 resource "aws_s3_bucket" "state_backend_bucket" {
-  bucket = "dm-gen-config"
+  bucket = var.account_type == "prod" ? "dm-gen-config-${var.account_type}" : "dm-gen-config"
 }
-
 
 resource "aws_s3_bucket_versioning" "state_backend_bucket_versioning" {
   bucket = aws_s3_bucket.state_backend_bucket.id
@@ -36,22 +37,6 @@ resource "aws_s3_bucket_public_access_block" "state_backend_bucket_acl" {
   restrict_public_buckets = true
 }
 
-
-
-//for terraform state lock file - one table for each environment
-resource "aws_dynamodb_table" "state_dynamo_table" {
-  name = var.dynamodb_tablename
-
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-}
-
-
 // DEVOPS ROLE
 
 # Create an IAM policy
@@ -73,24 +58,79 @@ resource "aws_iam_policy" "devops_iam_policy" {
 }
 
 # Create an IAM role
+resource "aws_iam_role" "adm_ec2_profile_role" {
+  name = var.adm_ec2_profile_role_name
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Attach the IAM policy to the IAM role
+resource "aws_iam_role_policy_attachment" "admin_access" {
+  role       = aws_iam_role.adm_ec2_profile_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.adm_ec2_profile_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "adm-ec2-instance-profile"
+  role = aws_iam_role.adm_ec2_profile_role.name
+}
+
 resource "aws_iam_role" "devops_role" {
   name = var.devops_role_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
-        }
-        Action = "sts:AssumeRole",
-        Condition = {
-          Bool : {
-            "aws:MultiFactorAuthPresent" : "true"
+      merge(
+        {
+          Effect = "Allow"
+          Principal = {
+            AWS = concat(
+              ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"],
+              var.account_type == "prod" ? [
+                "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+                "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk"
+              ] : []
+            )
           }
+          Action = "sts:AssumeRole"
+          Condition = merge(
+            {
+              Bool = {
+                "aws:MultiFactorAuthPresent" = "true"
+              }
+            },
+            var.account_type == "prod" ? {
+              IpAddress = {
+                "aws:SourceIp" = [
+                  "217.196.229.77/32",
+                  "217.196.229.79/32",
+                  "217.196.229.80/32",
+                  "217.196.229.81/32",
+                  "51.149.8.0/25",
+                  "51.149.8.128/29"
+                ]
+              }
+            } : {}
+          )
         }
-      }
+      )
     ]
   })
 }
@@ -127,7 +167,12 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:DescribeLogStreams",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/docker/mygroup:*"
+        "Resource": [
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
+                    ]
       },
       {
         "Sid" : "VisualEditor1",
@@ -136,7 +181,12 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:GetLogEvents",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/docker/mygroup:*"
+        "Resource": [
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-dev-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-stg-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-tst-logs:*",
+                      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:dm-fast-pro-logs:*"
+                    ]
       },
       {
         "Sid" : "VisualEditor2",
@@ -160,7 +210,7 @@ resource "aws_iam_policy" "developer_iam_policy" {
           "logs:GetLogEvents",
           "logs:DescribeLogGroups"
         ],
-        "Resource" : "arn:aws:logs:eu-west-2:855859226163:log-group:/tmp/dm/docker/applications:*"
+        "Resource" : "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/tmp/dm/docker/applications:*"
       }
     ]
 
@@ -177,7 +227,7 @@ resource "aws_iam_role" "developer_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = "sts:AssumeRole",
         Condition = {
@@ -199,227 +249,6 @@ resource "aws_iam_policy_attachment" "developer_role_policy_attachment" {
 
 // READONLY ROLE
 
-# Create an IAM policy
-resource "aws_iam_policy" "readonly_iam_policy" {
-  name = var.readonly_policy_name
-
-  policy = jsonencode({
-
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "a4b:Get*",
-          "a4b:List*",
-          "a4b:Search*",
-          "access-analyzer:GetAccessPreview",
-          "access-analyzer:GetAnalyzedResource",
-          "access-analyzer:GetAnalyzer",
-          "access-analyzer:GetArchiveRule",
-          "access-analyzer:GetFinding",
-          "access-analyzer:GetGeneratedPolicy",
-          "access-analyzer:ListAccessPreviewFindings",
-          "access-analyzer:ListAccessPreviews",
-          "access-analyzer:ListAnalyzedResources",
-          "access-analyzer:ListAnalyzers",
-          "access-analyzer:ListArchiveRules",
-          "access-analyzer:ListFindings",
-          "access-analyzer:ListPolicyGenerations",
-          "access-analyzer:ListTagsForResource",
-          "access-analyzer:ValidatePolicy",
-          "account:GetAccountInformation",
-          "account:GetAlternateContact",
-          "account:GetChallengeQuestions",
-          "account:GetContactInformation",
-          "account:GetRegionOptStatus",
-          "account:ListRegions",
-          "autoscaling-plans:Describe*",
-          "autoscaling-plans:GetScalingPlanResourceForecastData",
-          "autoscaling:Describe*",
-          "autoscaling:GetPredictiveScalingForecast",
-          "aws-portal:View*",
-          "backup-gateway:ListGateways",
-          "backup-gateway:ListHypervisors",
-          "backup-gateway:ListTagsForResource",
-          "backup-gateway:ListVirtualMachines",
-          "backup:Describe*",
-          "backup:Get*",
-          "backup:List*",
-          "batch:Describe*",
-          "batch:List*",
-          "billing:GetBillingData",
-          "billing:GetBillingDetails",
-          "billing:GetBillingNotifications",
-          "billing:GetBillingPreferences",
-          "billing:GetContractInformation",
-          "billing:GetCredits",
-          "billing:GetIAMAccessPreference",
-          "billing:GetSellerOfRecord",
-          "billing:ListBillingViews",
-          "billingconductor:ListAccountAssociations",
-          "billingconductor:ListBillingGroupCostReports",
-          "billingconductor:ListBillingGroups",
-          "billingconductor:ListCustomLineItems",
-          "billingconductor:ListCustomLineItemVersions",
-          "billingconductor:ListPricingPlans",
-          "billingconductor:ListPricingPlansAssociatedWithPricingRule",
-          "billingconductor:ListPricingRules",
-          "billingconductor:ListPricingRulesAssociatedToPricingPlan",
-          "billingconductor:ListResourcesAssociatedToCustomLineItem",
-          "billingconductor:ListTagsForResource",
-          "directconnect:Describe*",
-          "dynamodb:BatchGet*",
-          "dynamodb:Describe*",
-          "dynamodb:Get*",
-          "dynamodb:List*",
-          "dynamodb:PartiQLSelect",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "ec2:Describe*",
-          "ec2:Get*",
-          "ec2:ListImagesInRecycleBin",
-          "ec2:ListSnapshotsInRecycleBin",
-          "ec2:SearchLocalGatewayRoutes",
-          "ec2:SearchTransitGatewayRoutes",
-          "ec2messages:Get*",
-          "ecr-public:BatchCheckLayerAvailability",
-          "ecr-public:DescribeImages",
-          "ecr-public:DescribeImageTags",
-          "ecr-public:DescribeRegistries",
-          "ecr-public:DescribeRepositories",
-          "ecr-public:GetAuthorizationToken",
-          "ecr-public:GetRegistryCatalogData",
-          "ecr-public:GetRepositoryCatalogData",
-          "ecr-public:GetRepositoryPolicy",
-          "ecr-public:ListTagsForResource",
-          "ecr:BatchCheck*",
-          "ecr:BatchGet*",
-          "ecr:Describe*",
-          "ecr:Get*",
-          "ecr:List*",
-          "ecs:Describe*",
-          "ecs:List*",
-          "eks:Describe*",
-          "eks:List*",
-          "elasticfilesystem:Describe*",
-          "elasticfilesystem:ListTagsForResource",
-          "elasticloadbalancing:Describe*",
-          "iam:Generate*",
-          "iam:Get*",
-          "iam:List*",
-          "iam:Simulate*",
-          "identity-sync:GetSyncProfile",
-          "identity-sync:GetSyncTarget",
-          "identity-sync:ListSyncFilters",
-          "identitystore-auth:BatchGetSession",
-          "identitystore-auth:ListSessions",
-          "identitystore:DescribeGroup",
-          "identitystore:DescribeGroupMembership",
-          "identitystore:DescribeUser",
-          "identitystore:GetGroupId",
-          "identitystore:GetGroupMembershipId",
-          "identitystore:GetUserId",
-          "identitystore:IsMemberInGroups",
-          "identitystore:ListGroupMemberships",
-          "identitystore:ListGroupMembershipsForMember",
-          "identitystore:ListGroups",
-          "identitystore:ListUsers",
-          "kms:Describe*",
-          "kms:Get*",
-          "kms:List*",
-          "lambda:Get*",
-          "lambda:List*",
-          "resource-groups:Get*",
-          "resource-groups:List*",
-          "resource-groups:Search*",
-          "route53-recovery-cluster:Get*",
-          "route53-recovery-cluster:ListRoutingControls",
-          "route53-recovery-control-config:Describe*",
-          "route53-recovery-control-config:List*",
-          "route53-recovery-readiness:Get*",
-          "route53-recovery-readiness:List*",
-          "route53:Get*",
-          "route53:List*",
-          "route53:Test*",
-          "route53domains:Check*",
-          "route53domains:Get*",
-          "route53domains:List*",
-          "route53domains:View*",
-          "route53resolver:Get*",
-          "route53resolver:List*",
-          "s3-object-lambda:GetObject",
-          "s3-object-lambda:GetObjectAcl",
-          "s3-object-lambda:GetObjectLegalHold",
-          "s3-object-lambda:GetObjectRetention",
-          "s3-object-lambda:GetObjectTagging",
-          "s3-object-lambda:GetObjectVersion",
-          "s3-object-lambda:GetObjectVersionAcl",
-          "s3-object-lambda:GetObjectVersionTagging",
-          "s3-object-lambda:ListBucket",
-          "s3-object-lambda:ListBucketMultipartUploads",
-          "s3-object-lambda:ListBucketVersions",
-          "s3-object-lambda:ListMultipartUploadParts",
-          "s3:DescribeJob",
-          "s3:Get*",
-          "s3:List*",
-          "secretsmanager:Describe*",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:List*",
-          "ssm-contacts:DescribeEngagement",
-          "ssm-contacts:DescribePage",
-          "ssm-contacts:GetContact",
-          "ssm-contacts:GetContactChannel",
-          "ssm-contacts:ListContactChannels",
-          "ssm-contacts:ListContacts",
-          "ssm-contacts:ListEngagements",
-          "ssm-contacts:ListPageReceipts",
-          "ssm-contacts:ListPagesByContact",
-          "ssm-contacts:ListPagesByEngagement",
-          "ssm-incidents:GetIncidentRecord",
-          "ssm-incidents:GetReplicationSet",
-          "ssm-incidents:GetResourcePolicies",
-          "ssm-incidents:GetResponsePlan",
-          "ssm-incidents:GetTimelineEvent",
-          "ssm-incidents:ListIncidentRecords",
-          "ssm-incidents:ListRelatedItems",
-          "ssm-incidents:ListReplicationSets",
-          "ssm-incidents:ListResponsePlans",
-          "ssm-incidents:ListTagsForResource",
-          "ssm-incidents:ListTimelineEvents",
-          "ssm:Describe*",
-          "ssm:Get*",
-          "ssm:List*",
-          "vpc-lattice:GetAccessLogSubscription",
-          "vpc-lattice:GetAuthPolicy",
-          "vpc-lattice:GetListener",
-          "vpc-lattice:GetResourcePolicy",
-          "vpc-lattice:GetRule",
-          "vpc-lattice:GetService",
-          "vpc-lattice:GetServiceNetwork",
-          "vpc-lattice:GetServiceNetworkServiceAssociation",
-          "vpc-lattice:GetServiceNetworkVpcAssociation",
-          "vpc-lattice:GetTargetGroup",
-          "vpc-lattice:ListAccessLogSubscriptions",
-          "vpc-lattice:ListListeners",
-          "vpc-lattice:ListRules",
-          "vpc-lattice:ListServiceNetworks",
-          "vpc-lattice:ListServiceNetworkServiceAssociations",
-          "vpc-lattice:ListServiceNetworkVpcAssociations",
-          "vpc-lattice:ListServices",
-          "vpc-lattice:ListTagsForResource",
-          "vpc-lattice:ListTargetGroups",
-          "vpc-lattice:ListTargets",
-
-
-        ],
-        "Resource" : "*"
-      }
-    ]
-
-  })
-}
-
 # Create an IAM role
 resource "aws_iam_role" "readonly_role" {
   name = var.readonly_role_name
@@ -430,14 +259,34 @@ resource "aws_iam_role" "readonly_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::855859226163:root"
+          AWS = concat(
+            ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"],
+            var.account_type == "prod" ? [
+              "arn:aws:iam::622626885786:user/soydaner.ulker@digital.cabinet-office.gov.uk",
+              "arn:aws:iam::622626885786:user/john.palmer@digital.cabinet-office.gov.uk"
+            ] : []
+          )
         }
-        Action = "sts:AssumeRole",
-        Condition = {
-          Bool : {
-            "aws:MultiFactorAuthPresent" : "true"
-          }
-        }
+        Action = "sts:AssumeRole"
+        Condition = merge(
+          {
+            Bool = {
+              "aws:MultiFactorAuthPresent" = "true"
+            }
+          },
+          var.account_type == "prod" ? {
+            IpAddress = {
+              "aws:SourceIp" = [
+                "217.196.229.77/32",
+                "217.196.229.79/32",
+                "217.196.229.80/32",
+                "217.196.229.81/32",
+                "51.149.8.0/25",
+                "51.149.8.128/29"
+              ]
+            }
+          } : {}
+        )
       }
     ]
   })
@@ -446,6 +295,114 @@ resource "aws_iam_role" "readonly_role" {
 # Attach the IAM policy to the IAM role
 resource "aws_iam_policy_attachment" "readonly_role_policy_attachment" {
   name       = "Policy Attachement"
-  policy_arn = aws_iam_policy.readonly_iam_policy.arn
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
   roles      = [aws_iam_role.readonly_role.name]
+}
+
+
+resource "aws_secretsmanager_secret" "mssql_passwords" {
+  name        = "dm-gen-mssql-master-credentials"
+  description = "MSSQL master credentials"
+}
+resource "aws_secretsmanager_secret_version" "mssql_passwords_version" {
+  secret_id = aws_secretsmanager_secret.mssql_passwords.id
+  secret_string = jsonencode({
+    dbusername   = "saadmin",
+    dev-password = "NO-PASS-HERE",
+    tst-password = "NO-PASS-HERE",
+    stg-password = "NO-PASS-HERE",
+    pro-password = "NO-PASS-HERE"
+  })
+}
+
+resource "aws_secretsmanager_secret" "postgresql_passwords" {
+  name        = "dm-gen-postgresql-master-credentials"
+  description = "POSTGRESQL master credentials"
+}
+resource "aws_secretsmanager_secret_version" "postgresql_passwords_version" {
+  secret_id = aws_secretsmanager_secret.postgresql_passwords.id
+  secret_string = jsonencode({
+    dbusername   = "pgadmin",
+    dev-password = "NO-PASS-HERE",
+    tst-password = "NO-PASS-HERE",
+    stg-password = "NO-PASS-HERE",
+    pro-password = "NO-PASS-HERE"
+  })
+}
+
+# Private subnet for instances of admin tasks
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+resource "aws_subnet" "private_in_default" {
+  vpc_id            = data.aws_vpc.default.id
+  cidr_block        = "172.31.64.0/20" # adjust as needed
+  availability_zone = "eu-west-2a"
+
+  tags = {
+    Name = "default-private-subnet"
+    Type = "private"
+  }
+  depends_on = [aws_nat_gateway.default_ngw]
+}
+
+resource "aws_route_table" "private_rtb" {
+  vpc_id = data.aws_vpc.default.id
+
+  tags = {
+    Name = "private-route-table"
+  }
+}
+
+resource "aws_route_table_association" "private_assoc" {
+  subnet_id      = aws_subnet.private_in_default.id
+  route_table_id = aws_route_table.private_rtb.id
+}
+
+
+
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_subnet" "public_second" {
+  id = data.aws_subnets.default.ids[1]
+}
+
+
+
+data "aws_internet_gateway" "default" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+resource "aws_eip" "default_ngw" {
+  domain = "vpc"
+  tags = {
+    "Name" = "dm-gen-ElasticIP"
+  }
+}
+
+
+resource "aws_nat_gateway" "default_ngw" {
+  allocation_id = aws_eip.default_ngw.id
+  subnet_id     = data.aws_subnet.public_second.id
+
+  tags = {
+    Name = "default-vpc-nat-gw"
+  }
+}
+
+
+resource "aws_route" "private_to_internet" {
+  route_table_id         = aws_route_table.private_rtb.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.default_ngw.id
 }

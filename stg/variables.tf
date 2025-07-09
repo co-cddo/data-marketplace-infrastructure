@@ -5,7 +5,7 @@ variable "region" {
 variable "account_type" {
   type        = string
   description = "prod | dev"
-  default = "dev"
+  default = "prod"
 }
 variable "account_id_dev" {
   type    = string
@@ -22,18 +22,18 @@ variable "project_code" {
 # DO NOT FORGET TO UPDATE BACKEND FILE ALSO
 variable "env_name" {
   type    = string
-  default = "dev"
+  default = "stg"
 }
 #vpc vars
 variable "vpc_cidr" {
   type    = string
-  default = "10.10.0.0/16"
+  default = "10.20.0.0/16"
 }
 variable "private_subnets" {
-  default = ["10.10.3.0/24", "10.10.4.0/24"]
+  default = ["10.20.3.0/24", "10.20.4.0/24"]
 }
 variable "public_subnets" {
-  default = ["10.10.1.0/24", "10.10.2.0/24"]
+  default = ["10.20.1.0/24", "10.20.2.0/24"]
 }
 # eks cluster vars
 variable "cluster_version" {
@@ -96,11 +96,11 @@ variable "rds_postgres_engine" {
 }
 variable "rds_postgres_engine_version" {
   type    = string
-  default = "16.8"
+  default = "16.6"
 }
 variable "rds_postgres_instance_class" {
   type    = string
-  default = "db.t3.medium"
+  default = "db.t3.large"
 }
 variable "rds_postgres_allocated_storage" {
   type    = number
@@ -128,9 +128,5 @@ variable "rds_postgres_skip_final_snapshot" {
 }
 variable "rds_postgres_snapshot_identifier" {
   type = string
-}
-variable "auto_minor_version_upgrade" {
-  type    = bool
-  default = true
 }
 #-------------------------------------------------

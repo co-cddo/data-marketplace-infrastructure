@@ -40,3 +40,4 @@ terraform.rc
 **/test-results/
 **/screenshots/
 .env
+.vscode

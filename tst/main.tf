@@ -130,7 +130,7 @@ module "postgres" {
 module "app_params" {
   source = "../modules/parameter-store"
   prefix = "/${var.project_code}/${var.env_name}/appsettings/"
-  stringlist_parameters = [
+  securestring_parameters = [
     "ui",
     "api",
     "users",
