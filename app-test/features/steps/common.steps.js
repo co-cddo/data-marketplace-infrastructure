@@ -18,6 +18,7 @@ if (!fs.existsSync(screenshotsDir)) {
 }
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
+  bypassCSP: true,
   storageState: {
     cookies: [
       {

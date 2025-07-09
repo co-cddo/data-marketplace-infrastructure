@@ -10,6 +10,16 @@ import {
 } from "./common.steps.js";
 import { expect } from "@playwright/test";
 const listingTitle = `My test listing - ${crypto.randomUUID()}`;
+
+await context.route("**/*", (route) => {
+  const headers = {
+    ...route.request().headers(),
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+  };
+  route.continue({ headers });
+});
+
 Given("I navigate to the Add New Listing URL", async () => {
   const url = `${baseURL}publish/dashboard`;
 
