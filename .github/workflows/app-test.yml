@@ -37,22 +37,10 @@ env:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    # --- NEW: Define the container for this job ---
-    container:
-      image: e2e-tests # Use the image built in the previous step
-      options: >
-        --user root
-        -v ${{ github.workspace }}/screenshots:/app-test/screenshots
-        -e BASE_URL=${{ env.BASE_URL }}
-        -e TOKEN="${{ github.event.inputs.token }}"
-        -e AUTH_COOKIE="${{ github.event.inputs.authCookie }}"
-    # --- END NEW ---
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        # IMPORTANT: When using a 'container' in a job, 'actions/checkout'
-        # checks out the code *into* the container's working directory.
-        # So, your /app-test will be populated.
 
       - name: Set BASE_URL
         id: set-url
@@ -104,45 +92,26 @@ jobs:
           role-to-assume: ${{ env.ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # --- NEW/MODIFIED STEPS ---
-      - name: Build Docker image
-        run: docker build -t e2e-tests ./app-test
-        # We still need to build the image on the host.
-        # This image will then be used by the 'container' property of the job.
-
       - name: Create screenshots directory on host
         run: mkdir -p screenshots
-        # This ensures the directory exists on the GitHub Actions runner before the Docker mount.
 
-      - name: Debug - Inside container before tests
+      - name: Build and run E2E tests in Docker
         run: |
-          set -eux
-          echo '--- Inside Docker Container: Before Playwright tests ---'
-          echo 'Current working directory: $(pwd)'
-          echo 'Contents of /app-test:'
-          ls -la /app-test
-          echo 'Contents of /app-test/screenshots (should be empty or non-existent initially):'
-          ls -la /app-test/screenshots || true
-          mkdir -p /app-test/screenshots # Ensure directory exists inside container
+          docker build -t e2e-tests ./app-test
+          docker run --rm \
+            -e BASE_URL=${BASE_URL} \
+            -e TOKEN="${{ github.event.inputs.token }}" \
+            -e AUTH_COOKIE="${{ github.event.inputs.authCookie }}" \
+            -v "$(pwd)/screenshots:/app-test/screenshots" \
+            e2e-tests
 
-      - name: Run E2E tests inside Docker container
-        run: npm run test
-        # This command now runs directly within the 'e2e-tests' container.
-
-      - name: Debug - Inside container after tests
+      - name: Debug - List screenshots
         run: |
-          set -eux
-          echo '--- Inside Docker Container: After Playwright tests ---'
-          echo 'Contents of /app-test/screenshots (should now contain screenshots):'
-          ls -la /app-test/screenshots
-          echo 'Contents of /app-test:'
-          ls -la /app-test
-
-      - name: Debug - List screenshots on host after Docker run
-        run: |
-          echo "Checking screenshots folder contents on host after Docker run..."
-          # This command checks the directory on the GitHub Actions runner (host).
-          # If the volume mount worked, you should see your screenshots here.
+          echo "Checkingroot folder contents..."
+          ls -la .
+          echo "Checking app-test folder contents..."
+          ls -la ./app-test
+          echo "Checking screenshots folder contents..."
           ls -la ./screenshots
 
       - name: Upload screenshots to S3
@@ -151,4 +120,4 @@ jobs:
           NOW=$(date +"%Y-%m-%d_%H-%M-%S")
           TARGET="s3://dm-fast-assets/tests/$NOW/"
           echo "Uploading screenshots to $TARGET"
-          aws s3 cp ./screenshots "$TARGET" --recursive --debug --no-empty-source
+          aws s3 cp ./screenshots "$TARGET" --recursive
