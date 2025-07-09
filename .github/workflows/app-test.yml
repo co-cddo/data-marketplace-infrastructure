@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Select environment'
+        description: "Select environment"
         required: true
-        default: 'Dev'
+        default: "Dev"
         type: choice
         options:
           - Dev
@@ -16,25 +16,31 @@ on:
       custom_url:
         description: 'Custom URL (if "Custom" selected)'
         required: false
-        default: ''
+        default: ""
       token:
-        description: 'Manual JWT token (CO-Datamarketplace cookie)'
+        description: "Manual JWT token (CO-Datamarketplace cookie)"
         required: true
       authCookie:
-        description: 'Manual auth token (.AspNetCore.Cookies cookie)'
+        description: "Manual auth token (.AspNetCore.Cookies cookie)"
         required: true
+
+permissions:
+  id-token: write
+  contents: write
+
+env:
+  AWS_REGION: eu-west-2
+  DEV_URL: https://dev.datamarketplace.gov.uk/
+  TEST_URL: https://test.datamarketplace.gov.uk/
+  PROD_URL: https://www.datamarketplace.gov.uk/
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
 
-    env:
-      DEV_URL: https://dev.datamarketplace.gov.uk/
-      TEST_URL: https://test.datamarketplace.gov.uk/
-      PROD_URL: https://www.datamarketplace.gov.uk/
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set BASE_URL
         id: set-url
@@ -51,6 +57,41 @@ jobs:
               ;;
           esac
 
+      - name: Set AWS variables
+        id: aws-vars
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+
+          declare -A ENV_ACCOUNT_TYPE=(
+            ["Dev"]="DEV"
+            ["Test"]="DEV"
+            ["Prod"]="PROD"
+            ["Custom"]="DEV"
+          )
+
+          declare -A ACCOUNT_IDS=(
+            ["DEV"]="855859226163"
+            ["PROD"]="855859226163"
+          )
+
+          declare -A ROLES
+          for ACCOUNT_TYPE in "${!ACCOUNT_IDS[@]}"; do
+            ROLES[$ACCOUNT_TYPE]="arn:aws:iam::${ACCOUNT_IDS[$ACCOUNT_TYPE]}:role/ECRContainerPush"
+          done
+
+          ACCOUNT_TYPE="${ENV_ACCOUNT_TYPE[$ENV]}"
+          AWS_ACCOUNT_ID="${ACCOUNT_IDS[$ACCOUNT_TYPE]}"
+          ROLE_TO_ASSUME="${ROLES[$ACCOUNT_TYPE]}"
+
+          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+          echo "ROLE_TO_ASSUME=$ROLE_TO_ASSUME" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Build and run E2E tests in Docker
         run: |
           docker build -t e2e-tests ./app-test
@@ -58,4 +99,13 @@ jobs:
             -e BASE_URL=${BASE_URL} \
             -e TOKEN="${{ github.event.inputs.token }}" \
             -e AUTH_COOKIE="${{ github.event.inputs.authCookie }}" \
+            -v "$(pwd)/screenshots:/app/screenshots" \
             e2e-tests
+
+      - name: Upload screenshots to S3
+        if: always()
+        run: |
+          NOW=$(date +"%Y-%m-%d_%H-%M-%S")
+          TARGET="s3://dm-fast-assets/tests/$NOW/"
+          echo "Uploading screenshots to $TARGET"
+          aws s3 cp ./screenshots "$TARGET" --recursive
