@@ -106,9 +106,22 @@ Then("I add new keyword", { timeout: 90 * 1000 }, async () => {
     fullPage: true,
   });
   await page.getByRole("link", { name: "Keywords" }).click();
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword__before.png"),
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Add another keyword" }).click();
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_after.png"),
+    fullPage: true,
+  });
   await page.getByRole("textbox", { name: "Keywords" }).click();
+
   await page.getByRole("textbox", { name: "Keywords" }).fill("keyword2");
+  await page.screenshot({
+    path: path.join(screenshotsDir, "keyword_edited.png"),
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Save and return" }).click();
 });
 
