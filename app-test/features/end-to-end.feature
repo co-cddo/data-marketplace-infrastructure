@@ -11,4 +11,7 @@ Feature: End-to-End Application Flow and Verification
   Scenario: Create a new listing
     Given I navigate to the Add New Listing URL
     Then I should add new listing
+    Then I add new theme
+    Then I add new keyword
+    Then I publish the listing
     And I take a screenshot of the page

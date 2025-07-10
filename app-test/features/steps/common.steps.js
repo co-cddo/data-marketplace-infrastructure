@@ -2,6 +2,8 @@ import { Given, AfterAll, After, Before } from "@cucumber/cucumber";
 import { chromium, expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
+dotenv.config();
 
 const token = process.env.TOKEN;
 const baseURL = process.env.BASE_URL;
@@ -16,6 +18,7 @@ if (!fs.existsSync(screenshotsDir)) {
 }
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
+  bypassCSP: true,
   storageState: {
     cookies: [
       {

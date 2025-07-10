@@ -34,27 +34,27 @@ on:
       UI_VERSION:
         description: 'Select UI_VERSION'
         required: true
-        default: '0.8'
+        default: ''
         type: string
       API_VERSION:
         description: 'Select API_VERSION'
         required: true
-        default: '0.8'
+        default: ''
         type: string
       USERS_VERSION:
         description: 'Select USERS_VERSION'
         required: true
-        default: '0.4'
+        default: ''
         type: string
       DATASHARE_VERSION:
         description: 'Select DATASHARE_VERSION'
         required: true
-        default: '0.4'
+        default: ''
         type: string
       CATALOGUE_VERSION:
         description: 'Select CATALOGUE_VERSION'
         required: true
-        default: '0.13'
+        default: ''
         type: string
       ACCOUNT:
         description: 'Select ACCOUNT'
