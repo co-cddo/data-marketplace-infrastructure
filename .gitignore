@@ -41,3 +41,5 @@ terraform.rc
 **/screenshots/
 .env
 .vscode
+
+**/.terraform.lock.hcl
