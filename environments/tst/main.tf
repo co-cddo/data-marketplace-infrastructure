@@ -1,3 +1,29 @@
+terraform {
+  required_providers {
+    helm = {
+      source  = "hashicorp/helm"
+      version = "2.17.0"
+    }
+      aws = {
+      source  = "hashicorp/aws"
+      version = "5.97.0"
+    }
+      kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.36.0"
+    }
+      tls = {
+      source  = "hashicorp/tls"
+      version = "4.1.0"
+    }
+      null = {
+      source  = "hashicorp/null"
+      version = "3.2.4"
+    }
+  }
+  required_version = ">= 1.12.2"
+}
+
 provider "aws" {
   region = var.region
 }
@@ -11,7 +37,7 @@ locals {
 }
 
 module "vpcmodule" {
-  source = "../modules/vpc"
+  source = "../../modules/vpc"
 
   cidr_vpc        = var.vpc_cidr
   private_subnets = var.private_subnets
@@ -30,7 +56,7 @@ resource "null_resource" "network_ready" {
 }
 
 module "eks_cluster" {
-  source                = "../modules/eks"
+  source                = "../../modules/eks"
   project_code          = var.project_code
   env_name              = var.env_name
   cluster_version       = var.cluster_version
@@ -43,11 +69,10 @@ module "eks_cluster" {
   sa_name               = "aws-generic-sa"
   tags                  = local.tags
   network_dependency    = null_resource.network_ready.id
-  account_type          = var.account_type
 }
 
 module "load_balancer" {
-  source                         = "../modules/load-balancer"
+  source                         = "../../modules/load-balancer"
   vpc_id                         = module.vpcmodule.vpc.id
   eks_cluster                    = module.eks_cluster.eks_cluster
   project_code                   = var.project_code
@@ -69,7 +94,7 @@ resource "null_resource" "network_ready_2" {
 }
 
 module "external_secrets" {
-  source                = "../modules/external-secrets"
+  source                = "../../modules/external-secrets"
   eks_cluster           = module.eks_cluster.eks_cluster
   project_code          = var.project_code
   iam_fargate           = module.eks_cluster.iam_fargate
@@ -87,7 +112,7 @@ module "external_secrets" {
 
 
 module "mssql" {
-  source                        = "../modules/rds-mssql"
+  source                        = "../../modules/rds-mssql"
   project_code                  = var.project_code
   private_subnet_one_id         = module.vpcmodule.private_subnets_output[0]
   private_subnet_two_id         = module.vpcmodule.private_subnets_output[1]
@@ -107,7 +132,7 @@ module "mssql" {
 }
 
 module "postgres" {
-  source                               = "../modules/rds-postgres"
+  source                               = "../../modules/rds-postgres"
   project_code                         = var.project_code
   private_subnet_one_id                = module.vpcmodule.private_subnets_output[0]
   private_subnet_two_id                = module.vpcmodule.private_subnets_output[1]
@@ -124,11 +149,12 @@ module "postgres" {
   rds_postgres_skip_final_snapshot     = var.rds_postgres_skip_final_snapshot
   rds_postgres_license_model           = var.rds_postgres_license_model
   rds_postgres_snapshot_identifier     = var.rds_postgres_snapshot_identifier
+  auto_minor_version_upgrade           = var.auto_minor_version_upgrade
 }
 
 
 module "app_params" {
-  source = "../modules/parameter-store"
+  source = "../../modules/parameter-store"
   prefix = "/${var.project_code}/${var.env_name}/appsettings/"
   securestring_parameters = [
     "ui",
