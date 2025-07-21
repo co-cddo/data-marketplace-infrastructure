@@ -18,7 +18,7 @@ resource "aws_db_instance" "mssql_instance" {
   storage_encrypted	  = false
   license_model           = var.rds_mssql_license_model
   username                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["dbusername"]
-  password                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["${var.env_name}-password"]
+  password                = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["dev-password"]
   vpc_security_group_ids  = [aws_security_group.db_sg.id]
   db_subnet_group_name    = aws_db_subnet_group.db_subnet_group.name
   multi_az                = var.rds_multi_az
