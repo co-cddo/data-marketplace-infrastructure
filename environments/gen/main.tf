@@ -57,6 +57,160 @@ resource "aws_iam_policy" "devops_iam_policy" {
   })
 }
 
+#-------------------------------------------------
+#-- NEW                                      START
+#-------------------------------------------------
+resource "aws_iam_role_policy" "adm_ec2_profile_policy" {
+  name = "adm_ec2_profile_policy"
+  role = aws_iam_role.my_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:Delete*",
+                "kms:TagResource",
+                "kms:UntagResource",
+                "kms:Decrypt",
+                "kms:GenerateDataKey",
+                "kms:CreateKey",
+                "kms:ScheduleKeyDeletion",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:CreateSecret",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:DeleteSecret",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeVpcAttribute",
+                "ec2:DescribeRouteTables",
+                "ec2:CreateVpc",
+                "ec2:CreateTags",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DeleteVpc",
+                "ec2:CreateSecurityGroup",
+                "ec2:CreateSubnet",
+                "ec2:CreateInternetGateway",
+                "ec2:CreateRouteTable",
+                "ec2:CreateVpcPeeringConnection",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:AttachInternetGateway",
+                "ec2:DescribeVpcPeeringConnections",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteInternetGateway",
+                "ec2:DeleteVpcPeeringConnection",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteSecurityGroup",
+                "ec2:CreateRoute",
+                "ec2:AcceptVpcPeeringConnection",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:AssociateRouteTable",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:AllocateAddress",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeAddressesAttribute",
+                "ec2:ReleaseAddress",
+                "ec2:CreateNatGateway",
+                "ec2:DescribeNatGateways",
+                "ec2:DeleteNatGateway",
+                "ec2:DescribeSecurityGroupRules",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:DeleteRoute",
+                "ec2:DisassociateRouteTable",
+                "ec2:DetachInternetGateway",
+                "ec2:DeleteRouteTable",
+                "ec2:DisassociateAddress",
+                "eks:DescribeCluster",
+                "eks:ListClusters",
+                "eks:CreateCluster",
+                "eks:TagResource",
+                "eks:CreateFargateProfile",
+                "eks:DescribeFargateProfile",
+                "eks:DeleteFargateProfile",
+                "eks:CreateAddon",
+                "eks:DescribeAddon",
+                "eks:DeleteAddon",
+                "eks:DeleteCluster",
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:CreateBucket",
+                "s3:ListBucketVersions",
+                "s3:GetAccountPublicAccessBlock",
+                "s3:GetBucketPublicAccessBlock",
+                "s3:GetBucketPolicyStatus",
+                "s3:GetBucketAcl",
+                "s3:ListAccessPoints",
+                "s3:GetBucketPolicy",
+                "s3:GetBucketCORS",
+                "s3:GetBucketWebsite",
+                "s3:GetBucketVersioning",
+                "s3:GetAccelerateConfiguration",
+                "s3:GetBucketRequestPayment",
+                "s3:GetBucketLogging",
+                "s3:GetLifecycleConfiguration",
+                "s3:GetReplicationConfiguration",
+                "s3:GetEncryptionConfiguration",
+                "s3:GetBucketObjectLockConfiguration",
+                "s3:GetBucketTagging",
+                "s3:DeleteBucket",
+                "s3:PutBucketVersioning",
+                "s3:PutEncryptionConfiguration",
+                "s3:PutBucketPublicAccessBlock",
+                "iam:CreateRole",
+                "iam:CreatePolicy",
+                "iam:GetRole",
+                "iam:GetPolicy",
+                "iam:ListRolePolicies",
+                "iam:GetPolicyVersion",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListPolicyVersions",
+                "iam:ListInstanceProfilesForRole",
+                "iam:DeletePolicy",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy",
+                "iam:PassRole",
+                "iam:CreateOpenIDConnectProvider",
+                "iam:TagOpenIDConnectProvider",
+                "iam:GetOpenIDConnectProvider",
+                "iam:DeleteOpenIDConnectProvider",
+                "iam:DetachRolePolicy",
+                "ssm:DescribeParameters",
+                "ssm:PutParameter",
+                "ssm:DeleteParameter",
+                "ssm:ListTagsForResource",
+                "rds:CreateDBSubnetGroup",
+                "rds:AddTagsToResource",
+                "rds:DescribeDBSubnetGroups",
+                "rds:ListTagsForResource",
+                "rds:DeleteDBSubnetGroup",
+                "rds:RestoreDBInstanceFromDBSnapshot",
+                "rds:DescribeDBInstances",
+                "rds:DeleteDBInstance",
+                "rds:ModifyDBInstance"
+      ]
+      Effect   = "Allow"
+      Resource = "*"
+    }]
+  })
+}
+#------------------------------------------FINISH-
+
 # Create an IAM role
 resource "aws_iam_role" "adm_ec2_profile_role" {
   name = var.adm_ec2_profile_role_name
@@ -75,11 +229,27 @@ resource "aws_iam_role" "adm_ec2_profile_role" {
   })
 }
 
-# Attach the IAM policy to the IAM role
-resource "aws_iam_role_policy_attachment" "admin_access" {
-  role       = aws_iam_role.adm_ec2_profile_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+#-------------------------------------------------
+#-- NEW                                      START
+#-------------------------------------------------
+# Fetch Policy ARN
+data "aws_iam_policy" "adm_ec2_profile_policy_arn" {
+  arn = "arn:aws:iam::aws:policy/adm_ec2_profile_policy"
+  depends_on = [ aws_iam_role_policy.adm_ec2_profile_policy ]
 }
+
+# Attach the IAM policy to the IAM role
+resource "aws_iam_role_policy_attachment" "adm_ec2_profile_policy_attachment" {
+  role       = aws_iam_role.adm_ec2_profile_role.name
+  policy_arn = data.aws_iam_policy.adm_ec2_profile_policy_arn.arn
+  depends_on = [aws_iam_role_policy.adm_ec2_profile_policy]
+}
+#------------------------------------------FINISH-
+## Attach the IAM policy to the IAM role
+#resource "aws_iam_role_policy_attachment" "admin_access" {
+#  role       = aws_iam_role.adm_ec2_profile_role.name
+#  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+#}
 
 resource "aws_iam_role_policy_attachment" "ssm_core" {
   role       = aws_iam_role.adm_ec2_profile_role.name
