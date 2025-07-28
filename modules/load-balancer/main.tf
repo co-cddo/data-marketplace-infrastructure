@@ -1,11 +1,11 @@
-#provider "kubernetes" {
-#  config_path = "~/.kube/config"
-#}
-#provider "helm" {
-#  kubernetes {
-#    config_path = "~/.kube/config"
-#  }
-#}
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
 
 //eks service account
 data "aws_iam_policy_document" "sa_assumerole_trust" {

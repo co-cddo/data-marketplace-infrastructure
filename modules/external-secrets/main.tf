@@ -1,11 +1,11 @@
-#provider "kubernetes" {
-#  config_path = "~/.kube/config"
-#}
-#provider "helm" {
-#  kubernetes {
-#    config_path = "~/.kube/config"
-#  }
-#}
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
 
 resource "aws_eks_fargate_profile" "externalsecrets" {
   cluster_name           = var.eks_cluster.name
