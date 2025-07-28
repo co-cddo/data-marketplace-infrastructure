@@ -16,10 +16,9 @@ on:
       gitbranch:
         description: 'Select Git Branch to Clone'
         required: true
-        default: 'feature/EC2-instance-role'
+        default: 'dev'
         type: choice
         options:
-          - 'feature/EC2-instance-role'
           - 'dev'
           - 'tst'
           - 'main'
