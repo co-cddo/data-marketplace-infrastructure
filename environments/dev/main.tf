@@ -36,6 +36,26 @@ locals {
   }
 }
 
+provider "kubernetes" {
+  config_path            = "~/.kube/config"
+  host                   = module.eks_cluster.eks_cluster.endpoint
+  cluster_ca_certificate = base64decode(module.eks_cluster.eks_cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster_auth.token
+}
+
+data "aws_eks_cluster_auth" "cluster_auth" {
+  name = module.eks_cluster.eks_cluster.name
+}
+
+provider "helm" {
+  kubernetes {
+    config_path            = "~/.kube/config"
+    host                   = module.eks_cluster.eks_cluster.endpoint
+    cluster_ca_certificate = base64decode(module.eks_cluster.eks_cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster_auth.token
+  }
+}
+
 module "vpcmodule" {
   source = "../../modules/vpc"
 
