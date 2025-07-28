@@ -1,9 +1,11 @@
 //IAM role for EKS - used to make API calls to AWS services
 //i.e. to create managed node pools
 
+
 provider "kubernetes" {
   config_path = "~/.kube/config"
 }
+
 
 resource "aws_iam_role" "eks-cluster-role" {
   name = "${var.project_code}-${var.env_name}-role-eks-cluster"
