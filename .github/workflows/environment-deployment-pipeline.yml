@@ -60,7 +60,7 @@ env:
   BUCKET_NAME: "dm-fast-assets"
   BUCKET_FOLDER: "terraform"
   TFRUNNER_SCRIPT: ".github/scripts/tfrunner.sh"
-  APPROVERS: "soydaner,JohnPalmerGDS,denis-davidov-gds"
+  APPROVERS: "soydaner"
 
 jobs:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
