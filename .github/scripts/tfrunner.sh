@@ -84,12 +84,12 @@ echo "#~~ INFO: CURRENTCONTEXT: ${CURRENTCONTEXT}"
 
 if   [ "${TFACTION}" == "init+plan" ] && [ "${GITHUBJOBNAME}" == "TerraformInitPlanOnly" ]; then
     echo "#~~ INFO: |1| ENV: ${ENV} Running terraform init"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+    cd ${BASEDIR}/${REPODIR}/environments/${ENV}/ && \
     terraform init -no-color > ${INITLOG}
     echo "#~~ INFO: terraform init exitcode $?"
 
     echo "#~~ INFO:  ENV: ${ENV} Running terraform plan"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
+    cd ${BASEDIR}/${REPODIR}/environments/${ENV}/  && \
     terraform plan -no-color -input=false -out=${PLANOUTFILE} \
     -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
     -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${PLANLOG}
@@ -113,12 +113,12 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
 
     if [ "${GITHUBJOBNAME}" == "TerraformInitPlan" ]; then
         echo "#~~ INFO: |2| ENV: ${ENV} Running terraform init"
-        cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+        cd ${BASEDIR}/${REPODIR}/environments/${ENV}/ && \
         terraform init -no-color > ${INITLOG}
         echo "#~~ INFO:  ENV: ${ENV} terraform init exitcode $?"
 
         echo "#~~ INFO:  ENV: ${ENV} Running terraform plan"
-        cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
+        cd ${BASEDIR}/${REPODIR}/environments/${ENV}/  && \
         terraform plan -no-color -input=false -out=${PLANOUTFILE} \
         -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
         -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" > ${PLANLOG}
@@ -142,7 +142,7 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
 
     if [ "${GITHUBJOBNAME}" == "TerraformApply" ]; then
         echo "#~~ INFO:  ENV: ${ENV} Running terraform apply"
-        cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+        cd ${BASEDIR}/${REPODIR}/environments/${ENV}/ && \
         terraform apply -no-color -auto-approve \
         -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
         -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}"  \
@@ -155,12 +155,12 @@ elif [ "${TFACTION}" == "init+plan+apply" ] && ( [ "${GITHUBJOBNAME}" == "Terraf
 elif [ "${TFACTION}" == "approval+destroy" ] && [ "${GITHUBJOBNAME}" == "TerraformDestroy" ]; then
 
     echo "#~~ INFO: |2| ENV: ${ENV} Running terraform init"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/ && \
+    cd ${BASEDIR}/${REPODIR}/environments/${ENV}/ && \
     terraform init -no-color > ${INITLOG}
     echo "#~~ INFO:  ENV: ${ENV} terraform init exitcode $?"
 
     echo "#~~ INFO: |3| ENV: ${ENV} Running terraform destroy"
-    cd ${BASEDIR}/${REPODIR}/${ENV}/  && \
+    cd ${BASEDIR}/${REPODIR}/environments/${ENV}/  && \
     terraform destroy -no-color -auto-approve  \
     -var rds_mssql_snapshot_identifier="${MSSQL_SNAPSHOT}" \
     -var rds_postgres_snapshot_identifier="${PGSQL_SNAPSHOT}" 2>&1 > ${DESTROYLOG}.txt
