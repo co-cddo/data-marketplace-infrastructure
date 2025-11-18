@@ -8,7 +8,7 @@
     "test:dev": "cucumber-js --watch"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^11.3.0",
+    "@cucumber/cucumber": "^12.2.0",
     "@playwright/test": "^1.52.0"
   },
   "type": "module",
